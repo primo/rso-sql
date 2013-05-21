@@ -32,7 +32,7 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.5400567"
+     inkscape:zoom="1.1421576"
      inkscape:cx="329.80372"
      inkscape:cy="520"
      inkscape:document-units="px"
@@ -142,7 +142,7 @@
            x="400"
            y="452.36218"
            style="text-anchor:middle;text-align:center" /></flowRegion><flowPara
-         id="flowPara3029"></flowPara></flowRoot>    <g
+         id="flowPara3029" /></flowRoot>    <g
        id="g3059">
       <rect
          ry="30"
@@ -189,5 +189,21 @@
            id="flowPara3223">Text</flowPara><flowPara
            id="flowPara3225">Text</flowPara><flowPara
            id="flowPara3227">Text</flowPara></flowRoot>    </g>
+    <path
+       sodipodi:type="star"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.5;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="path3007"
+       sodipodi:sides="4"
+       sodipodi:cx="300"
+       sodipodi:cy="152.36218"
+       sodipodi:r1="100"
+       sodipodi:r2="70.710678"
+       sodipodi:arg1="1.5707963"
+       sodipodi:arg2="2.3561945"
+       inkscape:flatsided="true"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="M 300,252.36218 200,152.36219 300,52.362183 400,152.36218 z"
+       transform="matrix(1,0,0,0.5,49.999997,576.18109)" />
   </g>
 </svg>
