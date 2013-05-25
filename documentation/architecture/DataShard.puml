@@ -28,7 +28,7 @@ class SqlDescription {
  + XYZ sqlStatement
 }
 
-class QueryResultReceiver {
+interface QueryResultReceiver {
     + complete( QueryResult)
 }
 QueryResultReceiver ..> QueryResult
@@ -62,6 +62,13 @@ class QueryEngine {
     + QueryResult query(SqlDescription)
     + Map<int, Table> tables
     + Hash<String, int> name2TableIds
+    # select()
+    # insert()
+    # drop()
+    # update()
+    # create()
+    # findTable(id)
+    # findTuple(Table,id)
 }
 QueryEngine *-- Table
 
@@ -70,3 +77,5 @@ class TableSchema
 Table --> TableSchema
 
 @enduml
+
+lista węzlów gdzie leżą partycje
