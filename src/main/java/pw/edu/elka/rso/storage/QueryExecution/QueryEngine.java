@@ -1,4 +1,8 @@
-package pw.edu.elka.rso.storage;
+package pw.edu.elka.rso.storage.QueryExecution;
+
+import pw.edu.elka.rso.storage.DataRepresentation.Table;
+import pw.edu.elka.rso.storage.QueryResult;
+import pw.edu.elka.rso.storage.SqlDescription;
 
 import java.util.HashMap;
 
@@ -10,7 +14,7 @@ public class QueryEngine {
 
 
     public QueryResult query( SqlDescription query) {
-        return new QueryResult(-1);
+        return new QueryResult(query.id);
     }
 
     protected QueryResult select(Table t, SqlDescription q){

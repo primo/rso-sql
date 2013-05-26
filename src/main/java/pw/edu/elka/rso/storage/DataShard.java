@@ -1,27 +1,34 @@
 package pw.edu.elka.rso.storage;
 
+import org.apache.log4j.Logger;
+import pw.edu.elka.rso.storage.QueryExecution.QueryEngine;
+
 import java.lang.Thread;
+import java.security.InvalidParameterException;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-/**
- * Created with IntelliJ IDEA.
- * User: primo
- * Date: 5/25/13
- * Time: 2:37 PM
- * To change this template use File | Settings | File Templates.
+/** Provides interface to data base content.
  */
 public class DataShard implements IDataShard, Runnable {
 
     private ConcurrentLinkedQueue<SqlDescription> tasks;
-    private ConcurrentLinkedQueue<QueryResult> results;
+    ConcurrentLinkedQueue<QueryResult> results;
+    private QueryResultReceiver queryResultReceiver = null;
+    private Thread qrDispatcherThread = null;
+    private Thread shardExecutor =  null;
+    boolean stopped = false;
+    private long nextQueryId = 0;
+    private QueryEngine engine = null;
 
-    public DataShard(){
+    static Logger LOG = Logger.getLogger(DataShard.class);
 
-    }
+    public DataShard(){ /* TODO Should be removed ? */}
 
     @Override
     public long query(SqlDescription query) {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        tasks.offer(query);
+        query.id = nextQueryId;
+        return nextQueryId++;
     }
 
     @Override
@@ -36,7 +43,8 @@ public class DataShard implements IDataShard, Runnable {
 
     @Override
     public boolean registerQueryResultReceiver(QueryResultReceiver queryResultReceiver) {
-        return false;  //To change body of implemented methods use File | Settings | File Templates.
+        this.queryResultReceiver = queryResultReceiver;
+        return true;
     }
 
     /**
@@ -52,18 +60,41 @@ public class DataShard implements IDataShard, Runnable {
      */
     @Override
     public void run() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        while(false != stopped) {
+            SqlDescription query = tasks.poll();
+            QueryResult qr = engine.query(query);
+            results.offer(qr);
+        }
     }
 
+    public void start() {
+        if (null == queryResultReceiver) {
+            throw new InvalidParameterException("QueryResultReceiver was not specified.");
+        }
+        QueryResultDispatcher dispatcher = new QueryResultDispatcher(queryResultReceiver, this);
+        qrDispatcherThread = new Thread(dispatcher);
+        shardExecutor = new Thread(this);
+        engine = new QueryEngine();
+        LOG.trace("DataShard started successfully.");
+    }
+
+    public void stop() throws InterruptedException {
+        stopped = true;
+        qrDispatcherThread.join();
+        shardExecutor.join();
+        LOG.trace("DataShard stopped.");
+    }
 
 }
 
 
 class QueryResultDispatcher implements Runnable{
-    private QueryResultReceiver queryResultReceiver;
+    private QueryResultReceiver queryResultReceiver = null;
+    private DataShard managedObj = null;
 
-    public QueryResultDispatcher(QueryResultReceiver queryResultReceiver) {
+    public QueryResultDispatcher(QueryResultReceiver queryResultReceiver, DataShard managedObj) {
         this.queryResultReceiver = queryResultReceiver;
+        this.managedObj = managedObj;
     }
 
     /**
@@ -79,6 +110,9 @@ class QueryResultDispatcher implements Runnable{
      */
     @Override
     public void run() {
-        //To change body of implemented methods use File | Settings | File Templates.
+        while(false != managedObj.stopped) {
+            QueryResult qr = managedObj.results.poll();
+            queryResultReceiver.complete(qr);
+        }
     }
 }
