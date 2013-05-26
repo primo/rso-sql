@@ -8,7 +8,7 @@ public class Example {
         TableSchema ts = new TableSchema();
         ts.addColumn("ID", ColumnType.INT, 0);
         ts.addColumn("SALARY", ColumnType.DOUBLE, 0);
-        ts.addColumn("SURNAME", ColumnType.CHAR, 32);
+        ts.addColumn("SURNAME", ColumnType.CHAR, 22);
 
         Table table = new Table(ts);
         Record record = table.newRecord();

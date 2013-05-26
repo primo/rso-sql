@@ -66,7 +66,7 @@ class CharTableColumn extends TableColumn {
         for(i = 0; i < Math.min(new_value.length, length/2); i++){
             buffer.putChar(position + 2 * i + 1, new_value[i]);
         }
-        buffer.putChar(position + 2 * i + 1, '\0');
+        buffer.putChar(position + 2*i + 1, '\0');
     }
 
     Object getValue(ByteBuffer buffer){
@@ -74,7 +74,7 @@ class CharTableColumn extends TableColumn {
             return null;
         char[] output = new char[length/2];
         for(int i = 0; i < length/2; i++){
-            output[i] = buffer.getChar(position + 2*i);
+            output[i] = buffer.getChar(position + 2*i + 1);
             if(output[i] == '\0')
                 break;
         }

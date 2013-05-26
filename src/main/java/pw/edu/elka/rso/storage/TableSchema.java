@@ -22,7 +22,6 @@ public class TableSchema{
                 table_column = new CharTableColumn(length, currentPosition);
                 break;
             default:
-                System.out.println("Dupa");
                 return;
         }
         currentPosition += table_column.length;
