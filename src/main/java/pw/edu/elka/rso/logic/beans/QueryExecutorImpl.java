@@ -4,6 +4,7 @@ import net.sf.jsqlparser.statement.Statement;
 import org.apache.log4j.Logger;
 import pw.edu.elka.rso.logic.interfaces.IQueryExecutor;
 import pw.edu.elka.rso.storage.QueryEngine;
+import pw.edu.elka.rso.storage.QueryResultReceiver;
 import pw.edu.elka.rso.storage.SqlDescription;
 
 import java.util.Observable;
@@ -14,6 +15,8 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor {
   static Logger logger = Logger.getLogger(QueryExecutorImpl.class);
 
   private QueryEngine queryEngine;
+  private QueryResultReceiver queryResultReceiver;
+
   private Observable consoleObservable;
   private LinkedBlockingQueue<Statement> queryQueue = new LinkedBlockingQueue<Statement>();
 
@@ -28,7 +31,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor {
     this.consoleObservable.addObserver(this);
   }
 
-  public void execute(Statement statement) {
+  public void executeQuery(Statement statement) {
     SqlDescription query = new SqlDescription();
     //query.setStatement(statement);
     try {
@@ -40,9 +43,9 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor {
   }
 
   public void update(Observable o, Object arg) {
-    if ((o instanceof Console)) {
+    if ((o instanceof InputManager)) {
       logger.debug("Zostalem powiadomiony");
-      Console console = (Console) o;
+      InputManager console = (InputManager) o;
 
       Statement query = console.getQueryQueue().poll();
       logger.debug("Dodaje do kolejki zapytanie \"" + query.toString() + "\"");
@@ -53,15 +56,20 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor {
   }
 
   public void run() {
-    while (true)
+    while (true) {
       if (queryQueue.size() > 0) {
 
         Statement query = queryQueue.poll();
-
         logger.debug("Wykonuje zapytanie \"" + query.toString() + "\"");
-        execute(query);
+        executeQuery(query);
 
       }
+
+      //
+      //???
+//      QueryResult queryResult = queryResultReceiver.complete(new QueryResult(23));
+    }
+
   }
 
   public QueryEngine getQueryEngine() {

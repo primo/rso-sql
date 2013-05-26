@@ -8,12 +8,12 @@ import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Queue;
 
-public class Console extends Observable {
-  static Logger logger = Logger.getLogger(Console.class);
+public class InputManager extends Observable {
+  static Logger logger = Logger.getLogger(InputManager.class);
   private Queue<Statement> queryQueue = new LinkedList<Statement>();
   private QueryReaderImpl queryReader;
 
-  public Console() {
+  public InputManager() {
     this.queryReader = new QueryReaderImpl();
   }
 
