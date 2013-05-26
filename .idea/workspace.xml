@@ -2,25 +2,34 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="081eb063-cb9b-4c1c-9aa3-20820f460fbd" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/documentation/architecture/DataLayer.puml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/documentation/architecture/JoinSequence.puml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/QueryResultReceiver.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/documentation/architecture/DataShard.png" afterPath="$PROJECT_DIR$/documentation/architecture/DataShard.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/DataShard.java" afterPath="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/DataShard.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/IDataShard.java" afterPath="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/IDataShard.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/QueryEngine.java" afterPath="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/QueryEngine.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/QueryResult.java" afterPath="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/QueryResult.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="rso.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="081eb063-cb9b-4c1c-9aa3-20820f460fbd" time="1369486952905" ignored="false" />
-    <file path="/QueryEngine.java" changelist="081eb063-cb9b-4c1c-9aa3-20820f460fbd" time="1369411822376" ignored="false" />
+    <file path="/Dummy.txt" changelist="081eb063-cb9b-4c1c-9aa3-20820f460fbd" time="1369581009684" ignored="false" />
+    <file path="/QueryEngine.java" changelist="081eb063-cb9b-4c1c-9aa3-20820f460fbd" time="1369499834159" ignored="false" />
     <file path="/SqlDescription.java" changelist="081eb063-cb9b-4c1c-9aa3-20820f460fbd" time="1369407050766" ignored="false" />
     <file path="/ShardStatistics.java" changelist="081eb063-cb9b-4c1c-9aa3-20820f460fbd" time="1369176382281" ignored="false" />
     <file path="/ShardMetadata.java" changelist="081eb063-cb9b-4c1c-9aa3-20820f460fbd" time="1369176419276" ignored="false" />
-    <file path="/DataShard.java" changelist="081eb063-cb9b-4c1c-9aa3-20820f460fbd" time="1369485759934" ignored="false" />
+    <file path="/DataShard.java" changelist="081eb063-cb9b-4c1c-9aa3-20820f460fbd" time="1369500199248" ignored="false" />
     <file path="/DefaultTables.java" changelist="081eb063-cb9b-4c1c-9aa3-20820f460fbd" time="1369411618249" ignored="false" />
     <file path="/Table.java" changelist="081eb063-cb9b-4c1c-9aa3-20820f460fbd" time="1369413832606" ignored="false" />
-    <file path="$PROJECT_DIR$/.idea/workspace.xml" changelist="081eb063-cb9b-4c1c-9aa3-20820f460fbd" time="1369481766176" ignored="false" />
     <file path="/StoredProcedureProvider.java" changelist="081eb063-cb9b-4c1c-9aa3-20820f460fbd" time="1369482157732" ignored="false" />
     <file path="/Main.java" changelist="081eb063-cb9b-4c1c-9aa3-20820f460fbd" time="1369482588750" ignored="false" />
     <file path="/DataShard.uml" changelist="081eb063-cb9b-4c1c-9aa3-20820f460fbd" time="1369486887520" ignored="false" />
-    <file path="/QueryResult.java" changelist="081eb063-cb9b-4c1c-9aa3-20820f460fbd" time="1369487544258" ignored="false" />
+    <file path="/QueryResult.java" changelist="081eb063-cb9b-4c1c-9aa3-20820f460fbd" time="1369499534012" ignored="false" />
     <file path="/DataLayer.puml" changelist="081eb063-cb9b-4c1c-9aa3-20820f460fbd" time="1369487777638" ignored="false" />
-    <file path="/DataShard.puml" changelist="081eb063-cb9b-4c1c-9aa3-20820f460fbd" time="1369490037452" ignored="false" />
+    <file path="/DataShard.puml" changelist="081eb063-cb9b-4c1c-9aa3-20820f460fbd" time="1369494819582" ignored="false" />
+    <file path="/DataShardQuerySeq.puml" changelist="081eb063-cb9b-4c1c-9aa3-20820f460fbd" time="1369497609890" ignored="false" />
+    <file path="/QueryResultReceiver.java" changelist="081eb063-cb9b-4c1c-9aa3-20820f460fbd" time="1369499880239" ignored="false" />
+    <file path="/IDataShard.java" changelist="081eb063-cb9b-4c1c-9aa3-20820f460fbd" time="1369499929225" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,6 +44,8 @@
     <disable_hints />
   </component>
   <component name="DebuggerManager">
+    <line_breakpoints default_suspend_policy="SuspendAll" default_condition_enabled="true" />
+    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
       <breakpoint>
         <option name="NOTIFY_CAUGHT" value="true" />
@@ -71,8 +82,6 @@
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
     </breakpoint_any>
-    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
-    <line_breakpoints default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_rules />
     <ui_properties />
   </component>
@@ -82,19 +91,19 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="DataShard.puml" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/documentation/architecture/DataShard.puml">
+      <file leaf-file-name="DataLayer.puml" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/documentation/architecture/DataLayer.puml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="11" column="21" selection-start="256" selection-end="256" vertical-scroll-proportion="0.2787162">
+            <state line="3" column="27" selection-start="66" selection-end="66" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="DataLayer.puml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/documentation/architecture/DataLayer.puml">
+      <file leaf-file-name="JoinSequence.puml" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/documentation/architecture/JoinSequence.puml">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="3" column="28" selection-start="66" selection-end="66" vertical-scroll-proportion="0.0">
+            <state line="0" column="65" selection-start="9" selection-end="9" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -118,22 +127,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/shard/SqlDescription.java" />
-        <option value="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/shard/QueryEngine.java" />
         <option value="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/shard/DataShard.java" />
         <option value="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/shard/storage/QueryEngine.java" />
         <option value="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/shard/storage/QueryResult.java" />
         <option value="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/shard/QueryResult.java" />
         <option value="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/DefaultTables.java" />
-        <option value="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/QueryEngine.java" />
         <option value="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/Table.java" />
         <option value="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/logic/StoredProcedureProvider.java" />
         <option value="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/core/Main.java" />
+        <option value="$PROJECT_DIR$/documentation/architecture/DataShard.uml" />
+        <option value="$PROJECT_DIR$/documentation/architecture/DataShard.puml" />
+        <option value="$PROJECT_DIR$/documentation/architecture/DataShardQuerySeq.puml" />
+        <option value="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/QueryResult.java" />
+        <option value="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/QueryEngine.java" />
+        <option value="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/QueryResultReceiver.java" />
         <option value="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/IDataShard.java" />
         <option value="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/DataShard.java" />
-        <option value="$PROJECT_DIR$/documentation/architecture/DataShard.uml" />
-        <option value="$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/QueryResult.java" />
-        <option value="$PROJECT_DIR$/documentation/architecture/DataShard.puml" />
       </list>
     </option>
   </component>
@@ -146,10 +155,8 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-2" />
-    <option name="y" value="-3" />
-    <option name="width" value="1370" />
-    <option name="height" value="775" />
+    <option name="width" value="1366" />
+    <option name="height" value="768" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -177,7 +184,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="PackagesPane">
         <subPane />
       </pane>
@@ -297,6 +303,7 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -460,7 +467,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-2" y="-3" width="1370" height="775" extended-state="6" />
+    <frame x="0" y="0" width="1366" height="768" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -473,10 +480,10 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="PlantUML" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32954547" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
+      <window_info id="PlantUML" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.34650457" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24924242" sideWeight="0.6073132" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24924012" sideWeight="0.6073132" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -551,37 +558,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/documentation/architecture/DataShard.puml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="4" column="7" selection-start="20" selection-end="20" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/rso.iml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/rso.iml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/Table.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="6" column="6" selection-start="70" selection-end="70" vertical-scroll-proportion="0.0">
@@ -598,51 +574,17 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/logic/StoredProcedureProvider.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="0" selection-start="288" selection-end="288" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="12" column="0" selection-start="288" selection-end="288" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/logic/jsqlParserExample.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="14" column="13" selection-start="317" selection-end="317" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="14" column="13" selection-start="317" selection-end="317" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/core/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="3" column="3" selection-start="78" selection-end="78" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/IDataShard.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="14" column="0" selection-start="328" selection-end="328" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/DataShard.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="5" column="30" selection-start="94" selection-end="94" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/QueryResult.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="29" selection-start="179" selection-end="179" vertical-scroll-proportion="0.23116438">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/documentation/architecture/DataLayer.puml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="3" column="28" selection-start="66" selection-end="66" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="3" column="3" selection-start="78" selection-end="78" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/documentation/architecture/DataShard.png">
@@ -650,9 +592,70 @@
         <state />
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/ShardMetadata.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="5" column="33" selection-start="158" selection-end="158" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/documentation/architecture/DataShardQuerySeq.puml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="9" column="98" selection-start="202" selection-end="202" vertical-scroll-proportion="0.16637781" />
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/documentation/architecture/DataShard.puml">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="21" selection-start="256" selection-end="256" vertical-scroll-proportion="0.2787162">
+        <state line="56" column="25" selection-start="1306" selection-end="1306" vertical-scroll-proportion="0.26241136" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/QueryResult.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="5" column="58" selection-start="70" selection-end="70" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/QueryResultReceiver.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="34" selection-start="126" selection-end="126" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/QueryEngine.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="9" column="66" selection-start="237" selection-end="237" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/IDataShard.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="24" selection-start="411" selection-end="411" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/pw/edu/elka/rso/storage/DataShard.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="66" column="55" selection-start="1947" selection-end="1947" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/documentation/architecture/DataLayer.puml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="3" column="27" selection-start="66" selection-end="66" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/documentation/architecture/JoinSequence.puml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="65" selection-start="9" selection-end="9" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>

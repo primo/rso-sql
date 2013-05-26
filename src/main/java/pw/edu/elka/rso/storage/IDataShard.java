@@ -11,4 +11,5 @@ public interface IDataShard {
     long query( SqlDescription query);
     ShardMetadata getMetadata();
     ShardStatistics getStatistics();
+    boolean registerQueryResultReceiver( QueryResultReceiver queryResultReceiver);
 }
