@@ -25,6 +25,13 @@ public class Main {
 
     Reader reader = new StringReader("update pl_pracownicy set dupa = 2, dupa2=adas where id=32");
     console.readQuery(reader);
+
+
+    /**
+     *  WATEK KTORY ODBIERA BEDZIE CHODZIL CALY CZAS W TLE
+     *  ZABIJAMY GO CZERWONYM KRZYZYKIEM PO TY JAK SIE PROGRAM WYWALI
+     *  KKK TXZ
+     */
   }
 
 }
