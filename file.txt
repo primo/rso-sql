@@ -1,0 +1,3 @@
+select * from tabela;
+update tabela set id = '1' where row_id = '12-ASD';
+select asd from zxc;
