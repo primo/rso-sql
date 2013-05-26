@@ -1,4 +1,5 @@
-package pw.edu.elka.rso.logic;
+package pw.edu.elka.rso.sumRundomStuff;
+
 
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
@@ -13,6 +14,8 @@ import java.io.StringReader;
  * Date: 19.05.13
  */
 public class jsqlParserExample {
+
+
 
     public static void main(final String[] args) throws JSQLParserException {
         CCJSqlParserManager parser = new CCJSqlParserManager();
