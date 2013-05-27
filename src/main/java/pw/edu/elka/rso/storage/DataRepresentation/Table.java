@@ -40,18 +40,18 @@ public class Table {
         mainList = new LinkedList<ByteBuffer>();
     }
 
-    Record newRecord(){
+    public Record newRecord(){
         Record record = new Record(tableSchema);
         record.setByteBuffer(ByteBuffer.allocate(tableSchema.getLength()));
         return record;
     }
 
-    void insert(Record record){
+    public void insert(Record record){
         mainList.add(record.byteBuffer);
         record.setByteBuffer(ByteBuffer.allocate(tableSchema.getLength()));
     }
 
-    Iterator<Record> tableIterator(){
+    public Iterator<Record> tableIterator(){
         return new TableIterator(tableSchema, mainList.listIterator());
     }
 }

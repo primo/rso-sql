@@ -7,3 +7,5 @@ public enum DefaultTables {
     STATISTICS,
     __MAX__
 }
+
+
