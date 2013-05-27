@@ -23,6 +23,7 @@ import pw.edu.elka.rso.storage.DataRepresentation.Table;
 import pw.edu.elka.rso.storage.DataRepresentation.TableSchema;
 import pw.edu.elka.rso.storage.QueryResult;
 
+import java.nio.ByteBuffer;
 import java.security.InvalidParameterException;
 import java.util.Iterator;
 import java.util.List;
@@ -48,9 +49,27 @@ class RootQueryVisitor implements StatementVisitor {
         this.queryEngine = queryEngine;
     }
 
+    /** Executes a select sql statement.
+     *
+     * FIXME:
+     * + parse UNIONS
+     * + understand WITH statement
+     * o for example create a stack of select queries to be done with their names
+     *
+     * @param select Select sql statement in JQLPARSER structure
+     */
     @Override
     public void visit(Select select) {
+        SelectExecutor executor =  new SelectExecutor();
+        // Ignoring
+        select.getSelectBody().accept(executor);
+        int tableId = queryEngine.name2TableId.get(executor.fromTableName);
+        Table table = queryEngine.tables.get(tableId);
+        ByteBuffer output = ByteBuffer.allocate(0);
         // TODO
+        queryResult = new QueryResult();
+        queryResult.result = true;
+        queryResult.output = output;
     }
 
     @Override

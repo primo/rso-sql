@@ -58,12 +58,13 @@ class QueryItemsExtractor implements ItemsListVisitor, ExpressionVisitor {
 
     @Override
     public void visit(DoubleValue doubleValue) {
-        throw new UnsupportedOperationException("Expression extraction for this data type is not implemented.");
+        // Using autoboxing
+        appendObject(doubleValue.getValue());
     }
 
     @Override
     public void visit(LongValue longValue) {
-        throw new UnsupportedOperationException("Expression extraction for this data type is not implemented.");
+        appendObject(longValue.getValue());
     }
 
     @Override
@@ -88,7 +89,7 @@ class QueryItemsExtractor implements ItemsListVisitor, ExpressionVisitor {
 
     @Override
     public void visit(StringValue stringValue) {
-        throw new UnsupportedOperationException("Expression extraction for this data type is not implemented.");
+        appendObject(stringValue.getValue());
     }
 
     @Override
