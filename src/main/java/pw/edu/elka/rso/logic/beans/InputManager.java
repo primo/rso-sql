@@ -19,7 +19,7 @@ public class InputManager extends Observable {
 
 
   public void readQuery(Reader query) {
-    if (this.queryReader.validateQuery(query)) {
+    if (queryReader.validateQuery(query)) {
 
       Statement statement = queryReader.getParsedQuery();
 
