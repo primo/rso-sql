@@ -1,4 +1,4 @@
-package pw.edu.elka.rso.storage;
+package pw.edu.elka.rso.storage.DataRepresentation;
 
 public enum ColumnType {
     INT,
