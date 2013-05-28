@@ -3,7 +3,7 @@ package pw.edu.elka.rso.logic.beans;
 import net.sf.jsqlparser.statement.Statement;
 import org.apache.log4j.Logger;
 import pw.edu.elka.rso.logic.interfaces.IQueryExecutor;
-import pw.edu.elka.rso.storage.QueryEngine;
+import pw.edu.elka.rso.storage.QueryExecution.QueryEngine;
 import pw.edu.elka.rso.storage.QueryResultReceiver;
 import pw.edu.elka.rso.storage.SqlDescription;
 
