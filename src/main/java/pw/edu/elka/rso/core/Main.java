@@ -3,6 +3,7 @@ package pw.edu.elka.rso.core;
 import org.apache.log4j.Logger;
 import pw.edu.elka.rso.logic.beans.InputManager;
 import pw.edu.elka.rso.logic.beans.QueryExecutorImpl;
+import pw.edu.elka.rso.logic.procedures.ProceduresManager;
 
 import java.io.*;
 
@@ -22,7 +23,8 @@ public class Main {
     Thread queryExecutorThread = new Thread(queryExecutor);
     queryExecutorThread.start();
 
-
+    ProceduresManager proceduresManager = new ProceduresManager();
+    //proceduresManager.prepareProcedures();
 
     while (true) {
       BufferedReader br = new BufferedReader(new InputStreamReader(System.in));

@@ -14,11 +14,11 @@ public class Record {
         byteBuffer = byte_buffer;
     }
 
-    void setValue(String column_name, Object value){
+    public void setValue(String column_name, Object value){
         tableSchema.getTableColumn(column_name).setValue(byteBuffer, value);
     }
 
-    Object getValue(String column_name){
+    public Object getValue(String column_name){
         return tableSchema.getTableColumn(column_name).getValue(byteBuffer);
     }
 }

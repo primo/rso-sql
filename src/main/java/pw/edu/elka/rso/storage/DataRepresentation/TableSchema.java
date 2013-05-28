@@ -8,7 +8,7 @@ public class TableSchema{
     Map<String, TableColumn> specification = new HashMap<String, TableColumn>();
     int currentPosition = 1;
 
-    void addColumn(String column_name, ColumnType column_type, int length){
+    public void addColumn(String column_name, ColumnType column_type, int length){
         TableColumn table_column;
 
         switch (column_type) {
@@ -28,11 +28,11 @@ public class TableSchema{
         specification.put(column_name, table_column);
     }
 
-    TableColumn getTableColumn(String name){
+    public TableColumn getTableColumn(String name){
         return specification.get(name);
     }
 
-    int getLength(){
+    public int getLength(){
         return currentPosition;
     }
 }
