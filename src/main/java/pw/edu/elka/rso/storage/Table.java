@@ -1,39 +1,13 @@
 package pw.edu.elka.rso.storage;
 
 import java.nio.ByteBuffer;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Iterator;
+import java.nio.ByteOrder;
+import java.util.*;
 
-class TableIterator implements Iterator<Record>{
-    private Iterator<ByteBuffer> listIterator;
-    Record record;
-
-    public TableIterator(TableSchema table_schema, Iterator<ByteBuffer> list_iterator){
-        listIterator = list_iterator;
-        record = new Record(table_schema);
-    }
-
-    @Override
-    public boolean hasNext() {
-        return listIterator.hasNext();
-    }
-
-    @Override
-    public Record next() {
-        record.setByteBuffer(listIterator.next());
-        return record;
-    }
-
-    @Override
-    public void remove() {
-        listIterator.remove();
-    }
-}
-
-public class Table {
+public class Table implements Iterable<Record>{
     private final TableSchema tableSchema;
     List<ByteBuffer> mainList;
+    Map<String, Index> indexes;
 
     public Table(TableSchema table_schema){
       tableSchema = table_schema;
@@ -42,7 +16,9 @@ public class Table {
 
     Record newRecord(){
         Record record = new Record(tableSchema);
-        record.setByteBuffer(ByteBuffer.allocate(tableSchema.getLength()));
+        ByteBuffer bb = ByteBuffer.allocate(tableSchema.getLength());
+        bb.order(ByteOrder.BIG_ENDIAN);
+        record.setByteBuffer(bb);
         return record;
     }
 
@@ -51,7 +27,13 @@ public class Table {
         record.setByteBuffer(ByteBuffer.allocate(tableSchema.getLength()));
     }
 
-    Iterator<Record> tableIterator(){
+    void createIndex(String column_name){
+        Index index = new Index<ByteBuffer, ByteBuffer>(tableSchema.getTableColumn(column_name), mainList);
+        indexes.put(column_name, index);
+    }
+
+    @Override
+    public Iterator<Record> iterator() {
         return new TableIterator(tableSchema, mainList.listIterator());
     }
 }
