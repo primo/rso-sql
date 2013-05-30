@@ -9,9 +9,10 @@ interface Transformer<A, B>{
 }
 
 //Nie przyjmuje nulli jako wartosci v
-class Index<K, V>{
-    Map<K, Set<V>> index;
+class Index<K, V> implements Iterable<V>{
+    NavigableMap<K, Set<V>> index;
     Transformer<V, K> transformer;
+    double avgSetSize = 0;
     static Comparator<Object> addressComparator = new Comparator<Object>() {
         @Override
         public int compare(Object o1, Object o2) {
@@ -28,7 +29,13 @@ class Index<K, V>{
                 put(value);
     }
 
+    public Index(Transformer<V, K> a_transformer, NavigableMap<K, Set<V>> a_index){
+        index = a_index;
+        transformer = a_transformer;
+    }
+
     void put(V value){
+        avgSetSize *= index.size();
         K key = transformer.transform(value);
         Set<V> s = index.get(key);
         if (s == null){
@@ -36,6 +43,8 @@ class Index<K, V>{
             index.put(key, s);
         }
         s.add(value);
+        avgSetSize += 1;
+        avgSetSize /= 1;
     }
 
     Iterator<V> get(K key){
@@ -43,8 +52,16 @@ class Index<K, V>{
         return (s != null) ? s.iterator() : null;
     }
 
-    Iterator<V> get(K from_key, boolean fromInclusive, K to_key, boolean toInclusive){
-        Set<V> s = index.get(from_key);
-        return (s != null) ? s.iterator() : null;
+    Index<K, V> subIndex(K from_key, boolean fromInclusive, K to_key, boolean toInclusive){
+        return new Index<K, V>(transformer, index.subMap(from_key, fromInclusive, to_key, toInclusive));
+    }
+
+    double estimate(){
+        return index.size() * avgSetSize;
+    }
+
+    @Override
+    public Iterator<V> iterator() {
+        return new TwofoldIterator<V>(index.values());
     }
 }
