@@ -11,9 +11,9 @@ package pw.edu.elka.rso.procedures;
 import net.sf.jsqlparser.JSQLParserException;
 import pw.edu.elka.rso.logic.procedures.Procedure;
 
-public class SelectFromClients extends Procedure {
+public class SelectFromWorkers extends Procedure {
 
-    public final String procedureName = "SelectFromClients";
+    public final String procedureName = "SelectFromWorkers";
 
     public final String sql = "SELECT NumberOfSeats, COUNT(ReserveID) " +
             "FROM Flight AS F, Reservation AS R " +
