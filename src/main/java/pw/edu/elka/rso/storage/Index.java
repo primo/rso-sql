@@ -35,7 +35,7 @@ class Index implements Iterable<ByteBuffer>{
         Collection<ByteBuffer> s = index.get(key);
         if (s == null){
             s = new TreeSet<ByteBuffer>(innerCollectionComparator);
-            //s = new LinkedList<ByteBuffer>();
+            //s = new LinkedList<ByteBuffer>(); ?
             index.put(key, s);
         }
         s.add(value);
