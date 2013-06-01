@@ -1,10 +1,15 @@
 package pw.edu.elka.rso.storage.DataRepresentation;
 
+import javafx.util.Pair;
+
+import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+import java.util.Set;
 
-public class TableSchema{
-    Map<String, TableColumn> specification = new HashMap<String, TableColumn>();
+public class TableSchema implements Cloneable{
+    HashMap<String, TableColumn> specification = new HashMap<String, TableColumn>();
     int rLength = 1;
 
     public void addColumn(String column_name, ColumnType column_type, int length){
@@ -33,5 +38,60 @@ public class TableSchema{
 
     public int getLength(){
         return rLength;
+    }
+
+    public TableSchema copy() {
+        TableSchema ts = new TableSchema();
+        ts.specification = (HashMap<String, TableColumn>) this.specification.clone();
+        ts.rLength = this.rLength;
+        return ts;
+    }
+
+    public TableSchema copy( Set<String> columns) {
+        TableSchema ts = new TableSchema();
+        for (String s: columns) {
+            if (!this.specification.containsKey(s)) {
+                throw new InvalidParameterException("Source table schema doesn't contain the key: " + s);
+            }
+            TableColumn columnTable = this.specification.get(s);
+            ts.specification.put(s, columnTable);
+            ts.rLength += columnTable.length;
+        }
+        return ts;
+    }
+
+    public TableSchema copy( Set<String> columns, Map<String,String> renames) {
+        TableSchema ts = new TableSchema();
+
+        for (String s: columns) {
+            if (!this.specification.containsKey(s)) {
+                throw new InvalidParameterException("Source table schema doesn't contain the key: " + s);
+            }
+            TableColumn columnTable = this.specification.get(s);
+            ts.specification.put(renames.get(s), columnTable);
+            ts.rLength += columnTable.length;
+        }
+        return ts;
+    }
+
+    public TableSchema appendSchema(TableSchema tableSchema) {
+        Set<String> keys = tableSchema.specification.keySet();
+        for (String k: keys) {
+            if (this.specification.containsKey(k)) {
+                throw new InvalidParameterException("TableScheme to be appended duplicates keys from the source.");
+            }
+        }
+        for (String k : keys) {
+            this.specification.put(k, tableSchema.getTableColumn(k));
+        }
+        return this;
+    }
+
+    public TableSchema appendScheme(TableSchema tableSchema, List<Pair<String,String>> renames) {
+        // ! does not validate duplicated columns between schemas etc...
+        for (Pair<String,String> p : renames) {
+            this.specification.put(p.getKey(), tableSchema.getTableColumn(p.getValue()));
+        }
+        return this;
     }
 }
