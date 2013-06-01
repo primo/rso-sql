@@ -18,7 +18,7 @@ public class Table implements Iterable<Record>{
         return new Record(tableSchema);
     }
 
-    void insert(Record record){
+    public void insert(Record record){
         for(Index idx : indexes.values())
             idx.put(record.byteBuffer);
         mainList.add(record.byteBuffer);

@@ -32,6 +32,6 @@ public class TableSchema{
     }
 
     public int getLength(){
-        return currentPosition;
+        return rLength;
     }
 }
