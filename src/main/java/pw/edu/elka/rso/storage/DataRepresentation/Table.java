@@ -1,57 +1,63 @@
 package pw.edu.elka.rso.storage.DataRepresentation;
 
 import java.nio.ByteBuffer;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Iterator;
+import java.util.*;
 
-class TableIterator implements Iterator<Record>{
-    private Iterator<ByteBuffer> listIterator;
-    Record record;
-
-    public TableIterator(TableSchema table_schema, Iterator<ByteBuffer> list_iterator){
-        listIterator = list_iterator;
-        record = new Record(table_schema);
-    }
-
-    @Override
-    public boolean hasNext() {
-        return listIterator.hasNext();
-    }
-
-    @Override
-    public Record next() {
-        record.setByteBuffer(listIterator.next());
-        return record;
-    }
-
-    @Override
-    public void remove() {
-        listIterator.remove();
-    }
-}
-
-public class Table {
-    private final TableSchema tableSchema;
+public class Table implements Iterable<Record>{
+    final TableSchema tableSchema;
     List<ByteBuffer> mainList;
+    Map<String, Index> indexes;
 
     public Table(TableSchema table_schema){
-      tableSchema = table_schema;
+        tableSchema = table_schema;
         mainList = new LinkedList<ByteBuffer>();
+        indexes = new HashMap<String, Index>();
     }
 
-    public Record newRecord(){
-        Record record = new Record(tableSchema);
-        record.setByteBuffer(ByteBuffer.allocate(tableSchema.getLength()));
-        return record;
+    Record newRecord(){
+        return new Record(tableSchema);
     }
 
-    public void insert(Record record){
+    void insert(Record record){
+        for(Index idx : indexes.values())
+            idx.put(record.byteBuffer);
         mainList.add(record.byteBuffer);
-        record.setByteBuffer(ByteBuffer.allocate(tableSchema.getLength()));
+        record.anew();
     }
 
-    public Iterator<Record> tableIterator(){
-        return new TableIterator(tableSchema, mainList.listIterator());
+    void delete(ByteBuffer byte_buffer, Index deletion_source){
+        //@TODO Implement this.
+//        for(Index idx : indexes.values())
+//            idx.remove();
+    }
+
+    void createIndex(String column_name){
+        Index index = new Index(tableSchema.getTableColumn(column_name), mainList);
+        indexes.put(column_name, index);
+    }
+
+    public Iterator<Record> indexedIterator(String column_name) {
+        Index ndx = indexes.get(column_name);
+        return new TableIterator(this, ndx, ndx.estimate());
+    }
+
+    public Iterator<Record> indexedIteratorFrom(String column_name, Object from, boolean from_inclusive) {
+        Index ndx = indexes.get(column_name).subIndexFrom(from, from_inclusive);
+        return new TableIterator(this, ndx, ndx.estimate());
+    }
+
+    public Iterator<Record> indexedIteratorTo(String column_name, Object to, boolean to_inclusive) {
+        Index ndx = indexes.get(column_name).subIndexTo(to, to_inclusive);
+        return new TableIterator(this, ndx, ndx.estimate());
+    }
+
+    public Iterator<Record> indexedIterator(String column_name, Object from, boolean from_inclusive, Object to, boolean to_inclusive) {
+        Index ndx = indexes.get(column_name).subIndex(from, from_inclusive, to, to_inclusive);
+        return new TableIterator(this, ndx, ndx.estimate());
+    }
+
+    @Override
+    public Iterator<Record> iterator() {
+        return new TableIterator(this, mainList, mainList.size());
     }
 }
