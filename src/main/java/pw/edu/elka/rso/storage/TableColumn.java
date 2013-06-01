@@ -2,17 +2,13 @@ package pw.edu.elka.rso.storage;
 
 import java.nio.ByteBuffer;
 
-abstract class TableColumn implements Transformer<ByteBuffer, ByteBuffer>{
+abstract class TableColumn {
     final int length;
     final int position;
 
     protected TableColumn(int length, int position) {
         this.length = length;
         this.position = position;
-    }
-
-    public ByteBuffer transform(ByteBuffer original){
-        return ByteBuffer.wrap(original.array(), position, length);
     }
 
     abstract void setValue(ByteBuffer ba, Object value);

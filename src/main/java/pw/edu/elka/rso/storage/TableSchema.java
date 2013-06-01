@@ -3,7 +3,6 @@ package pw.edu.elka.rso.storage;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public class TableSchema{
     Map<String, TableColumn> specification = new HashMap<String, TableColumn>();
     int rLength = 1;

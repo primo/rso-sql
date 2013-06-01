@@ -38,12 +38,14 @@ class TwofoldIterator<T> implements Iterator<T> {
 
 public class TableIterator implements Iterator<Record>{
     Iterator<ByteBuffer> listIterator;
+    Table table;
     Record record;
     final double estimate;
 
-    public TableIterator(TableSchema table_schema, Iterable<ByteBuffer> iterable, double a_estimate){
+    public TableIterator(Table a_table, Iterable<ByteBuffer> iterable, double a_estimate){
         listIterator = iterable.iterator();
-        record = new Record(table_schema);
+        table = a_table;
+        record = new Record(a_table.tableSchema);
         estimate = a_estimate;
     }
 
@@ -60,6 +62,7 @@ public class TableIterator implements Iterator<Record>{
 
     @Override
     public void remove() {
+        //Uoooo!!! Usuwanko z tabeli!!
         listIterator.remove();
     }
 }

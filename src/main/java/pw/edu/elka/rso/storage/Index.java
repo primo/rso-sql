@@ -1,19 +1,15 @@
 package pw.edu.elka.rso.storage;
 
+import java.nio.ByteBuffer;
 import java.util.*;
 
 import static java.lang.System.*;
 
-interface Transformer<A, B>{
-    B transform(A a);
-}
-
 //Nie przyjmuje nulli jako wartosci v
-class Index<K, V> implements Iterable<V>{
-    NavigableMap<K, Set<V>> index;
-    Transformer<V, K> transformer;
-    double avgSetSize = 0;
-    static Comparator<Object> addressComparator = new Comparator<Object>() {
+class Index implements Iterable<ByteBuffer>{
+    NavigableMap<Object, Collection<ByteBuffer>> index;
+    TableColumn column;
+    static Comparator<Object> innerCollectionComparator = new Comparator<Object>() {
         @Override
         public int compare(Object o1, Object o2) {
             Integer address1 = identityHashCode(o1);
@@ -21,47 +17,60 @@ class Index<K, V> implements Iterable<V>{
         }
     };
 
-    public Index(Transformer<V, K> a_transformer, Iterable<V> iterable){
-        index = new TreeMap<K, Set<V>>();
-        transformer = a_transformer;
+    public Index(TableColumn a_transformer, Iterable<ByteBuffer> iterable){
+        index = new TreeMap<Object, Collection<ByteBuffer>>();
+        column = a_transformer;
         if(iterable != null)
-            for (V value : iterable)
+            for (ByteBuffer value : iterable)
                 put(value);
     }
 
-    public Index(Transformer<V, K> a_transformer, NavigableMap<K, Set<V>> a_index){
+    public Index(TableColumn a_column, NavigableMap<Object, Collection<ByteBuffer>> a_index){
         index = a_index;
-        transformer = a_transformer;
+        column = a_column;
     }
 
-    void put(V value){
-        avgSetSize *= index.size();
-        K key = transformer.transform(value);
-        Set<V> s = index.get(key);
+    void put(ByteBuffer value){
+        Object key = column.getValue(value);
+        Collection<ByteBuffer> s = index.get(key);
         if (s == null){
-            s = new TreeSet<V>(addressComparator);
+            s = new TreeSet<ByteBuffer>(innerCollectionComparator);
+            //s = new LinkedList<ByteBuffer>();
             index.put(key, s);
         }
         s.add(value);
-        avgSetSize += 1;
-        avgSetSize /= 1;
     }
 
-    Iterator<V> get(K key){
-        Set<V> s = index.get(key);
+    void remove(ByteBuffer value){
+        Object key = column.getValue(value);
+        Collection<ByteBuffer> s = index.get(key);
+        if (s != null)
+            s.remove(value);
+    }
+
+    Iterator<ByteBuffer> get(Object key){
+        Collection<ByteBuffer> s = index.get(key);
         return (s != null) ? s.iterator() : null;
     }
 
-    Index<K, V> subIndex(K from_key, boolean fromInclusive, K to_key, boolean toInclusive){
-        return new Index<K, V>(transformer, index.subMap(from_key, fromInclusive, to_key, toInclusive));
+    Index subIndexFrom(Object from_key, boolean fromInclusive){
+        return new Index(column, index.tailMap(from_key, fromInclusive));
+    }
+
+    Index subIndexTo(Object to_key, boolean toInclusive){
+        return new Index(column, index.headMap(to_key, toInclusive));
+    }
+
+    Index subIndex(Object from_key, boolean fromInclusive, Object to_key, boolean toInclusive){
+        return new Index(column, index.subMap(from_key, fromInclusive, to_key, toInclusive));
     }
 
     double estimate(){
-        return index.size() * avgSetSize;
+        return index.size();
     }
 
     @Override
-    public Iterator<V> iterator() {
-        return new TwofoldIterator<V>(index.values());
+    public Iterator<ByteBuffer> iterator() {
+        return new TwofoldIterator<ByteBuffer>(index.values());
     }
 }
