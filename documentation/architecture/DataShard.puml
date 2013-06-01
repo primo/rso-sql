@@ -1,0 +1,81 @@
+@startuml
+
+interface IDataShard {
+    + long query(SqlDescription)
+    + ShardMetadata getMetadata()
+    + ShardStatistics getStatisticd()
+    + void registerQueryResultReceiver(QueryResultReceiver)
+}
+
+class DataShard --|> IDataShard
+
+hide empty attributes
+
+' Specify object crossing boundary between storage and logic layers
+
+IDataShard ..> ShardStatistics
+class ShardStatistics {
+    + int completedQueries
+    + int currentLoad
+}
+
+IDataShard ..> ShardMetadata
+IDataShard ..> SqlDescription
+IDataShard ..> QueryResultReceiver
+
+class SqlDescription {
+ + long Id
+ + XYZ sqlStatement
+}
+
+interface QueryResultReceiver {
+    + complete( QueryResult)
+}
+QueryResultReceiver ..> QueryResult
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+' Description of DataShard functionality
+class DataShard <<Runnable>> {
+    + ConcurrentLinkedList tasks
+    + ConcurrentLinkedList results
+    + run()
+}
+
+note "Metoda run obsługuje kolejkę,\n w jej kontekscie wykonywane są zapytania." as N1
+N1 .. DataShard
+
+class QueryResultDispatcher <<Runnable>> {
+    + run()
+}
+note "Passes the QueryResults\n to dispatcher object,\n as indicated on DataShard setup." as N2
+N2 .. QueryResultDispatcher
+
+DataShard -> QueryResultDispatcher : Instiatiates
+DataShard <- QueryResultDispatcher : Manages
+
+'''''''''''''''''' Query engine part '''''''''''''''''''''''
+DataShard --> QueryEngine
+
+' Description of QueryEngine functionality
+class QueryEngine {
+    + QueryResult query(SqlDescription)
+    + Map<int, Table> tables
+    + Hash<String, int> name2TableIds
+    # select()
+    # insert()
+    # drop()
+    # update()
+    # create()
+    # findTable(id)
+    # findTuple(Table,id)
+}
+QueryEngine *-- Table
+
+class Table
+class TableSchema
+Table --> TableSchema
+
+@enduml
+
+lista węzlów gdzie leżą partycje

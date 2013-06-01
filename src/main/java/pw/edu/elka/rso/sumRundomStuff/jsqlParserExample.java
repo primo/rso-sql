@@ -1,4 +1,5 @@
-package pw.edu.elka.rso.logic;
+package pw.edu.elka.rso.sumRundomStuff;
+
 
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
@@ -20,7 +21,11 @@ import java.util.Vector;
  */
 public class jsqlParserExample {
 
+<<<<<<< HEAD:src/main/java/pw/edu/elka/rso/logic/jsqlParserExample.java
     final static String INPUT_FILE = "C:/Documents and Settings/Administrator/My Documents/GitHub/rso-sql/file.txt";
+=======
+
+>>>>>>> shard-prototype:src/main/java/pw/edu/elka/rso/sumRundomStuff/jsqlParserExample.java
 
     public static void main(final String[] args) throws JSQLParserException {
 

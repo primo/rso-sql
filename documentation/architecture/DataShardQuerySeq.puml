@@ -1,0 +1,39 @@
+@startuml
+activate DataShard
+[-> DataShard : query(SqlDescription sq)
+
+activate DataShard
+DataShard --> DataShard : tasks.put(sq)
+deactivate DataShard
+
+[<-- DataShard : return(long)
+deactivate DataShard
+
+activate "DataShard::run()"
+"DataShard::run()" -> "DataShard::run()" : notify()
+activate "DataShard::run()"
+"DataShard::run()" -> "DataShard::run()" : sq := tasks.get()
+deactivate "DataShard::run()"
+
+"DataShard::run()" -> QueryEngine : query( sq )
+
+activate QueryEngine
+QueryEngine -> QueryEngine : table := findTable(id)
+
+alt query type
+    activate QueryEngine
+        QueryEngine -> QueryEngine : select(table, sq)
+    deactivate QueryEngine
+end
+QueryEngine --> "DataShard::run()" : qr := return(QueryResult)
+deactivate QueryEngine
+
+"DataShard::run()" -> "DataShard::run()": results.put(qr)
+"DataShard::run()" --> QueryResultDispatcher: notify()
+deactivate "DataShard::run()"
+
+activate QueryResultDispatcher
+QueryResultDispatcher -> QueryResultDispatcher : qr = results.get()
+QueryResultDispatcher --> QueryResultDispatcher : receiver.complete(qr)
+deactivate QueryResultDispatcher
+@enduml
