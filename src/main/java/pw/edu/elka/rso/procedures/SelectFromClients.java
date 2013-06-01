@@ -12,9 +12,9 @@ import pw.edu.elka.rso.logic.procedures.Procedure;
 
 public class SelectFromClients extends Procedure {
 
-    public final String sql = "SELECT NumberOfSeats, COUNT(ReserveID) " +
-            "FROM Flight AS F, Reservation AS R " +
-            "WHERE F.FlightID=R.FlightID AND R.FlightID=? " +
-            "GROUP BY NumberOfSeats;";
+  public final String sql = "SELECT NumberOfSeats, COUNT(ReserveID) " +
+      "FROM Flight AS F, Reservation AS R " +
+      "WHERE F.FlightID=R.FlightID AND R.FlightID=? " +
+      "GROUP BY NumberOfSeats;";
 
 }
