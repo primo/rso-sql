@@ -14,7 +14,7 @@ public class Table implements Iterable<Record>{
         indexes = new HashMap<String, Index>();
     }
 
-    Record newRecord(){
+    public Record newRecord(){
         return new Record(tableSchema);
     }
 

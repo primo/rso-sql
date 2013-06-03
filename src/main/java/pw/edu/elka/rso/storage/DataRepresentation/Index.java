@@ -1,6 +1,6 @@
 package pw.edu.elka.rso.storage.DataRepresentation;
 
-import pw.edu.elka.rso.storage.TwofoldIterator;
+import pw.edu.elka.rso.storage.DataRepresentation.TwofoldIterator;
 
 import java.nio.ByteBuffer;
 import java.util.*;

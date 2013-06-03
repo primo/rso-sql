@@ -75,6 +75,8 @@ public class DataShard implements IDataShard, Runnable {
         qrDispatcherThread = new Thread(dispatcher);
         shardExecutor = new Thread(this);
         engine = new QueryEngine();
+        tasks = new ConcurrentLinkedQueue<SqlDescription>();
+        results = new ConcurrentLinkedQueue<QueryResult>();
         LOG.trace("DataShard started successfully.");
     }
 

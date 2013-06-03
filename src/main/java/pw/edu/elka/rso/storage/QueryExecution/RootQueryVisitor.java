@@ -12,6 +12,7 @@ import net.sf.jsqlparser.statement.drop.Drop;
 import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.replace.Replace;
 import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectBody;
 import net.sf.jsqlparser.statement.truncate.Truncate;
 import net.sf.jsqlparser.statement.update.Update;
 
@@ -60,16 +61,10 @@ class RootQueryVisitor implements StatementVisitor {
      */
     @Override
     public void visit(Select select) {
-        SelectExecutor executor =  new SelectExecutor();
-        // Ignoring
-        select.getSelectBody().accept(executor);
-        int tableId = queryEngine.name2TableId.get(executor.fromTableName);
-        Table table = queryEngine.tables.get(tableId);
-        ByteBuffer output = ByteBuffer.allocate(0);
-        // TODO
-        queryResult = new QueryResult();
-        queryResult.result = true;
-        queryResult.output = output;
+        GeneralSelectExecutor executor =  new GeneralSelectExecutor(queryEngine);
+        SelectBody selectBody = select.getSelectBody();
+        selectBody.accept(executor);
+        queryResult = executor.queryResult;
     }
 
     @Override
@@ -145,19 +140,19 @@ class RootQueryVisitor implements StatementVisitor {
         for (ColumnDefinition def : (List<ColumnDefinition>)createTable.getColumnDefinitions()) {
             ColDataType dataType =  def.getColDataType();
             ColumnType internalDataType;
-            switch (dataType.getDataType()) {
-                case "INTEGER":
-                    internalDataType = ColumnType.INT;
-                    break;
-                case "FLOAT":
-                    internalDataType = ColumnType.DOUBLE;
-                    break;
-                case "CHAR":
+//            switch (dataType.getDataType()) {
+//                case "INTEGER":
+//                    internalDataType = ColumnType.INT;
+//                    break;
+//                case "FLOAT":
+//                    internalDataType = ColumnType.DOUBLE;
+//                    break;
+//                case "CHAR":
                     internalDataType = ColumnType.CHAR;
-                    break;
-            default:
-                throw new InvalidParameterException("Unsupported data type");
-            }
+//                    break;
+//            default:
+//                throw new InvalidParameterException("Unsupported data type");
+//            }
             schema.addColumn(def.getColumnName(), internalDataType, 0);
         }
         for (Index indexDef : (List<Index>)createTable.getIndexes()) {
