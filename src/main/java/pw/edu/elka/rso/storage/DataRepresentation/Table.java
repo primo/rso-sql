@@ -31,7 +31,7 @@ public class Table implements Iterable<Record>{
 //            idx.remove();
     }
 
-    void createIndex(String column_name){
+    public void createIndex(String column_name){
         Index index = new Index(tableSchema.getTableColumn(column_name), mainList);
         indexes.put(column_name, index);
     }

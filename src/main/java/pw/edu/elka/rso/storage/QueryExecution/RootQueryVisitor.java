@@ -140,25 +140,24 @@ class RootQueryVisitor implements StatementVisitor {
         for (ColumnDefinition def : (List<ColumnDefinition>)createTable.getColumnDefinitions()) {
             ColDataType dataType =  def.getColDataType();
             ColumnType internalDataType;
-//            switch (dataType.getDataType()) {
-//                case "INTEGER":
-//                    internalDataType = ColumnType.INT;
-//                    break;
-//                case "FLOAT":
-//                    internalDataType = ColumnType.DOUBLE;
-//                    break;
-//                case "CHAR":
-                    internalDataType = ColumnType.CHAR;
-//                    break;
-//            default:
-//                throw new InvalidParameterException("Unsupported data type");
-//            }
+            if (dataType.getDataType().contentEquals("INTEGER")) {
+                internalDataType = ColumnType.INT;
+            } else if(dataType.getDataType().contentEquals("DOUBLE")) {
+                internalDataType = ColumnType.DOUBLE;
+            } else if (dataType.getDataType().contentEquals("CHAR")) {
+                internalDataType = ColumnType.CHAR;
+            } else {
+                throw new InvalidParameterException("Unsupported data type");
+            }
             schema.addColumn(def.getColumnName(), internalDataType, 0);
         }
-        for (Index indexDef : (List<Index>)createTable.getIndexes()) {
-            // TODO
-        }
         Table table = new Table(schema);
+        for (Index indexDef : (List<Index>)createTable.getIndexes()) {
+            List cols = indexDef.getColumnsNames();
+            for (String s : cols) {
+                table.createIndex(s);
+            }
+        }
 
         // 4. Complete creation by adding it to the QE collections
         int tableId = queryEngine.freeTableId++;
