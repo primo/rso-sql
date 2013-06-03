@@ -54,7 +54,23 @@ public class ProceduresManager{
         return null;
     }
 
-    /**
+  public Procedure getProcedure(String procedure) throws ClassNotFoundException {
+    //TODO change to some structure to find by name, like associative array
+    Iterator<Procedure> it = procedures.iterator();
+    while(it.hasNext())
+    {
+      Procedure p = it.next();
+      if(p.name.equals(procedure)){
+        return p;
+        //return p.run();
+      }
+    }
+
+    return null;
+  }
+
+
+  /**
      * Scans all classes accessible from the context class loader which belong to the given package and subpackages.
      *
      * @return The classes names

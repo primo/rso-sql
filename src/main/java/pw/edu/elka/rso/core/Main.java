@@ -15,7 +15,7 @@ public class Main {
 
     // This DB server can accept up to maxClientsCount clients' connections.
     private static final int maxClientsCount = 10;
-    private static final clientThread[] threads = new clientThread[maxClientsCount];
+    private static final ClientThread[] threads = new ClientThread[maxClientsCount];
 
     // The server socket.
     private static ServerSocket serverSocket = null;
@@ -40,7 +40,7 @@ public class Main {
             for (int i = 0; i < maxClientsCount; i++) {
                 if (threads[i] == null) {
                     logger.debug("New client! Creating new thread...");
-                    (threads[i] = new clientThread(clientSocket, threads, proceduresManager)).start();
+                    (threads[i] = new ClientThread(clientSocket, threads, proceduresManager)).start();
                     break;
                 }
             }

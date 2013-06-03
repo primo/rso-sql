@@ -3,10 +3,12 @@ package pw.edu.elka.rso.logic.procedures;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserManager;
 import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.StatementVisitor;
+import org.apache.log4j.Logger;
+import pw.edu.elka.rso.logic.interfaces.IQueryReader;
 
 import java.io.Reader;
 import java.io.StringReader;
+import java.security.InvalidParameterException;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,36 +17,59 @@ import java.io.StringReader;
  * Time: 15:19
  * To change this template use File | Settings | File Templates.
  */
-public class Procedure {
+public class Procedure implements IQueryReader {
 
-    public String name;
-    Statement statement;
+  static Logger logger = Logger.getLogger(Procedure.class);
 
-    /*
-    * method to execute statement
-     * @param list of params to execute query
-     * TODO return data type ???
-     */
-    public String run(){
-        //execute statement
-        System.out.println("Pobieram dane z bazy!");
-        return "To sa dane z procedury: "+name;
-    }
+  public String name;
+  private Statement statement;
 
-    public Procedure prepareProcedure(String name, String sql) throws JSQLParserException {
-        Procedure procedure = new Procedure();
+  private CCJSqlParserManager parser = new CCJSqlParserManager();
 
-        procedure.name = name;
+  /*
+  * method to execute statement
+   * @param list of params to execute query
+   * TODO return data type ???
+   */
+  public String run() {
+    //execute statement
+    System.out.println("Pobieram dane z bazy!");
+    return "To sa dane z procedury: " + name;
+  }
 
-        CCJSqlParserManager parser = new CCJSqlParserManager();
-        Reader reader = new StringReader(sql);
-        procedure.statement = parser.parse(reader);
+  public Procedure prepareProcedure(String name, String sql) throws JSQLParserException {
+    Procedure procedure = new Procedure();
+
+    procedure.name = name;
+    Reader reader = new StringReader(sql);
 
         /*
          * @TODO check if all statement tables, fields etc. exist
          * maybe by executing it once?
          */
-
-        return procedure;
+    if(!validateQuery(reader)){
+      throw new InvalidParameterException("Statment could not be parsed.");
+    }else{
+      procedure.statement = this.statement;
     }
+
+
+    return procedure;
+  }
+
+  public boolean validateQuery(Reader query) {
+    try {
+      statement = parser.parse(query);
+
+      return true;
+    } catch (JSQLParserException e) {
+      logger.debug("Blad podczas parsowania zapytania.");
+      e.printStackTrace();
+    }
+    return false;
+  }
+
+  public Statement getParsedQuery() {
+    return this.statement;
+  }
 }
