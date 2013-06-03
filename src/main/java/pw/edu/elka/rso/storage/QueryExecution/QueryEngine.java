@@ -27,4 +27,10 @@ public class QueryEngine {
         queryResult.queryId =  query.id;
         return queryResult;
     }
+
+    Table getTable( String name) {
+        Integer key = name2TableId.get(name);
+        assert key != null;
+        return tables.get(key);
+    }
 }

@@ -21,13 +21,17 @@ class IntTableColumn extends TableColumn {
     }
 
     void setValue(ByteBuffer buffer, Object value){
+        if(value == null){
+            buffer.put(position, (byte) 0);
+            return;
+        }
         int new_value = (Integer) value;
         buffer.put(position, (byte) 1);
         buffer.putInt(position+1, new_value);
     }
 
     Object getValue(ByteBuffer buffer){
-        if (buffer.get(position) == (byte) 0)
+        if (buffer.get(position) == 0)
             return null;
         else
             return buffer.getInt(position + 1);
@@ -40,41 +44,54 @@ class DoubleTableColumn extends TableColumn {
     }
 
     void setValue(ByteBuffer buffer, Object value){
+        if(value == null){
+            buffer.put(position, (byte) 0);
+            return;
+        }
         double new_value = (Double) value;
         buffer.put(position, (byte) 1);
         buffer.putDouble(position + 1, new_value);
     }
 
     Object getValue(ByteBuffer buffer){
-        if (buffer.get(position) == (byte) 0)
+        if (buffer.get(position) == 0)
             return null;
         else
-            return buffer.getDouble(position+1);
+            return buffer.getDouble(position + 1);
     }
 }
 
 class CharTableColumn extends TableColumn {
     public CharTableColumn(int length, int position){
-        super(2*(length + 1)+1, position);
+        super(2*(length)+1, position);
     }
 
     void setValue(ByteBuffer buffer, Object object){
-        buffer.put(position, (byte) 1);
-
-        char[] new_value = ((String)object).toCharArray();
-        int i;
-        for(i = 0; i < Math.min(new_value.length, length/2); i++){
-            buffer.putChar(position + 2 * i + 1, new_value[i]);
+        buffer.position(position);
+        if(object == null){
+            buffer.put((byte) 0);
+            return;
         }
-        buffer.putChar(position + 2*i + 1, '\0');
+        buffer.put((byte) 1);
+        char[] new_value = ((String)object).toCharArray();
+        int chars = Math.min(new_value.length, length/2);
+
+        int i;
+        for(i = 0; i < chars; i++)
+            buffer.putChar(new_value[i]);
+
+        if(i != length/2)
+            buffer.putChar('\0');
     }
 
     Object getValue(ByteBuffer buffer){
-        if (buffer.get(position) == (byte)0)
+        buffer.position(position);
+        if (buffer.get() == 0)
             return null;
-        char[] output = new char[length/2];
-        for(int i = 0; i < length/2; i++){
-            output[i] = buffer.getChar(position + 2*i + 1);
+        int chars = length/2;
+        char[] output = new char[chars];
+        for(int i = 0; i < chars; i++){
+            output[i] = buffer.getChar();
             if(output[i] == '\0')
                 break;
         }
