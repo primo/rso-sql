@@ -23,7 +23,7 @@ public class ProceduresManager{
     private static ProceduresManager instance = null;
 
     static final String proceduresPackageName = "pw.edu.elka.rso.procedures";
-    ArrayList<Procedure> procedures;
+    ArrayList<Procedure> procedures = new ArrayList<Procedure>();
 
     public ProceduresManager() {
         // Exists only to defeat instantiation.
@@ -39,17 +39,19 @@ public class ProceduresManager{
     * @param procedure - name of procedure to execute
     * TODO return data type ???
      */
-    public void executeProcedure(String procedure) throws ClassNotFoundException {
+    public String executeProcedure(String procedure) throws ClassNotFoundException {
         //TODO change to some structure to find by name, like associative array
         Iterator<Procedure> it = procedures.iterator();
         while(it.hasNext())
         {
             Procedure p = it.next();
             if(p.name.equals(procedure)){
-                p.run();
+                return p.run();
                 //return p.run();
             }
         }
+
+        return null;
     }
 
     /**
@@ -126,11 +128,12 @@ public class ProceduresManager{
             try {
                 Object t = c.newInstance();
                 Method runMethod = c.getDeclaredMethod("prepareProcedure");
-                out.format("Preparing "+name+" procedure...", runMethod);
+                out.print("Preparing "+name+" procedure...");
                 runMethod.setAccessible(true);
-                Object o = runMethod.invoke(t);
+                Procedure p = (Procedure)runMethod.invoke(t);
 
-                procedures.add((Procedure)o);
+                procedures.add(p);
+                out.println("done");
 
             } catch (InstantiationException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.

@@ -25,9 +25,10 @@ public class Procedure {
      * @param list of params to execute query
      * TODO return data type ???
      */
-    public void run(){
+    public String run(){
         //execute statement
         System.out.println("Pobieram dane z bazy!");
+        return "To sa dane z procedury: "+name;
     }
 
     public Procedure prepareProcedure(String name, String sql) throws JSQLParserException {

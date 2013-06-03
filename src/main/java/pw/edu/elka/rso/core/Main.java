@@ -1,69 +1,50 @@
 package pw.edu.elka.rso.core;
 
 import org.apache.log4j.Logger;
-import pw.edu.elka.rso.logic.beans.InputManager;
-import pw.edu.elka.rso.logic.beans.QueryExecutorImpl;
 import pw.edu.elka.rso.logic.procedures.ProceduresManager;
-import pw.edu.elka.rso.storage.DataShard;
-import pw.edu.elka.rso.storage.QueryResultReceiver;
 
 import java.io.*;
+import java.net.*;
 
 /**
  * Main class, bootstrapping the database.
  */
 public class Main {
 
-  static Logger logger = Logger.getLogger(Main.class);
+    static Logger logger = Logger.getLogger(Main.class);
 
-  public static void main(String[] args) throws IOException {
-    logger.debug("Start inputManager");
+    // This DB server can accept up to maxClientsCount clients' connections.
+    private static final int maxClientsCount = 10;
+    private static final clientThread[] threads = new clientThread[maxClientsCount];
 
-    InputManager inputManager = new InputManager();
+    // The server socket.
+    private static ServerSocket serverSocket = null;
+    // The client socket.
+    private static Socket clientSocket = null;
 
-    DataShard dataShard = new DataShard();
-    QueryExecutorImpl queryExecutor = new QueryExecutorImpl(inputManager);
-    queryExecutor.setDataShard(dataShard);
+    public static void main(String[] args) throws IOException {
+        int portNumber = 2222;
+        serverSocket = new ServerSocket(portNumber);
+        logger.debug("Start listening server thread");
 
-    QueryResultReceiver queryResultReceiver;
+        ProceduresManager proceduresManager = new ProceduresManager();
+        proceduresManager.prepareProcedures();
 
-    Thread queryExecutorThread = new Thread(queryExecutor);
+        while (true) {
+            clientSocket = serverSocket.accept();
 
-
-
-    dataShard.start();
-    queryExecutorThread.start();
-
-
-//    ProceduresManager proceduresManager = new ProceduresManager();
-    //proceduresManager.prepareProcedures();
-
-//    while (true) {
-      BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
-      System.out.println("Type sql command | DUPA for exit");
-//      String command = br.readLine();
-      String command = "CREATE TABLE table\n" +
-          "(\n" +
-          "zupa INTEGER,\n" +
-          ");";
-      if("dupa".equals(command)) {
-//        break;
-      }
-
-      Reader reader = new StringReader(command);
-      logger.debug("Wczytuje zapytanie:" + reader);
-      inputManager.readQuery(reader);
-
-
-
-//    }
-
-    /**
-     *  WATEK KTORY ODBIERA BEDZIE CHODZIL CALY CZAS W TLE
-     *  ZABIJAMY GO CZERWONYM KRZYZYKIEM PO TY JAK SIE PROGRAM WYWALI
-     *  KKK TXZ
-     */
-  }
-
+              /*
+              * Create a client socket for each connection and pass it to a new client
+              * thread.
+              */
+            for (int i = 0; i < maxClientsCount; i++) {
+                if (threads[i] == null) {
+                    logger.debug("New client! Creating new thread...");
+                    (threads[i] = new clientThread(clientSocket, threads, proceduresManager)).start();
+                    break;
+                }
+            }
+            //TODO handle clients over maxClientsCount
+        }
+    }
 }

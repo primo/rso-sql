@@ -3,7 +3,6 @@ package pw.edu.elka.rso.logic.beans;
 import net.sf.jsqlparser.statement.Statement;
 import org.apache.log4j.Logger;
 import pw.edu.elka.rso.logic.interfaces.IQueryExecutor;
-import pw.edu.elka.rso.storage.DataShard;
 import pw.edu.elka.rso.storage.QueryExecution.QueryEngine;
 import pw.edu.elka.rso.storage.QueryResultReceiver;
 import pw.edu.elka.rso.storage.SqlDescription;
@@ -15,24 +14,28 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor {
   static Logger logger = Logger.getLogger(QueryExecutorImpl.class);
 
-
-  private DataShard dataShard;
+  private QueryEngine queryEngine;
   private QueryResultReceiver queryResultReceiver;
 
   private Observable consoleObservable;
-  private LinkedBlockingQueue<Statement> queryQueue = new LinkedBlockingQueue<>();
+  private LinkedBlockingQueue<Statement> queryQueue = new LinkedBlockingQueue<Statement>();
 
+  public QueryExecutorImpl(Observable observable) {
+    this.consoleObservable = observable;
+    this.consoleObservable.addObserver(this);
+  }
 
-  public QueryExecutorImpl(Observable consoleObservable) {
+  public QueryExecutorImpl(Observable consoleObservable, QueryEngine queryEngine) {
     this.consoleObservable = consoleObservable;
+    this.queryEngine = queryEngine;
     this.consoleObservable.addObserver(this);
   }
 
   public void executeQuery(Statement statement) {
     SqlDescription query = new SqlDescription();
-    query.statement = statement;
+    //query.setStatement(statement);
     try {
-      dataShard.query(query);
+      queryEngine.query(query);
     } catch (Exception ex) {
       //TODO: ladne obluzycy wyjatek
       ex.printStackTrace();
@@ -69,14 +72,13 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor {
 
   }
 
-  public DataShard getDataShard() {
-    return dataShard;
+  public QueryEngine getQueryEngine() {
+    return this.queryEngine;
   }
 
-  public void setDataShard(DataShard dataShard) {
-    this.dataShard = dataShard;
+  public void setQueryEngine(QueryEngine queryEngine) {
+    this.queryEngine = queryEngine;
   }
-
 
   public Observable getConsoleObservable() {
     return consoleObservable;
