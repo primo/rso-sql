@@ -3,6 +3,9 @@ package pw.edu.elka.rso.logic.beans;
 import net.sf.jsqlparser.statement.Statement;
 import org.apache.log4j.Logger;
 import pw.edu.elka.rso.logic.interfaces.IQueryExecutor;
+import pw.edu.elka.rso.logic.procedures.Procedure;
+import pw.edu.elka.rso.logic.procedures.ProceduresManager;
+import pw.edu.elka.rso.storage.IDataShard;
 import pw.edu.elka.rso.storage.QueryExecution.QueryEngine;
 import pw.edu.elka.rso.storage.QueryResultReceiver;
 import pw.edu.elka.rso.storage.SqlDescription;
@@ -14,28 +17,35 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor {
   static Logger logger = Logger.getLogger(QueryExecutorImpl.class);
 
-  private QueryEngine queryEngine;
-  private QueryResultReceiver queryResultReceiver;
+  private IDataShard dataShard;
+  private QueryResultReceiverImpl queryResultReceiver;
 
   private Observable consoleObservable;
-  private LinkedBlockingQueue<Statement> queryQueue = new LinkedBlockingQueue<Statement>();
+  private LinkedBlockingQueue<String> queryQueue = new LinkedBlockingQueue<>();
+  private ProceduresManager proceduresManager;
 
-  public QueryExecutorImpl(Observable observable) {
-    this.consoleObservable = observable;
-    this.consoleObservable.addObserver(this);
-  }
 
-  public QueryExecutorImpl(Observable consoleObservable, QueryEngine queryEngine) {
+  public QueryExecutorImpl(Observable consoleObservable, IDataShard dataShard) {
+    this.proceduresManager = ProceduresManager.getInstance();
+    proceduresManager.prepareProcedures();
+
     this.consoleObservable = consoleObservable;
-    this.queryEngine = queryEngine;
+    this.dataShard = dataShard;
+
     this.consoleObservable.addObserver(this);
   }
 
-  public void executeQuery(Statement statement) {
-    SqlDescription query = new SqlDescription();
-    //query.setStatement(statement);
+  public void executeQuery(String procedureName) throws ClassNotFoundException {
+    Procedure procedure = proceduresManager.getProcedure(procedureName);
     try {
-      queryEngine.query(query);
+      //TODO: do logic here
+
+      SqlDescription sqlDescription = new SqlDescription();
+      sqlDescription.statement = procedure.getParsedQuery();
+      //TODO: get properID
+      sqlDescription.id = 0;
+      dataShard.query(sqlDescription);
+
     } catch (Exception ex) {
       //TODO: ladne obluzycy wyjatek
       ex.printStackTrace();
@@ -47,7 +57,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor {
       logger.debug("Zostalem powiadomiony");
       InputManager console = (InputManager) o;
 
-      Statement query = console.getQueryQueue().poll();
+      String query = console.getQueryQueue().poll();
       logger.debug("Dodaje do kolejki zapytanie \"" + query.toString() + "\"");
 
       queryQueue.add(query);
@@ -59,33 +69,31 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor {
     while (true) {
       if (queryQueue.size() > 0) {
 
-        Statement query = queryQueue.poll();
-        logger.debug("Wykonuje zapytanie \"" + query.toString() + "\"");
-        executeQuery(query);
+        String query = queryQueue.poll();
+        logger.debug("Wykonuje procedure\"" + query + "\"");
+
+        try {
+          executeQuery(query);
+        } catch (ClassNotFoundException e) {
+          //TODO
+          e.printStackTrace();
+        }
 
       }
+      if(!queryResultReceiver.getQueryResult().isEmpty()){
+        logger.debug("COS JEST!1111");
 
-      //
-      //???
-//      QueryResult queryResult = queryResultReceiver.complete(new QueryResult(23));
+      }
     }
 
   }
 
-  public QueryEngine getQueryEngine() {
-    return this.queryEngine;
+  public QueryResultReceiver getQueryResultReceiver() {
+    return queryResultReceiver;
   }
 
-  public void setQueryEngine(QueryEngine queryEngine) {
-    this.queryEngine = queryEngine;
-  }
-
-  public Observable getConsoleObservable() {
-    return consoleObservable;
-  }
-
-  public void setConsoleObservable(Observable consoleObservable) {
-    this.consoleObservable = consoleObservable;
+  public void setQueryResultReceiver(QueryResultReceiverImpl queryResultReceiver) {
+    this.queryResultReceiver = queryResultReceiver;
   }
 }
 
