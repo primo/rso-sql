@@ -1,6 +1,7 @@
 package pw.edu.elka.rso.storage.DataRepresentation;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 public class Record {
     TableSchema tableSchema;
@@ -8,6 +9,13 @@ public class Record {
 
     public Record(TableSchema table_schema){
         tableSchema = table_schema;
+        byteBuffer = ByteBuffer.allocate(tableSchema.getLength());
+        byteBuffer.order(ByteOrder.BIG_ENDIAN);
+    }
+
+    public void anew(){
+        byteBuffer = ByteBuffer.allocate(tableSchema.getLength());
+        byteBuffer.order(ByteOrder.BIG_ENDIAN);
     }
 
     void setByteBuffer(ByteBuffer byte_buffer){
