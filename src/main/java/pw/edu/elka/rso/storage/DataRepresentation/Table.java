@@ -18,6 +18,10 @@ public class Table implements Iterable<Record>{
         return new Record(tableSchema);
     }
 
+    public final TableSchema getTableSchema() {
+        return tableSchema;
+    }
+
     public void insert(Record record){
         for(Index idx : indexes.values())
             idx.put(record.byteBuffer);

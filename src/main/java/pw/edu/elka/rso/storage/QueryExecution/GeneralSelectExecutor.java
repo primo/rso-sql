@@ -1,9 +1,11 @@
 package pw.edu.elka.rso.storage.QueryExecution;
 
 import net.sf.jsqlparser.statement.select.*;
+import pw.edu.elka.rso.storage.DataRepresentation.Record;
 import pw.edu.elka.rso.storage.DataRepresentation.Table;
 import pw.edu.elka.rso.storage.QueryResult;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -19,8 +21,20 @@ public class GeneralSelectExecutor implements SelectVisitor {
 
     @Override
     public void visit(PlainSelect plainSelect) {
-        PlainSelectExecutor select = new PlainSelectExecutor(queryEngine);
-        Table output = select.execute(plainSelect);
+        try {
+            PlainSelectExecutor select = new PlainSelectExecutor(queryEngine);
+            Table output = select.execute(plainSelect);
+            queryResult = new QueryResult();
+            queryResult.result = true;
+            Iterator<Record> it = output.iterator();
+            for(;it.hasNext();) {
+                queryResult.output.add(it.next().getContentDuplicate());
+            }
+        } catch (Exception e) {
+            queryResult = new QueryResult();
+            queryResult.result = false;
+            queryResult.output = null;
+        }
     }
 
     @Override
