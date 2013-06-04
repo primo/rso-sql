@@ -14,16 +14,16 @@ import java.net.Socket;
  * Time: 16:50
  * The DB server client thread
  */
-class clientThread extends Thread {
+class ClientThread extends Thread {
 
-    private final clientThread[] threads;
+    private final ClientThread[] threads;
     private ProceduresManager proceduresManager;
     private DataInputStream is = null;
     private PrintStream os = null;
     private Socket clientSocket = null;
     private int maxClientsCount;
 
-    public clientThread(Socket clientSocket, clientThread[] threads, ProceduresManager proceduresManager) {
+    public ClientThread(Socket clientSocket, ClientThread[] threads, ProceduresManager proceduresManager) {
         this.proceduresManager = proceduresManager;
         this.clientSocket = clientSocket;
         this.threads = threads;
@@ -32,7 +32,7 @@ class clientThread extends Thread {
 
     public void run() {
         int maxClientsCount = this.maxClientsCount;
-        clientThread[] threads = this.threads;
+        ClientThread[] threads = this.threads;
 
         //TODO change to some DataTable Structure
         String responseData;

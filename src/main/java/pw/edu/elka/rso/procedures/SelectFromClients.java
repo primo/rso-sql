@@ -15,10 +15,7 @@ public class SelectFromClients extends Procedure {
 
     public final String procedureName = "SelectFromClients";
 
-    public final String sql = "SELECT NumberOfSeats, COUNT(ReserveID) " +
-            "FROM Flight AS F, Reservation AS R " +
-            "WHERE F.FlightID=R.FlightID AND R.FlightID=? " +
-            "GROUP BY NumberOfSeats;";
+    public final String sql = "SELECT client FROM pracownicy;";
 
     public Procedure prepareProcedure() throws JSQLParserException {
         return super.prepareProcedure(procedureName, sql);
