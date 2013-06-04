@@ -21,7 +21,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor {
   private QueryResultReceiverImpl queryResultReceiver;
 
   private Observable consoleObservable;
-  private LinkedBlockingQueue<String> queryQueue = new LinkedBlockingQueue<>();
+  private LinkedBlockingQueue<String> queryQueue = new LinkedBlockingQueue<String>();
   private ProceduresManager proceduresManager;
 
 

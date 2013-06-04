@@ -8,7 +8,7 @@ import java.util.Queue;
 
 public class InputManager extends Observable {
   static Logger logger = Logger.getLogger(InputManager.class);
-  private Queue<String> input = new LinkedList<>();
+  private Queue<String> input = new LinkedList<String>();
 
   public void readInput(String procedureName) {
 
