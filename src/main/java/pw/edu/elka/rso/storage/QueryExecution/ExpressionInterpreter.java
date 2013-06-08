@@ -1,7 +1,8 @@
 package pw.edu.elka.rso.storage.QueryExecution;
 
-import java.util.AbstractMap;
+import java.util.*;
 import java.util.Map.Entry;
+
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
@@ -9,219 +10,346 @@ import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.SubSelect;
+import pw.edu.elka.rso.storage.DataRepresentation.Record;
+import pw.edu.elka.rso.storage.DataRepresentation.Table;
 
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  */
 public class ExpressionInterpreter implements ExpressionVisitor {
 
-    public final List<ExpressionWrapper> expressions = new LinkedList<ExpressionWrapper>();
-    private Entry<String,String> lastColumn;
+    public static final Object NullObject = new Object();
+
+    private HashMap<String, Record> currentLines = new HashMap<String, Record>();
+    private HashMap<String, Table>  subjectTables = new HashMap<String, Table>();
+    private HashMap<String, String>  aliases = new HashMap<String, String>();
+    private HashMap<String, String> columnMapping  = new HashMap<String, String>();
+    private Deque<Object> elements = new ArrayDeque<Object>();
 
     @Override
     public void visit(NullValue nullValue) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        elements.add(NullObject);
     }
 
     @Override
     public void visit(Function function) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalArgumentException("Operation not yet implemented.");
     }
 
     @Override
     public void visit(InverseExpression inverseExpression) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalArgumentException("Operation not yet implemented.");
     }
 
     @Override
     public void visit(JdbcParameter jdbcParameter) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalArgumentException("Operation not yet implemented.");
     }
 
     @Override
     public void visit(DoubleValue doubleValue) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        elements.add(doubleValue.getValue());
     }
 
     @Override
     public void visit(LongValue longValue) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        elements.add(longValue.getValue());
     }
 
     @Override
     public void visit(DateValue dateValue) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalArgumentException("Date data type is not yet supported.");
     }
 
     @Override
     public void visit(TimeValue timeValue) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalArgumentException("Time data type is not yet supported.");
     }
 
     @Override
     public void visit(TimestampValue timestampValue) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalArgumentException("Timestamp data type is not yet supported.");
     }
 
     @Override
     public void visit(Parenthesis parenthesis) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        Expression e = parenthesis.getExpression();
+        e.accept(this);
     }
 
     @Override
     public void visit(StringValue stringValue) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        elements.add(stringValue.getValue());
     }
 
     @Override
     public void visit(Addition addition) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        Expression l = addition.getLeftExpression();
+        Expression r = addition.getRightExpression();
+        l.accept(this);
+        r.accept(this);
+        Object ro = elements.pop();
+        Object lo = elements.pop();
+        // TODO elements.add(r+l)
     }
 
     @Override
     public void visit(Division division) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalArgumentException("Operation not yet implemented.");
     }
 
     @Override
     public void visit(Multiplication multiplication) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalArgumentException("Operation not yet implemented.");
     }
 
     @Override
     public void visit(Subtraction subtraction) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalArgumentException("Operation not yet implemented.");
     }
 
     @Override
     public void visit(AndExpression andExpression) {
-        andExpression.accept(this);
+        Expression l = andExpression.getLeftExpression();
+        Expression r  = andExpression.getRightExpression();
+        l.accept(this);
+        r.accept(this);
+        elements.add( (Boolean)elements.pop() && (Boolean)elements.pop());
     }
 
     @Override
     public void visit(OrExpression orExpression) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        Expression l = orExpression.getLeftExpression();
+        Expression r  = orExpression.getRightExpression();
+        l.accept(this);
+        r.accept(this);
+        elements.add( (Boolean)elements.pop() || (Boolean)elements.pop());
     }
 
     @Override
     public void visit(Between between) {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    private void wrapExpression(BinaryExpression expr, Operation op) {
-        expr.getLeftExpression().accept(this);
-        Entry<String,String> c1 = lastColumn;
-        expr.getRightExpression().accept(this);
-        Entry<String,String> c2 = lastColumn;
-        ExpressionWrapper ew = new ExpressionWrapper(c1.getKey(),c1.getValue(), op, c2.getKey(),c2.getValue());
-        expressions.add(ew);
+        throw new IllegalArgumentException("Between");
     }
 
     @Override
     public void visit(EqualsTo equalsTo) {
-        wrapExpression(equalsTo, Operation.EQ);
+        Expression l = equalsTo.getLeftExpression();
+        Expression r = equalsTo.getRightExpression();
+        l.accept(this);
+        r.accept(this);
+        // Equality is symmetric
+        Comparable rc = (Comparable) elements.pop();
+        Comparable lc = (Comparable) elements.pop();
+
+        try {
+            if (0 == lc.compareTo(rc)) {
+                elements.add(Boolean.valueOf(true));
+            } else {
+                elements.add(Boolean.valueOf(false));
+            }
+        } catch (ClassCastException ce) {
+            elements.add(Boolean.valueOf(false));
+        }
     }
 
     @Override
     public void visit(GreaterThan greaterThan) {
-        wrapExpression(greaterThan, Operation.GT);
+        Expression l = greaterThan.getLeftExpression();
+        Expression r = greaterThan.getRightExpression();
+        l.accept(this);
+        r.accept(this);
+        // Equality is symmetric
+        Comparable rc = (Comparable) elements.pop();
+        Comparable lc = (Comparable) elements.pop();
+
+        try {
+            if (0 <= lc.compareTo(rc)) {
+                elements.add(Boolean.valueOf(true));
+            } else {
+                elements.add(Boolean.valueOf(false));
+            }
+        } catch (ClassCastException ce) {
+            elements.add(Boolean.valueOf(false));
+        }
     }
 
     @Override
     public void visit(GreaterThanEquals greaterThanEquals) {
-        wrapExpression(greaterThanEquals, Operation.GTE);
+        Expression l = greaterThanEquals.getLeftExpression();
+        Expression r = greaterThanEquals.getRightExpression();
+        l.accept(this);
+        r.accept(this);
+        // Equality is symmetric
+        Comparable rc = (Comparable) elements.pop();
+        Comparable lc = (Comparable) elements.pop();
+
+        try {
+            if (0 < lc.compareTo(rc)) {
+                elements.add(Boolean.valueOf(true));
+            } else {
+                elements.add(Boolean.valueOf(false));
+            }
+        } catch (ClassCastException ce) {
+            elements.add(Boolean.valueOf(false));
+        }
     }
 
     @Override
     public void visit(InExpression inExpression) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalArgumentException("Operation not yet implemented.");
     }
 
     @Override
     public void visit(IsNullExpression isNullExpression) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        Expression l = isNullExpression.getLeftExpression();
+        l.accept(this);
+        elements.add( (elements.pop() == NullObject && !isNullExpression.isNot()) ||
+                (elements.pop() != NullObject && isNullExpression.isNot()));
     }
 
     @Override
     public void visit(LikeExpression likeExpression) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalArgumentException("Operation not yet implemented.");
     }
 
     @Override
     public void visit(MinorThan minorThan) {
-        wrapExpression(minorThan, Operation.LT);
+        Expression l = minorThan.getLeftExpression();
+        Expression r = minorThan.getRightExpression();
+        l.accept(this);
+        r.accept(this);
+        // Equality is symmetric
+        Comparable rc = (Comparable) elements.pop();
+        Comparable lc = (Comparable) elements.pop();
+
+        try {
+            if (0 > lc.compareTo(rc)) {
+                elements.add(Boolean.valueOf(true));
+            } else {
+                elements.add(Boolean.valueOf(false));
+            }
+        } catch (ClassCastException ce) {
+            elements.add(Boolean.valueOf(false));
+        }
     }
 
     @Override
     public void visit(MinorThanEquals minorThanEquals) {
-        wrapExpression(minorThanEquals, Operation.LTE);
+        Expression l = minorThanEquals.getLeftExpression();
+        Expression r = minorThanEquals.getRightExpression();
+        l.accept(this);
+        r.accept(this);
+        // Equality is symmetric
+        Comparable rc = (Comparable) elements.pop();
+        Comparable lc = (Comparable) elements.pop();
+
+        try {
+            if (0 >= lc.compareTo(rc)) {
+                elements.add(Boolean.valueOf(true));
+            } else {
+                elements.add(Boolean.valueOf(false));
+            }
+        } catch (ClassCastException ce) {
+            elements.add(Boolean.valueOf(false));
+        }
 
     }
 
     @Override
     public void visit(NotEqualsTo notEqualsTo) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        Expression l = notEqualsTo.getLeftExpression();
+        Expression r = notEqualsTo.getRightExpression();
+        l.accept(this);
+        r.accept(this);
+        // Equality is symmetric
+        Comparable rc = (Comparable) elements.pop();
+        Comparable lc = (Comparable) elements.pop();
+
+        try {
+            if (0 != lc.compareTo(rc)) {
+                elements.add(Boolean.valueOf(true));
+            } else {
+                elements.add(Boolean.valueOf(false));
+            }
+        } catch (ClassCastException ce) {
+            elements.add(Boolean.valueOf(false));
+        }
     }
 
     @Override
     public void visit(Column column) {
-        lastColumn = new AbstractMap.SimpleEntry<String, String>(column.getTable().getName(), column.getColumnName());
+        // Get column value
+        final String colname = column.getColumnName();
+        final String tabname = column.getTable().getName();
+        final String tabalias = column.getTable().getName();
+        Object out = null;
+        if (null != tabname) {
+            Record r = currentLines.get(tabname);
+            out = r.getValue(colname);
+        } else if(null != tabalias) {
+            String name = aliases.get(tabalias);
+            Record r = currentLines.get(tabname);
+            out = r.getValue(colname);
+        } else {
+            String temp = columnMapping.get(colname);
+            Record r = currentLines.get(tabname);
+            out = r.getValue(colname);
+        }
+        elements.add(out);
     }
 
     @Override
     public void visit(SubSelect subSelect) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalArgumentException("Operation not yet implemented.");
     }
 
     @Override
     public void visit(CaseExpression caseExpression) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalArgumentException("Operation not yet implemented.");
     }
 
     @Override
     public void visit(WhenClause whenClause) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalArgumentException("Operation not yet implemented.");
     }
 
     @Override
     public void visit(ExistsExpression existsExpression) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalArgumentException("Operation not yet implemented.");
     }
 
     @Override
     public void visit(AllComparisonExpression allComparisonExpression) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalArgumentException("Operation not yet implemented.");
     }
 
     @Override
     public void visit(AnyComparisonExpression anyComparisonExpression) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalArgumentException("Operation not yet implemented.");
     }
 
     @Override
     public void visit(Concat concat) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalArgumentException("Operation not yet implemented.");
     }
 
     @Override
     public void visit(Matches matches) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalArgumentException("Operation not yet implemented.");
     }
 
     @Override
     public void visit(BitwiseAnd bitwiseAnd) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalArgumentException("Operation not yet implemented.");
     }
 
     @Override
     public void visit(BitwiseOr bitwiseOr) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalArgumentException("Operation not yet implemented.");
     }
 
     @Override
     public void visit(BitwiseXor bitwiseXor) {
-        //To change body of implemented methods use File | Settings | File Templates.
+        throw new IllegalArgumentException("Operation not yet implemented.");
     }
 }
