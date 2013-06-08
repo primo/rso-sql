@@ -20,11 +20,20 @@ public class ExpressionInterpreter implements ExpressionVisitor {
 
     public static final Object NullObject = new Object();
 
-    private HashMap<String, Record> currentLines = new HashMap<String, Record>();
-    private HashMap<String, Table>  subjectTables = new HashMap<String, Table>();
-    private HashMap<String, String>  aliases = new HashMap<String, String>();
-    private HashMap<String, String> columnMapping  = new HashMap<String, String>();
+    private HashMap<String, Record> currentLines;
+    private HashMap<String, Table>  subjectTables ;
+    private HashMap<String, String>  aliases ;
+    private HashMap<String, String> columnMapping ;
     private Deque<Object> elements = new ArrayDeque<Object>();
+
+    public ExpressionInterpreter(HashMap<String, Record> currentLines, HashMap<String, Table> subjectTables, HashMap<String, String> aliases, HashMap<String, String> columnMapping) {
+        this.currentLines = currentLines;
+        this.subjectTables = subjectTables;
+        this.aliases = aliases;
+        this.columnMapping = columnMapping;
+    }
+
+
 
     @Override
     public void visit(NullValue nullValue) {

@@ -20,7 +20,11 @@ public class PlainSelectExecutor {
 
     private QueryEngine queryEngine;
     private Expression whereExpressions;
-    private ExpressionInterpreter ei = new ExpressionInterpreter();
+    HashMap<String,Table> tables = new HashMap<String, Table>();
+    HashMap<String, String>  aliases = new HashMap<String, String>();
+    HashMap<String, String> columnMapping  = new HashMap<String, String>();
+    HashMap<String, Record> currentLines = new HashMap<String, Record>();
+    private ExpressionInterpreter ei = new ExpressionInterpreter(currentLines, tables, aliases,  columnMapping);
 
     public PlainSelectExecutor( QueryEngine queryEngine) {
         this.queryEngine = queryEngine;
@@ -28,10 +32,6 @@ public class PlainSelectExecutor {
 
     Table execute(PlainSelect select) {
         Table targetTable = null;
-        Map<String,Table> tables = new HashMap<String, Table>();
-        HashMap<String, String>  aliases = new HashMap<String, String>();
-        HashMap<String, String> columnMapping  = new HashMap<String, String>();
-        HashMap<String, Record> currentLines = new HashMap<String, Record>();
 
         // Parsed objects
         FromItem table1 = select.getFromItem();
@@ -63,7 +63,8 @@ public class PlainSelectExecutor {
                     Table base = tables.get(leftTable);
                     Table result = doInnerJoin(base, leftTable, table, fe.tableName, onExpr);
                     resultTable = leftTable +"#"+fe.tableName;
-                    tables.put(fe.tableName, table);
+                    tables.put(resultTable, table);
+                    tables.remove(leftTable);
                 } else {
                     aliases.put(fe.tableAlias, fe.tableName);
                     tables.put(fe.tableName, table);
@@ -79,40 +80,41 @@ public class PlainSelectExecutor {
         List<SimpleEntry<String,String>> selectItems = extractSelectItems(select.getSelectItems());
         List<SelectItemDescription> outputItems = new LinkedList<SelectItemDescription>();
 
-        // Create output schema
-        TableSchema schema = new TableSchema();
-        for (Entry<String,String> p : selectItems) {
-            String sourceTable = p.getKey();
-            if (null == sourceTable) {
-                //must check all tables
-                //TODO
-                // sourceTable = ...
-            }
-            Table temp = queryEngine.getTable(sourceTable);
-            ColumnType type = temp.getTableSchema().getColumnType(p.getValue());
-            int length = 0;
-            if (type == ColumnType.CHAR) {
-                length = (temp.getTableSchema().getTableColumn(p.getValue()).getLength() - 1) / 2;
-            }
+        Table output = null;
+        if ( 1 == tables.size()) {
+            // No join
+            Entry<String, Table> e = tables.entrySet().iterator().next();
+            String tableName = e.getKey();
+            Table table = e.getValue();
+            // Create output schema
+            TableSchema schema = new TableSchema();
+            for (Entry<String,String> p : selectItems) {
+                String sourceTable = p.getKey();
+                // Assuming that if we join tables then we prefix columns with its names
+                if (null == sourceTable) {
+                    throw new IllegalArgumentException("");
+                }
+                String columnName = sourceTable!=null?sourceTable+"."+p.getValue():p.getValue();
+                ColumnType type = table.getTableSchema().getColumnType(columnName);
+                int length = 0;
+                if (type == ColumnType.CHAR) {
+                    length = (table.getTableSchema().getTableColumn(columnName).getLength() - 1) / 2;
+                }
 
-            SelectItemDescription desc = new SelectItemDescription(sourceTable, p.getValue(), type);
-            outputItems.add(desc);
-            schema.addColumn(p.getValue(), type ,length);
-        }
-
-        Table output = new Table(schema);
-        if (tablesList.size() == 1) {
-            String n1 = tablesList.get(0).getKey();
+                SelectItemDescription desc = new SelectItemDescription(sourceTable, p.getValue(), type);
+                outputItems.add(desc);
+                schema.addColumn(p.getValue(), type ,length);
+            }
+            output = new Table(schema);
             Iterator<Record> it1 = tablesList.get(0).getValue().iterator();
             for (;it1.hasNext();) {
-                // Validate where
-                //for( ExpressionWrapper e : whereExpressions) {
-//                    e.e
-                // continue ; // ...
-                //}
+                Record r = it1.next();
+                // TODO setup ei
+                currentLines.put(tableName, r);
+                whereExpressions.accept(ei);
+                if (!ei.isTrue()) continue;
 
                 // Select items
-                Record r = it1.next();
                 Record out = output.newRecord();
                 for (Entry<String,String> p : selectItems) {
                     Object o = r.getValue(p.getValue());
@@ -121,16 +123,9 @@ public class PlainSelectExecutor {
                 output.insert(out);
             }
         } else {
-            HashMap<String, Iterator<Record>> records = new HashMap<String, Iterator<Record>>();
-            for (Entry<String,Table> p : tablesList) {
-                Iterator<Record> it = p.getValue().iterator();
-                records.put(p.getKey(), it);
-            }
-            String n1 = tablesList.get(0).getKey();
-            String n2 = tablesList.get(1).getKey();
-            Iterator<Record> it1 = tablesList.get(0).getValue().iterator();
-            Iterator<Record> it2 = tablesList.get(0).getValue().iterator();
+            throw new IllegalArgumentException("Multiple tables not yet supported.");
         }
+
         return output;
     }
 
@@ -152,8 +147,10 @@ public class PlainSelectExecutor {
         Iterator<Record> subjectIt = subject.iterator();
         while (baseIt.hasNext()) {
             Record rb = baseIt.next();
+            currentLines.put(baseName, rb);
             while (subjectIt.hasNext()) {
                 Record rs = subjectIt.next();
+                currentLines.put(subjectName, rs);
                 onExpr.accept(ei);
                 if (ei.isTrue()) {
                     // Join the rows
