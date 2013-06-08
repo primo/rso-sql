@@ -25,5 +25,6 @@ public class PlanningLB {
             //Nie istnieje wezel z oboma
 
         }
+        return null;
     }
 }
