@@ -102,7 +102,7 @@ public class Server implements Runnable, ITaskManager {
       try {
         oos = new ObjectOutputStream(clientSocket.getOutputStream());
         oos.writeObject(input);
-        log.debug("Witam się z serwerem!");
+        log.debug("Lacze sie z serwerem: " + clientSocket.toString());
 
         ois = new ObjectInputStream(clientSocket.getInputStream());
 
@@ -120,7 +120,7 @@ public class Server implements Runnable, ITaskManager {
       if (connectionSucessfull) {
         connections.put(input, clientSocket);
         outcomingData.put(input, new LinkedList<>());
-        log.debug("Success! polaczono do " + input);
+        log.debug("Success! Polaczono do " + input.toString());
       }
     } else {
       log.debug("Polaczenie do " + input.toString() + "exist.");
@@ -173,7 +173,6 @@ public class Server implements Runnable, ITaskManager {
 
     while (true) {
       try {
-
         //LOGIC HERE
         if (tasks.size() > 0) {
 
@@ -195,6 +194,8 @@ public class Server implements Runnable, ITaskManager {
 
 
         // DODA
+
+
         for (Map.Entry<ShardDetails, Socket> entry : connections.entrySet()) {
           Socket socket = entry.getValue();
           ShardDetails key = entry.getKey();
@@ -272,7 +273,7 @@ class IncomingDataThread implements Runnable {
 
         //DOPISAC OBSLUGE TASKOW
         if (data instanceof QueryTask) {
-          log.debug("Odebralme cos " + data.toString());
+          log.debug("Odebralme("+ server.getServerDetails() +") cos " + data.toString());
           server.getQueryExecutor().doTask((QueryTask) data);
         }
       } catch (IOException | ClassNotFoundException e) {

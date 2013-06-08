@@ -1,12 +1,10 @@
 package pw.edu.elka.rso.storage.DataRepresentation;
 
-import javafx.util.Pair;
 
+import java.util.AbstractMap.SimpleEntry;
+import java.util.Map.Entry;
 import java.security.InvalidParameterException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class TableSchema implements Cloneable{
     HashMap<String, TableColumn> specification = new HashMap<String, TableColumn>();
@@ -93,9 +91,9 @@ public class TableSchema implements Cloneable{
         return this;
     }
 
-    public TableSchema appendScheme(TableSchema tableSchema, List<Pair<String,String>> renames) {
+    public TableSchema appendScheme(TableSchema tableSchema, List<SimpleEntry<String,String>> renames) {
         // ! does not validate duplicated columns between schemas etc...
-        for (Pair<String,String> p : renames) {
+        for (Entry<String,String> p : renames) {
             this.specification.put(p.getKey(), tableSchema.getTableColumn(p.getValue()));
         }
         return this;

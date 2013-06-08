@@ -1,14 +1,11 @@
 package pw.edu.elka.rso.storage.QueryExecution;
 
-import javafx.util.Pair;
-import java.util.HashMap;
+import java.util.Map.Entry;
 import net.sf.jsqlparser.statement.select.AllColumns;
 import net.sf.jsqlparser.statement.select.AllTableColumns;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import net.sf.jsqlparser.statement.select.SelectItemVisitor;
 
-import java.util.LinkedList;
-import java.util.List;
 
 /**
 * Created with IntelliJ IDEA.
@@ -46,7 +43,7 @@ class SelectItemsExtractor implements SelectItemVisitor {
         if (qie.items.size() != 1) throw new IllegalArgumentException("qie.items.size != 1");
         // } FIXME
 
-        Pair<String,String> item = (Pair<String, String>) qie.items.get(0);
+        Entry<String,String> item = (Entry<String, String>) qie.items.get(0);
         table = item.getKey();
         column = item.getValue();
     }

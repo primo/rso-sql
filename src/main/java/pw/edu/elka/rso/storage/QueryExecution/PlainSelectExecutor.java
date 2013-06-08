@@ -2,7 +2,8 @@ package pw.edu.elka.rso.storage.QueryExecution;
 
 import java.util.*;
 
-import javafx.util.Pair;
+import java.util.Map.Entry;
+import java.util.AbstractMap.SimpleEntry;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.statement.select.FromItem;
 import net.sf.jsqlparser.statement.select.Join;
@@ -30,13 +31,13 @@ public class PlainSelectExecutor {
         List<Join> joins = select.getJoins();
         Table targetTable = null;
         Map<String,Table> tables = new HashMap<String, Table>();
-        List<Pair<String,Table>> tablesList = new LinkedList<Pair<String,Table>>();
+        List<SimpleEntry<String,Table>> tablesList = new LinkedList<SimpleEntry<String,Table>>();
         FromExtractor fe = new FromExtractor();
         table1.accept(fe);
         targetTable = queryEngine.getTable(fe.tableName);
         tables.put(fe.tableName, targetTable);
         tables.put(fe.tableAlias, targetTable);
-        tablesList.add(new Pair(fe.tableName, targetTable));
+        tablesList.add(new SimpleEntry<String, Table>(fe.tableName, targetTable));
 
         if (!joins.isEmpty()) {
             // table1 is also joined, it's a strange jsqlparser custom to split join clause in this way
@@ -49,7 +50,7 @@ public class PlainSelectExecutor {
                 Table table = queryEngine.getTable(fe.tableName);
                 tables.put(fe.tableAlias, table);
                 tables.put(fe.tableName, table);
-                tablesList.add(new Pair(fe.tableName, table));
+                tablesList.add(new SimpleEntry<String, Table>(fe.tableName, table));
                 Expression onExpr = j.getOnExpression();
                 whereExpressions.add(wrap(leftTable, fe.tableName, onExpr));
                 leftTable = fe.tableName;
@@ -60,12 +61,12 @@ public class PlainSelectExecutor {
         whereExpressions.addAll(split(whereExpr));
 
         // select required columns
-        List<Pair<String,String>> selectItems = extractSelectItems(select.getSelectItems());
+        List<SimpleEntry<String,String>> selectItems = extractSelectItems(select.getSelectItems());
         List<SelectItemDescription> outputItems = new LinkedList<SelectItemDescription>();
 
         // Create output schema
         TableSchema schema = new TableSchema();
-        for (Pair<String,String> p : selectItems) {
+        for (Entry<String,String> p : selectItems) {
             String sourceTable = p.getKey();
             if (null == sourceTable) {
                 //must check all tables
@@ -97,7 +98,7 @@ public class PlainSelectExecutor {
                 // Select items
                 Record r = it1.next();
                 Record out = output.newRecord();
-                for (Pair<String,String> p : selectItems) {
+                for (Entry<String,String> p : selectItems) {
                     Object o = r.getValue(p.getValue());
                     out.setValue(p.getValue(), o);
                 }
@@ -105,7 +106,7 @@ public class PlainSelectExecutor {
             }
         } else {
             HashMap<String, Iterator<Record>> records = new HashMap<String, Iterator<Record>>();
-            for (Pair<String,Table> p : tablesList) {
+            for (Entry<String,Table> p : tablesList) {
                 Iterator<Record> it = p.getValue().iterator();
                 records.put(p.getKey(), it);
             }
@@ -127,12 +128,12 @@ public class PlainSelectExecutor {
         return null;
     }
 
-    List<Pair<String,String>> extractSelectItems( List<SelectItem> items ) {
-        List<Pair<String,String>> ret = new LinkedList<Pair<String, String>>();
+    List<SimpleEntry<String,String>> extractSelectItems( List<SelectItem> items ) {
+        List<SimpleEntry<String,String>> ret = new LinkedList<SimpleEntry<String, String>>();
         SelectItemsExtractor extractor = new SelectItemsExtractor();
         for (SelectItem si : items) {
             si.accept(extractor);
-            ret.add(new Pair<String, String>(extractor.table, extractor.column));
+            ret.add(new SimpleEntry<String, String>(extractor.table, extractor.column));
         }
         return ret;
     }
