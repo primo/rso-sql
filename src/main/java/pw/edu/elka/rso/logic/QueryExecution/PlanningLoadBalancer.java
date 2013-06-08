@@ -4,6 +4,8 @@ import java.util.*;
 
 public class PlanningLoadBalancer {
     static int chooseNode(int[] partitions_ID){
+        //uwzglednia gdzie dane leza i ich obciaznie dla nodow
+        //nie uwzglednia jeszcze czegos malo w tej chwili
         int part1 = partitions_ID[0];
         int part2 = partitions_ID[1];
         Set<Integer> nodes_with_1 = Metadata.metadata.getPartitionNodes(part1);

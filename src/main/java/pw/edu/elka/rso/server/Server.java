@@ -97,8 +97,8 @@ public class Server implements Runnable, ITaskManager {
 
       Socket clientSocket = initConnectionToOtherShard(input);
 
-      ObjectOutputStream oos = null;
-      ObjectInputStream ois = null;
+      ObjectOutputStream oos;
+      ObjectInputStream ois;
       try {
         oos = new ObjectOutputStream(clientSocket.getOutputStream());
         oos.writeObject(input);
@@ -179,14 +179,24 @@ public class Server implements Runnable, ITaskManager {
           for (int i = 0; i < tasks.size(); i++) {
             Task task = tasks.poll();
             log.debug("Wykonuje zadanie" + task.toString());
+            /**
+             * DODAC OBSLUGE WSZYSTKICH TYPOW TASKOW
+             */
             if (task instanceof SetConnectionTask) {
-              initOutgoingConnections((ShardDetails) task.input);
+              SetConnectionTask connectionTask = (SetConnectionTask) task;
+              initOutgoingConnections(connectionTask.input);
             }
+
+
             if (task instanceof QueryTask) {
-              // po liscie przejechac
-              Queue<Object> queue = outcomingData.get(((QueryTask) task).getWhereToExecuteQuery().get(0));
+
+              QueryTask queryTask = (QueryTask) task;
+              Queue<Object> queue = outcomingData.get(queryTask.getWhereToExecuteQuery().get(0));
               queue.add(task);
-              outcomingData.put(((QueryTask) task).getWhereToExecuteQuery().get(0), queue);
+
+              for (ShardDetails shardDetail : queryTask.getWhereToExecuteQuery()) {
+                outcomingData.put(shardDetail, queue);
+              }
             }
           }
         }
@@ -273,7 +283,7 @@ class IncomingDataThread implements Runnable {
 
         //DOPISAC OBSLUGE TASKOW
         if (data instanceof QueryTask) {
-          log.debug("Odebralme("+ server.getServerDetails() +") cos " + data.toString());
+          log.debug("Odebralme(" + server.getServerDetails() + ") cos " + data.toString());
           server.getQueryExecutor().doTask((QueryTask) data);
         }
       } catch (IOException | ClassNotFoundException e) {

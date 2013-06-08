@@ -6,5 +6,6 @@ package pw.edu.elka.rso.server;
  * Date: 08.06.13
  */
 public enum QueryType {
-  MANGED, RAW
+  MANGED, // wykonaj logike zwiazna z zapytaniem
+  RAW //olej logike wykonaj query tylko na tym shardzie
 }

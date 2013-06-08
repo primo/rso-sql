@@ -1,11 +1,12 @@
 package pw.edu.elka.rso.storage;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.List;
 
 /**
  */
-public class QueryResult {
+public class QueryResult implements Serializable {
     public long queryId;
     public boolean result;
     public List<ByteBuffer> output;

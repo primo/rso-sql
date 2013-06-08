@@ -9,7 +9,6 @@ import pw.edu.elka.rso.storage.IDataShard;
 import pw.edu.elka.rso.storage.QueryResultReceiver;
 import pw.edu.elka.rso.storage.SqlDescription;
 
-import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.Observable;
 import java.util.Observer;
@@ -27,6 +26,8 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
   private ProceduresManager proceduresManager;
   private Queue<Task> tasks = new LinkedBlockingQueue<>();
 
+  private static int queryId = 0;
+
   public Server DoTegoRootuj;
 
   public QueryExecutorImpl(Observable consoleObservable, IDataShard dataShard, Server server) {
@@ -40,35 +41,45 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
     this.server = server;
   }
 
-  public void executeProcedure(String procedureName) throws ClassNotFoundException {
+  public void executeProcedure(String procedureName, QueryType queryType) throws ClassNotFoundException {
     Procedure procedure = proceduresManager.getProcedure(procedureName);
     try {
-      //TODO: do logic here
-      //
-      //TWORZYMY QUERY TASKA I TASKI DO LACZENIA
-
-      //EXAMPLE LOGIC(ZAWSZE PROBUJE LACZYC, poprawic)
       //logika powinna wiedziec gdzie jjuz jet polaczona
-      LinkedList<ShardDetails> whereToConnect = new LinkedList<>();
-      whereToConnect.add(DoTegoRootuj.getServerDetails());
-      logger.debug("HEREE");
-      //listy etcetc
-      Task connectionTask = new SetConnectionTask(DoTegoRootuj.getServerDetails());
-      server.doTask(connectionTask);
 
 
       SqlDescription sqlDescription = new SqlDescription();
       sqlDescription.statement = procedure.getParsedQuery();
-      //TODO: get properID
-      sqlDescription.id = 0;
+      sqlDescription.toStringQuery(procedureName);
+      sqlDescription.id = queryId++;
 
-      Task queryTask = new QueryTask(sqlDescription);
-      ((QueryTask) queryTask).getWhereToExecuteQuery().addAll(whereToConnect);
-      ((QueryTask) queryTask).setQueryRoot(server.getServerDetails());
-      server.doTask(queryTask);
+      QueryTask queryTask = new QueryTask(sqlDescription);
 
-      //
+      if (queryType == QueryType.MANGED) {
+        //TODO: ALL LOGIC GOES HERE
+        //listy etcetc
 
+
+        logger.debug("Doing some logic stuff.");
+        LinkedList<ShardDetails> whereToConnect = new LinkedList<>();
+        whereToConnect.add(DoTegoRootuj.getServerDetails());
+
+        Task connectionTask = new SetConnectionTask(DoTegoRootuj.getServerDetails());
+        server.doTask(connectionTask);
+        logger.debug("Doing some execution stuff.");
+
+        queryTask.getWhereToExecuteQuery().addAll(whereToConnect);
+        queryTask.setQueryRoot(server.getServerDetails());
+        server.doTask(queryTask);
+      }
+
+
+      /**
+       * !!!!!!!
+       * !!!!!!!
+       * TUTAJ WYKONUJEMY ZAPYTANIE DO Sharda
+       * !!!!!!!
+       * !!!!!!!
+       */
       dataShard.query(sqlDescription);
 
     } catch (Exception ex) {
@@ -97,7 +108,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
         String query = clientProcedureQueue.poll();
         logger.debug("Wykonuje procedure\"" + query + "\"");
         try {
-          executeProcedure(query);
+          executeProcedure(query, QueryType.MANGED);
         } catch (ClassNotFoundException e) {
           //TODO
           e.printStackTrace();
@@ -108,8 +119,15 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
         for (int i = 0; i < tasks.size(); i++) {
           Task task = tasks.poll();
           if (task instanceof QueryTask) {
-            logger.debug("Dostalem zapytanie" + ((QueryTask) task).getInput());
-            dataShard.query(((QueryTask) task).getInput());
+            QueryTask queryTask = (QueryTask) task;
+            logger.debug("Dostalem zapytanie: " + queryTask.getInput().getProcedureName());
+
+            try {
+              executeProcedure(queryTask.getInput().getProcedureName(), QueryType.RAW);
+            } catch (ClassNotFoundException e) {
+              logger.debug("Wywalilem sie przy probie wykonania zapytania" + queryTask.getInput().getProcedureName());
+              e.printStackTrace();
+            }
           }
         }
       }

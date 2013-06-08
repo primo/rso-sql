@@ -28,7 +28,6 @@ public class DataShard implements IDataShard, Runnable {
   @Override
   public long query(SqlDescription query) {
     tasks.offer(query);
-    query.id = nextQueryId;
     return nextQueryId++;
   }
 
