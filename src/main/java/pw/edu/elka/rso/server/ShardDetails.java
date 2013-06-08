@@ -69,6 +69,7 @@ public class ShardDetails implements Serializable {
     return "ShardDetails{" +
         "portNumber=" + portNumber +
         ", host=" + host +
+        ", id=" + id +
         '}';
   }
 }

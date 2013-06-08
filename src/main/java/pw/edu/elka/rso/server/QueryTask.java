@@ -11,7 +11,15 @@ import java.util.LinkedList;
  */
 public class QueryTask extends Task<SqlDescription> implements Serializable {
 
+  ShardDetails queryRoot;
 
+  public ShardDetails getQueryRoot() {
+    return queryRoot;
+  }
+
+  public void setQueryRoot(ShardDetails queryRoot) {
+    this.queryRoot = queryRoot;
+  }
 
   public QueryTask(SqlDescription input) {
     this.input = input;
@@ -25,5 +33,12 @@ public class QueryTask extends Task<SqlDescription> implements Serializable {
 
   public void setWhereToExecuteQuery(LinkedList<ShardDetails> whereToExecuteQuery) {
     this.whereToExecuteQuery = whereToExecuteQuery;
+  }
+
+  @Override
+  public String toString() {
+    return "QueryTask{" +
+        "queryRoot=" + queryRoot +
+        '}';
   }
 }
