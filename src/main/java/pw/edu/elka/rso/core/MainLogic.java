@@ -48,11 +48,11 @@ public class MainLogic {
 
     QueryExecutorImpl queryExecutor = new QueryExecutorImpl(inputManager, dataShard, server1);
     queryExecutor.setQueryResultReceiver(queryResultReceiver);
-    queryExecutor.DoTegoRootuj = server2;
+    queryExecutor.DoTegoRootuj = server1;
 
     QueryExecutorImpl queryExecutor2 = new QueryExecutorImpl(inputManager2, dataShard, server2);
     queryExecutor.setQueryResultReceiver(queryResultReceiver2);
-    queryExecutor.DoTegoRootuj = server1;
+    queryExecutor.DoTegoRootuj = server2;
 //
     server1.setQueryExecutor(queryExecutor);
     server2.setQueryExecutor(queryExecutor2);

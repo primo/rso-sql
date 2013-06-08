@@ -25,7 +25,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
   private Observable consoleObservable;
   private LinkedBlockingQueue<String> clientProcedureQueue = new LinkedBlockingQueue<>();
   private ProceduresManager proceduresManager;
-  private Queue<Task> tasks = new LinkedList<>();
+  private Queue<Task> tasks = new LinkedBlockingQueue<>();
 
   public Server DoTegoRootuj;
 
@@ -63,7 +63,8 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
       sqlDescription.id = 0;
 
       Task queryTask = new QueryTask(sqlDescription);
-      ((QueryTask)queryTask).getWhereToExecuteQuery().addAll(whereToConnect);
+      ((QueryTask) queryTask).getWhereToExecuteQuery().addAll(whereToConnect);
+      ((QueryTask) queryTask).setQueryRoot(server.getServerDetails());
       server.doTask(queryTask);
 
       //
@@ -107,15 +108,16 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
         for (int i = 0; i < tasks.size(); i++) {
           Task task = tasks.poll();
           if (task instanceof QueryTask) {
+            logger.debug("Dostalem zapytanie" + ((QueryTask) task).getInput());
             dataShard.query(((QueryTask) task).getInput());
           }
         }
       }
 
-      if (!queryResultReceiver.getQueryResult().isEmpty()) {
-        logger.debug("COS JEST!1111");
-
-      }
+//      if (!queryResultReceiver.getQueryResult().isEmpty()) {
+//        logger.debug("COS JEST!1111");
+//
+//      }
     }
 
   }
