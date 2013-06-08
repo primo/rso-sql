@@ -78,6 +78,17 @@ public class TableSchema implements Cloneable{
         return ts;
     }
 
+    public TableSchema copy(String prefix) {
+        TableSchema ts = new TableSchema();
+
+        for (String s: specification.keySet()) {
+            TableColumn columnTable = this.specification.get(s);
+            ts.specification.put(prefix+"."+s, columnTable);
+            ts.rLength += columnTable.length;
+        }
+        return ts;
+    }
+
     public TableSchema appendSchema(TableSchema tableSchema) {
         Set<String> keys = tableSchema.specification.keySet();
         for (String k: keys) {
@@ -91,11 +102,28 @@ public class TableSchema implements Cloneable{
         return this;
     }
 
+    public TableSchema appendSchema(TableSchema tableSchema, String prefix) {
+        Set<String> keys = tableSchema.specification.keySet();
+        for (String k: keys) {
+            if (this.specification.containsKey(prefix.concat(k))) {
+                throw new InvalidParameterException("TableScheme to be appended duplicates keys from the source.");
+            }
+        }
+        for (String k : keys) {
+            this.specification.put(prefix+"."+k, tableSchema.getTableColumn(k));
+        }
+        return this;
+    }
+
     public TableSchema appendScheme(TableSchema tableSchema, List<SimpleEntry<String,String>> renames) {
         // ! does not validate duplicated columns between schemas etc...
         for (Entry<String,String> p : renames) {
             this.specification.put(p.getKey(), tableSchema.getTableColumn(p.getValue()));
         }
         return this;
+    }
+
+    public Set<String> getColumnNames() {
+        return this.specification.keySet();
     }
 }

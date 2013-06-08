@@ -352,4 +352,8 @@ public class ExpressionInterpreter implements ExpressionVisitor {
     public void visit(BitwiseXor bitwiseXor) {
         throw new IllegalArgumentException("Operation not yet implemented.");
     }
+
+    public boolean isTrue() {
+        return (Boolean)elements.pop();
+    }
 }

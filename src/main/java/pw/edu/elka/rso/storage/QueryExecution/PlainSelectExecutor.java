@@ -19,46 +19,61 @@ import pw.edu.elka.rso.storage.DataRepresentation.TableSchema;
 public class PlainSelectExecutor {
 
     private QueryEngine queryEngine;
-    private List<ExpressionWrapper> whereExpressions;
+    private Expression whereExpressions;
+    private ExpressionInterpreter ei = new ExpressionInterpreter();
 
     public PlainSelectExecutor( QueryEngine queryEngine) {
         this.queryEngine = queryEngine;
-        whereExpressions = new LinkedList<ExpressionWrapper>();
     }
 
     Table execute(PlainSelect select) {
-        FromItem table1 = select.getFromItem();
-        List<Join> joins = select.getJoins();
         Table targetTable = null;
         Map<String,Table> tables = new HashMap<String, Table>();
+        HashMap<String, String>  aliases = new HashMap<String, String>();
+        HashMap<String, String> columnMapping  = new HashMap<String, String>();
+        HashMap<String, Record> currentLines = new HashMap<String, Record>();
+
+        // Parsed objects
+        FromItem table1 = select.getFromItem();
+        List<Join> joins = select.getJoins();
+
         List<SimpleEntry<String,Table>> tablesList = new LinkedList<SimpleEntry<String,Table>>();
         FromExtractor fe = new FromExtractor();
         table1.accept(fe);
         targetTable = queryEngine.getTable(fe.tableName);
         tables.put(fe.tableName, targetTable);
-        tables.put(fe.tableAlias, targetTable);
+        aliases.put(fe.tableAlias, fe.tableName);
         tablesList.add(new SimpleEntry<String, Table>(fe.tableName, targetTable));
 
         if (!joins.isEmpty()) {
             // table1 is also joined, it's a strange jsqlparser custom to split join clause in this way
             // so perform a join
             String leftTable = fe.tableName;
+            String resultTable = null;
             for (Iterator it = joins.iterator();it.hasNext();) {
+                // Extract the joined table object
                 Join j = (Join) it.next();
                 FromItem temp = j.getRightItem();
                 temp.accept(fe);
                 Table table = queryEngine.getTable(fe.tableName);
-                tables.put(fe.tableAlias, table);
-                tables.put(fe.tableName, table);
-                tablesList.add(new SimpleEntry<String, Table>(fe.tableName, table));
+                // Get the join condition
                 Expression onExpr = j.getOnExpression();
-                whereExpressions.add(wrap(leftTable, fe.tableName, onExpr));
-                leftTable = fe.tableName;
+                if (null != onExpr) {
+                    // Fetch the previous table
+                    Table base = tables.get(leftTable);
+                    Table result = doInnerJoin(base, leftTable, table, fe.tableName, onExpr);
+                    resultTable = leftTable +"#"+fe.tableName;
+                    tables.put(fe.tableName, table);
+                } else {
+                    aliases.put(fe.tableAlias, fe.tableName);
+                    tables.put(fe.tableName, table);
+                    resultTable = fe.tableName;
+                }
+                leftTable = resultTable;
             }
         }
         // now evaluate where clause and prepare a filter
-        Expression whereExpr =  select.getWhere();
-        whereExpressions.addAll(split(whereExpr));
+        whereExpressions = select.getWhere();
 
         // select required columns
         List<SimpleEntry<String,String>> selectItems = extractSelectItems(select.getSelectItems());
@@ -84,6 +99,7 @@ public class PlainSelectExecutor {
             outputItems.add(desc);
             schema.addColumn(p.getValue(), type ,length);
         }
+
         Table output = new Table(schema);
         if (tablesList.size() == 1) {
             String n1 = tablesList.get(0).getKey();
@@ -118,14 +134,40 @@ public class PlainSelectExecutor {
         return output;
     }
 
-    List<ExpressionWrapper> split(Expression expr) {
-        ExpressionInterpreter ei = new ExpressionInterpreter();
-        expr.accept(ei);
-        return ei.expressions;
-    }
+    private Table doInnerJoin(Table base, String baseName, Table subject, String subjectName, Expression onExpr) {
+        // FIXME do not create long names -- check it
+        Set<String> baseColumns = base.getTableSchema().getColumnNames();
+        Set<String> subjectColumns = subject.getTableSchema().getColumnNames();
+        TableSchema schema = null;
+        if (baseName.contains("#")) {
+            schema = base.getTableSchema().copy();
+        } else {
+            schema = base.getTableSchema().copy(baseName);
+        }
+        schema.appendSchema(subject.getTableSchema(),subjectName);
+        Table output = new Table(schema);
+        Record out =  output.newRecord();
 
-    ExpressionWrapper wrap(String t1, String t2, Expression expr) {
-        return null;
+        Iterator<Record> baseIt = base.iterator();
+        Iterator<Record> subjectIt = subject.iterator();
+        while (baseIt.hasNext()) {
+            Record rb = baseIt.next();
+            while (subjectIt.hasNext()) {
+                Record rs = subjectIt.next();
+                onExpr.accept(ei);
+                if (ei.isTrue()) {
+                    // Join the rows
+                    for (String s : baseColumns) {
+                        out.setValue(baseName+"."+s, rb.getValue(s));
+                    }
+                    for (String s : subjectColumns) {
+                        out.setValue(subjectName+"."+s, rs.getValue(s));
+                    }
+                    output.insert(out);
+                }
+            }
+        }
+        return output;
     }
 
     List<SimpleEntry<String,String>> extractSelectItems( List<SelectItem> items ) {
@@ -137,7 +179,6 @@ public class PlainSelectExecutor {
         }
         return ret;
     }
-
 }
 
 
