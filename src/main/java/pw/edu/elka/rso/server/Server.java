@@ -176,9 +176,10 @@ public class Server implements Runnable, ITaskManager {
 
         //LOGIC HERE
         if (tasks.size() > 0) {
-          log.debug("ZADANIE!11");
+
           for (int i = 0; i < tasks.size(); i++) {
             Task task = tasks.poll();
+            log.debug("Wykonuje zadanie" + task.toString());
             if (task instanceof SetConnectionTask) {
               initOutgoingConnections((ShardDetails) task.input);
             }

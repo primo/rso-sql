@@ -12,11 +12,19 @@ import pw.edu.elka.rso.storage.SqlDescription;
  */
 public abstract class Task<I> {
 
-  private int taskId;
+  private int taskId = 0;
 
   protected I input;
 
   public I getInput() {
     return input;
+  }
+
+  @Override
+  public String toString() {
+    return "Task{" +
+        "taskId=" + taskId +
+        ", input=" + input +
+        '}';
   }
 }

@@ -11,6 +11,8 @@ import java.util.LinkedList;
  */
 public class QueryTask extends Task<SqlDescription> implements Serializable {
 
+
+
   public QueryTask(SqlDescription input) {
     this.input = input;
   }

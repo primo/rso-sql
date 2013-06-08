@@ -104,7 +104,6 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
       }
 
       if (tasks.size() > 0) {
-        logger.debug("ZADANIE!11");
         for (int i = 0; i < tasks.size(); i++) {
           Task task = tasks.poll();
           if (task instanceof QueryTask) {

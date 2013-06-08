@@ -38,8 +38,10 @@ public class MainLogic {
 
 
     QueryResultReceiverImpl queryResultReceiver = new QueryResultReceiverImpl();
+    QueryResultReceiverImpl queryResultReceiver2 = new QueryResultReceiverImpl();
 
     InputManager inputManager = new InputManager();
+    InputManager inputManager2 = new InputManager();
 
     DataShard dataShard = new DataShard();
     dataShard.registerQueryResultReceiver(queryResultReceiver);
@@ -48,8 +50,8 @@ public class MainLogic {
     queryExecutor.setQueryResultReceiver(queryResultReceiver);
     queryExecutor.DoTegoRootuj = server2;
 
-    QueryExecutorImpl queryExecutor2 = new QueryExecutorImpl(inputManager, dataShard, server2);
-    queryExecutor.setQueryResultReceiver(queryResultReceiver);
+    QueryExecutorImpl queryExecutor2 = new QueryExecutorImpl(inputManager2, dataShard, server2);
+    queryExecutor.setQueryResultReceiver(queryResultReceiver2);
     queryExecutor.DoTegoRootuj = server1;
 //
     server1.setQueryExecutor(queryExecutor);
@@ -57,11 +59,11 @@ public class MainLogic {
 
     Thread queryExecutorThread = new Thread(queryExecutor);
     queryExecutorThread.start();
-    dataShard.start();
+    //dataShard.start();
 
     Thread queryExecutorThread2 = new Thread(queryExecutor2);
     queryExecutorThread2.start();
-    dataShard.start();
+    //dataShard.start();
 
 
     inputManager.readInput("SelectFromClients");
