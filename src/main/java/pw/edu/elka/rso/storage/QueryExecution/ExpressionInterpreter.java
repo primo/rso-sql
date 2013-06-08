@@ -1,6 +1,7 @@
 package pw.edu.elka.rso.storage.QueryExecution;
 
-import javafx.util.Pair;
+import java.util.AbstractMap;
+import java.util.Map.Entry;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
@@ -17,7 +18,7 @@ import java.util.List;
 public class ExpressionInterpreter implements ExpressionVisitor {
 
     public final List<ExpressionWrapper> expressions = new LinkedList<ExpressionWrapper>();
-    private Pair<String,String> lastColumn;
+    private Entry<String,String> lastColumn;
 
     @Override
     public void visit(NullValue nullValue) {
@@ -111,9 +112,9 @@ public class ExpressionInterpreter implements ExpressionVisitor {
 
     private void wrapExpression(BinaryExpression expr, Operation op) {
         expr.getLeftExpression().accept(this);
-        Pair<String,String> c1 = lastColumn;
+        Entry<String,String> c1 = lastColumn;
         expr.getRightExpression().accept(this);
-        Pair<String,String> c2 = lastColumn;
+        Entry<String,String> c2 = lastColumn;
         ExpressionWrapper ew = new ExpressionWrapper(c1.getKey(),c1.getValue(), op, c2.getKey(),c2.getValue());
         expressions.add(ew);
     }
@@ -166,7 +167,7 @@ public class ExpressionInterpreter implements ExpressionVisitor {
 
     @Override
     public void visit(Column column) {
-        lastColumn = new Pair<String, String>(column.getTable().getName(), column.getColumnName());
+        lastColumn = new AbstractMap.SimpleEntry<String, String>(column.getTable().getName(), column.getColumnName());
     }
 
     @Override

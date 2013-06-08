@@ -1,6 +1,5 @@
 package pw.edu.elka.rso.storage.QueryExecution;
 
-import javafx.util.Pair;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
@@ -9,6 +8,7 @@ import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -175,7 +175,7 @@ class QueryItemsExtractor implements ItemsListVisitor, ExpressionVisitor {
 
     @Override
     public void visit(Column column) {
-        appendObject(new Pair(column.getTable().getName(), column.getColumnName()));
+        appendObject(new SimpleEntry<String,String>(column.getTable().getName(), column.getColumnName()));
     }
 
     @Override
