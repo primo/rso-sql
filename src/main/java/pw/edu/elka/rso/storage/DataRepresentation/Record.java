@@ -29,4 +29,8 @@ public class Record {
     public Object getValue(String column_name){
         return tableSchema.getTableColumn(column_name).getValue(byteBuffer);
     }
+
+    public ByteBuffer getContentDuplicate() {
+        return byteBuffer.duplicate();
+    }
 }

@@ -2,13 +2,20 @@ package pw.edu.elka.rso.storage.DataRepresentation;
 
 import java.nio.ByteBuffer;
 
-abstract class TableColumn {
+public abstract class TableColumn {
+
+    public int getLength() {
+        return length;
+    }
+
     final int length;
     final int position;
+    final public ColumnType columnType;
 
-    protected TableColumn(int length, int position) {
+    protected TableColumn(int length, int position, ColumnType columnType) {
         this.length = length;
         this.position = position;
+        this.columnType = columnType;
     }
 
     abstract void setValue(ByteBuffer ba, Object value);
@@ -17,7 +24,7 @@ abstract class TableColumn {
 
 class IntTableColumn extends TableColumn {
     IntTableColumn(int position) {
-        super(5, position);
+        super(5, position, ColumnType.INT);
     }
 
     void setValue(ByteBuffer buffer, Object value){
@@ -40,7 +47,7 @@ class IntTableColumn extends TableColumn {
 
 class DoubleTableColumn extends TableColumn {
     DoubleTableColumn(int position) {
-        super(9, position);
+        super(9, position, ColumnType.DOUBLE);
     }
 
     void setValue(ByteBuffer buffer, Object value){
@@ -63,7 +70,7 @@ class DoubleTableColumn extends TableColumn {
 
 class CharTableColumn extends TableColumn {
     public CharTableColumn(int length, int position){
-        super(2*(length)+1, position);
+        super(2*(length)+1, position, ColumnType.CHAR);
     }
 
     void setValue(ByteBuffer buffer, Object object){

@@ -4,42 +4,107 @@ import pw.edu.elka.rso.storage.DataRepresentation.Record;
 
 /**
  */
-public class ExpressionWrapper {
-    protected String col1;
-    protected String col2;
-    protected Operation op;
+class ExpressionWrapper {
+    public final String tab1;
+    public final String tab2;
+    public final String col1;
+    public final String col2;
+    public final Operation op;
 
-    public ExpressionWrapper(Operation op, String col2, String col1) {
+    public ExpressionWrapper(String tab1, String col1, Operation op,  String tab2, String col2) {
         this.op = op;
         this.col2 = col2;
         this.col1 = col1;
+        this.tab1 = tab1;
+        this.tab2 = tab2;
     }
 
     public boolean evaluate(Record r1, Record r2) {
+        Object temp = r1.getValue(col1);
         switch (op) {
             case EQ:
-                if (r1.getValue(col1) == r2.getValue(col2)) {
-                    return true;
+                if (temp instanceof String) {
+                    if (((String)temp).compareTo((String)r2.getValue(col2)) == 0) {
+                        return true;
+                    }
+                    return false;
+                }
+                else if (temp instanceof Integer) {
+                    if (((Comparable<Integer>)temp).compareTo ((Integer)r2.getValue(col2)) == 0)
+                        return true;
+                    return false;
+                } else if(temp instanceof Double)                                                          {
+                    if (((Comparable<Double>)temp).compareTo ((Double)r2.getValue(col2)) == 0)
+                        return true;
+                    return false;
                 }
                 return false;
             case GT:
-                if (((Comparable<?>)r1.getValue(col1)).compareTo (r2.getValue(col2))>0) {
-                    return true;
+                if (temp instanceof String) {
+                    if (((String)temp).compareTo((String)r2.getValue(col2)) > 0) {
+                        return true;
+                    }
+                    return false;
+                }
+                else if (temp instanceof Integer) {
+                    if (((Comparable<Integer>)temp).compareTo ((Integer)r2.getValue(col2)) > 0)
+                        return true;
+                    return false;
+                } else if(temp instanceof Double)                                                          {
+                    if (((Comparable<Double>)temp).compareTo ((Double)r2.getValue(col2)) > 0)
+                        return true;
+                    return false;
                 }
                 return false;
             case LT:
-                if (((Comparable<?>)r1.getValue(col1)).compareTo(r2.getValue(col2)) < 0) {
-                    return true;
+                if (temp instanceof String) {
+                    if (((String)temp).compareTo((String)r2.getValue(col2)) < 0) {
+                        return true;
+                    }
+                    return false;
+                }
+                else if (temp instanceof Integer) {
+                    if (((Comparable<Integer>)temp).compareTo ((Integer)r2.getValue(col2)) < 0)
+                        return true;
+                    return false;
+                } else if(temp instanceof Double)                                                          {
+                    if (((Comparable<Double>)temp).compareTo ((Double)r2.getValue(col2)) < 0)
+                        return true;
+                    return false;
                 }
                 return false;
             case GTE:
-                if (((Comparable<?>)r1.getValue(col1)).compareTo(r2.getValue(col2)) >= 0) {
-                    return true;
+                if (temp instanceof String) {
+                    if (((String)temp).compareTo((String)r2.getValue(col2)) >= 0) {
+                        return true;
+                    }
+                    return false;
+                }
+                else if (temp instanceof Integer) {
+                    if (((Comparable<Integer>)temp).compareTo ((Integer)r2.getValue(col2)) >= 0)
+                        return true;
+                    return false;
+                } else if(temp instanceof Double)                                                          {
+                    if (((Comparable<Double>)temp).compareTo ((Double)r2.getValue(col2)) >= 0)
+                        return true;
+                    return false;
                 }
                 return false;
             case LTE:
-                if (((Comparable<?>)r1.getValue(col1)).compareTo(r2.getValue(col2)) <= 0) {
-                    return true;
+                if (temp instanceof String) {
+                    if (((String)temp).compareTo((String)r2.getValue(col2)) <= 0) {
+                        return true;
+                    }
+                    return false;
+                }
+                else if (temp instanceof Integer) {
+                    if (((Comparable<Integer>)temp).compareTo ((Integer)r2.getValue(col2)) <= 0)
+                        return true;
+                    return false;
+                } else if(temp instanceof Double)                                                          {
+                    if (((Comparable<Double>)temp).compareTo ((Double)r2.getValue(col2)) <= 0)
+                        return true;
+                    return false;
                 }
                 return false;
             default:

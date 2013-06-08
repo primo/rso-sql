@@ -36,6 +36,12 @@ public class TableSchema implements Cloneable{
         return specification.get(name);
     }
 
+    public ColumnType getColumnType(String name) {
+        if (null != specification.get(name))
+            return  specification.get(name).columnType;
+        return null;
+    }
+
     public int getLength(){
         return rLength;
     }

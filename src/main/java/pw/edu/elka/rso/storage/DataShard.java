@@ -23,8 +23,6 @@ public class DataShard implements IDataShard, Runnable {
   static Logger LOG = Logger.getLogger(DataShard.class);
 
   public DataShard() {
-    tasks = new ConcurrentLinkedQueue<>();
-    /* TODO Should be removed ? */
   }
 
   @Override

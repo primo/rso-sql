@@ -153,7 +153,7 @@ class RootQueryVisitor implements StatementVisitor {
         }
         Table table = new Table(schema);
         for (Index indexDef : (List<Index>)createTable.getIndexes()) {
-            List cols = indexDef.getColumnsNames();
+            List<String> cols = indexDef.getColumnsNames();
             for (String s : cols) {
                 table.createIndex(s);
             }

@@ -16,7 +16,7 @@ import java.util.Map;
 public class QueryResultReceiverImpl implements QueryResultReceiver {
 
   private QueryResult qr;
-  private Map<Long, LinkedList<ByteBuffer>> queryResult = new HashMap<>();
+  private Map<Long, LinkedList<ByteBuffer>> queryResult = new HashMap<Long, LinkedList<ByteBuffer>>();
 
   @Override
   public void complete(QueryResult qr) {
@@ -24,7 +24,7 @@ public class QueryResultReceiverImpl implements QueryResultReceiver {
     if (qr.result) {
       Long queryId = qr.queryId;
       LinkedList<ByteBuffer> result = !(queryResult.containsKey(queryId)) ? new LinkedList<ByteBuffer>() : queryResult.get(queryId);
-      result.add(qr.output);
+      result.addAll(qr.output);
     }else{
      //TODO: obsluzyc bledne wywolanie procedury
     }

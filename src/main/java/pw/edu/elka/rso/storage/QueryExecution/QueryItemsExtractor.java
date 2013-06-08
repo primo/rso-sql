@@ -1,5 +1,6 @@
 package pw.edu.elka.rso.storage.QueryExecution;
 
+import javafx.util.Pair;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.expression.operators.arithmetic.*;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
@@ -174,7 +175,7 @@ class QueryItemsExtractor implements ItemsListVisitor, ExpressionVisitor {
 
     @Override
     public void visit(Column column) {
-        throw new UnsupportedOperationException("Expression extraction for this data type is not implemented.");
+        appendObject(new Pair(column.getTable().getName(), column.getColumnName()));
     }
 
     @Override
