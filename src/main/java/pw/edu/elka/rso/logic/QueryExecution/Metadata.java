@@ -2,6 +2,7 @@ package pw.edu.elka.rso.logic.QueryExecution;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 
 public class Metadata{
     //One instance
@@ -26,6 +27,13 @@ public class Metadata{
         return partition2nodes.get(partition_id);
     }
 
+    void updateLoad(int node_id, float new_load){
+        currentLoad.put(node_id, new_load);
+    }
+
+    float getLoad(int node_id){
+        return currentLoad.get(node_id);
+    }
 //    static Set<Integer> stripID(Set<MetadataObject> collection){
 //        Set<Integer> return_set = new HashSet<Integer>();
 //        for (MetadataObject mo : collection)
