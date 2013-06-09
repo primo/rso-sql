@@ -16,11 +16,11 @@ public class ExecutionLoadBalancer {
     public ShardDetails selectLeastLoadedNode(ArrayList<ShardDetails> shards) {
         return statistics.getTheLeastLoaded(shards);
     }
-    public void incOperationCount(ShardDetails shard) {
-        statistics.incShardOpcount(shard);
+    public void incOperationCount(ShardDetails shard,int by) {
+        statistics.incShardOpcountBy(shard,by);
     }
-    public void incOperationCount(int shardId) {
-        statistics.incShardOpcount(shardId);
+    public void incShardOpcountBy(int shardId,int by) {
+        statistics.incShardOpcount(shardId,by);
     }
     public void resetOperationCount(ShardDetails shard) {
         statistics.resetShardOpcount(shard);
