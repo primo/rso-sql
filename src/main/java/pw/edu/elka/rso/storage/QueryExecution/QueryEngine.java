@@ -17,6 +17,8 @@ public class QueryEngine {
     public QueryEngine() {
         // 1. Setup metadata and statistic
         // TODO
+        name2TableId = new HashMap<String, Integer>();
+        tables = new HashMap<Integer,Table>();
     }
 
     public QueryResult query( SqlDescription query) {
