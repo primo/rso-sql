@@ -5,11 +5,14 @@ import pw.edu.elka.rso.core.communication.ClientServer;
 import pw.edu.elka.rso.logic.interfaces.IQueryExecutor;
 import pw.edu.elka.rso.logic.procedures.Procedure;
 import pw.edu.elka.rso.logic.procedures.ProceduresManager;
-import pw.edu.elka.rso.server.*;
+import pw.edu.elka.rso.server.Server;
+import pw.edu.elka.rso.server.ShardDetails;
+import pw.edu.elka.rso.server.Task;
 import pw.edu.elka.rso.server.tasks.ITaskManager;
 import pw.edu.elka.rso.server.tasks.QueryResultTask;
 import pw.edu.elka.rso.server.tasks.QueryTask;
 import pw.edu.elka.rso.server.tasks.SetConnectionTask;
+import pw.edu.elka.rso.storage.DataRepresentation.Table;
 import pw.edu.elka.rso.storage.IDataShard;
 import pw.edu.elka.rso.storage.QueryResult;
 import pw.edu.elka.rso.storage.QueryResultReceiver;
@@ -20,7 +23,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, ITaskManager {
   static Logger logger = Logger.getLogger(QueryExecutorImpl.class);
-
+  private static long queryId = 0;
+  //TODO: wywalic, testowe
+  public Server DoTegoRootuj;
   private IDataShard dataShard;
   private QueryResultReceiverImpl queryResultReceiver;
   private Server server;
@@ -31,25 +36,9 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
   private LinkedBlockingQueue<QueryInfo> clientProcedureQueue = new LinkedBlockingQueue<>();
   private ProceduresManager proceduresManager;
   private QueryResultManager queryResultManager;
-
   //do tej kolejki pushowane sa zadania ktore logika ma wykonac, pushuje je serwer.
   private Queue<Task> tasks = new LinkedBlockingQueue<>();
-
-  private static long queryId = 0;
-
-  //TODO: wywalic, testowe
-  public Server DoTegoRootuj;
-
   private ClientServer clientServer;
-
-  public ClientServer getClientServer() {
-    return clientServer;
-  }
-
-  public void setClientServer(ClientServer clientServer) {
-    this.clientServer = clientServer;
-  }
-
 
   public QueryExecutorImpl(Observable consoleObservable, IDataShard dataShard, Server server) {
     this.proceduresManager = ProceduresManager.getInstance();
@@ -64,11 +53,21 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
     this.queryResultManager = new QueryResultManager();
   }
 
+  public static long returnNewQueryId() {
+    return queryId++;
+  }
+
+  public ClientServer getClientServer() {
+    return clientServer;
+  }
+
+  public void setClientServer(ClientServer clientServer) {
+    this.clientServer = clientServer;
+  }
+
   public void executeProcedure(QueryInfo queryInfo, QueryType queryType, QueryTask queryTaskReceived) throws ClassNotFoundException {
     Procedure procedure = proceduresManager.getProcedure(queryInfo.getProcedureName());
     try {
-      //logika powinna wiedziec gdzie jjuz jet polaczona
-
 
       /**
        *
@@ -80,7 +79,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
 
 
       /**
-       * Ta ladna liste wypelni nam Tadek swoja funkcja haszujaca
+       * Ta ladna liste wypelni nam
        */
 
 
@@ -105,8 +104,6 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
             server.doTask(connectionTask);
           }
         }
-        //dodaje siebie
-
 
         /**
          * QueryTask uzupelniamy:
@@ -125,29 +122,27 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
 
       /**
        * !!!!!!!
-       * !!!!!!!
        * TUTAJ WYKONUJEMY ZAPYTANIE DO Sharda
-       * !!!!!!!
        * !!!!!!!
        */
 
-      //dataShard.query(sqlDescription);
+      dataShard.query(sqlDescription, queryTaskReceived);
 
-      QueryResult qr = new QueryResult();
-      qr.queryId = sqlDescription.id;
-      String result = "Wynik:" + server.getServerDetails() + "[id:" + sqlDescription.id+ "]";
-      qr.stringResult = result;
+//      QueryResult qr = new QueryResult();
+//      qr.queryId = sqlDescription.id;
+//      String result = "Wynik:" + server.getServerDetails() + "[id:" + sqlDescription.id+ "]";
+//      qr.stringResult = result;
 
 
-      //TESTOWE!
-      if (queryType == QueryType.MANGED) {
-        queryResultReceiver.getTestResult().add(qr);
-      } else if (queryType == QueryType.RAW) {
-        //TO WPIAC W MIEJSCE W KTORY MA BYC TWRZONY TASK Z REZUTLATEM !111
-        Task queryResultTask = new QueryResultTask(qr);
-        ((QueryResultTask) queryResultTask).setReturnShard(queryTaskReceived.getQueryRoot());
-        server.doTask(queryResultTask);
-      }
+//      //TESTOWE!
+//      if (queryType == QueryType.MANGED) {
+//        queryResultReceiver.getTestResult().add(qr);
+//      } else if (queryType == QueryType.RAW) {
+//        //TO WPIAC W MIEJSCE W KTORY MA BYC TWRZONY TASK Z REZUTLATEM !111
+//        Task queryResultTask = new QueryResultTask(qr);
+//        ((QueryResultTask) queryResultTask).setReturnShard(queryTaskReceived.getQueryRoot());
+//        server.doTask(queryResultTask);
+//      }
 
     } catch (Exception ex) {
       //TODO: ladne obluzycy wyjatek
@@ -215,7 +210,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
             QueryResultTask queryResultTask = (QueryResultTask) task;
             logger.debug("Dostalem(@" + server.getServerDetails() + ") odpowiedz  " + queryResultTask.getInput());
             QueryResult queryResult = queryResultTask.getInput();
-            queryResultManager.insertResult(queryResult.queryId, queryResult.stringResult);
+            queryResultManager.insertResult(queryResult.queryId, queryResult.output);
           }
         }
       }
@@ -233,7 +228,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
           //if(qr.) stworzyc taska
 
           logger.debug("Dodaje rezultat zapytania " + qr.toString());
-          queryResultManager.insertResult(qr.queryId, qr.stringResult);
+          queryResultManager.insertResult(qr.queryId, qr.output);
         }
       }
 
@@ -244,12 +239,12 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
       if (queryResultManager.checkResult() != null) {
         //PUSH DALEJ
         //wyswietlam wynik calego zapytania dla jaj
-        for (Map.Entry<Long, LinkedList<String>> entry : queryResultManager.returnResult().entrySet()) {
+        for (Map.Entry<Long, LinkedList<Table>> entry : queryResultManager.returnResult().entrySet()) {
           Long queryId = entry.getKey();
-          LinkedList<String> value = entry.getValue();
+          LinkedList<Table> value = entry.getValue();
           StringBuilder sb = new StringBuilder();
-          for (String val : value) {
-            sb.append(val);
+          for (Table val : value) {
+            sb.append(val.toString());
             logger.debug("Rezultat:" + val);
           }
           clientServer.pushToClientServer(sb.toString());
@@ -271,10 +266,6 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
 
   public void setQueryResultReceiver(QueryResultReceiverImpl queryResultReceiver) {
     this.queryResultReceiver = queryResultReceiver;
-  }
-
-  public static long returnNewQueryId(){
-    return queryId++;
   }
 }
 
