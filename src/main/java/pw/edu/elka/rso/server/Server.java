@@ -14,13 +14,13 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created with IntelliJ IDEA.
  * User: michal
  * Date: 04.06.13
  * Time: 01:14
- * To change this template use File | Settings | File Templates.
  */
 public class Server implements Runnable, ITaskManager {
 
@@ -33,11 +33,11 @@ public class Server implements Runnable, ITaskManager {
   // The client socket.
 
   private Map<ShardDetails, Socket> connections = new HashMap<>();
+  //kolejka danych
   private Map<ShardDetails, Queue<Object>> outcomingData = new HashMap<>();
 
   private Queue<Task> tasks = new LinkedList<>();
 
-  private Queue<ShardDetails> newConnections = new LinkedList<>();
 
   private QueryExecutorImpl queryExecutor;
 
@@ -45,13 +45,14 @@ public class Server implements Runnable, ITaskManager {
     return queryExecutor;
   }
 
+  public Map<ShardDetails, Socket> getConnections() {
+    return connections;
+  }
+
   public void setQueryExecutor(QueryExecutorImpl queryExecutor) {
     this.queryExecutor = queryExecutor;
   }
 
-  public void setNewConnections(Queue<ShardDetails> newConnections) {
-    this.newConnections = newConnections;
-  }
 
   public Server(int portNumber, int id) throws UnknownHostException {
     shardDetails = new ShardDetails(portNumber, InetAddress.getLocalHost(), id);
@@ -88,20 +89,23 @@ public class Server implements Runnable, ITaskManager {
     return clientSocket;
   }
 
-  public void initOutgoingConnections(ShardDetails input) {
+  public void initOutgoingConnections(ShardDetails shardDetail) {
 
 
     boolean connectionSucessfull = false;
 
-    if (!connections.containsKey(input)) {
+    if (!connections.containsKey(shardDetail)) {
 
-      Socket clientSocket = initConnectionToOtherShard(input);
+      Socket clientSocket = initConnectionToOtherShard(shardDetail);
+
+      IncomingDataThread incData = new IncomingDataThread(this, clientSocket);
+
 
       ObjectOutputStream oos;
       ObjectInputStream ois;
       try {
         oos = new ObjectOutputStream(clientSocket.getOutputStream());
-        oos.writeObject(input);
+        oos.writeObject(this.getServerDetails());
         log.debug("Lacze sie z serwerem: " + clientSocket.toString());
 
         ois = new ObjectInputStream(clientSocket.getInputStream());
@@ -112,18 +116,21 @@ public class Server implements Runnable, ITaskManager {
           connectionSucessfull = true;
         }
 
+        Thread incomingDataThread = new Thread(incData);
+        incomingDataThread.start();
+
 
       } catch (IOException | ClassNotFoundException e) {
         e.printStackTrace();
       }
 
       if (connectionSucessfull) {
-        connections.put(input, clientSocket);
-        outcomingData.put(input, new LinkedList<>());
-        log.debug("Success! Polaczono do " + input.toString());
+        connections.put(shardDetail, clientSocket);
+        outcomingData.put(shardDetail, new LinkedBlockingQueue<>());
+        log.debug("Success! Polaczono do " + shardDetail.toString());
       }
     } else {
-      log.debug("Polaczenie do " + input.toString() + "exist.");
+      log.debug("Polaczenie do " + shardDetail.toString() + "exist.");
     }
 
   }
@@ -145,7 +152,7 @@ public class Server implements Runnable, ITaskManager {
       incData = new IncomingDataThread(this, clientSocket);
 
       connections.put(shard, clientSocket);
-      outcomingData.put(shard, new LinkedList<>());
+      outcomingData.put(shard, new LinkedBlockingQueue<>());
 
       oos = new ObjectOutputStream(clientSocket.getOutputStream());
       oos.writeObject("ok");
@@ -178,7 +185,7 @@ public class Server implements Runnable, ITaskManager {
 
           for (int i = 0; i < tasks.size(); i++) {
             Task task = tasks.poll();
-            log.debug("Wykonuje zadanie" + task.toString());
+            log.debug("Wykonuje zadanie " + task.toString());
             /**
              * DODAC OBSLUGE WSZYSTKICH TYPOW TASKOW
              */
@@ -191,12 +198,20 @@ public class Server implements Runnable, ITaskManager {
             if (task instanceof QueryTask) {
 
               QueryTask queryTask = (QueryTask) task;
-              Queue<Object> queue = outcomingData.get(queryTask.getWhereToExecuteQuery().get(0));
-              queue.add(task);
 
               for (ShardDetails shardDetail : queryTask.getWhereToExecuteQuery()) {
+                Queue<Object> queue = outcomingData.get(shardDetail);
+                queue.add(task);
                 outcomingData.put(shardDetail, queue);
               }
+            }
+
+            if (task instanceof QueryResultTask) {
+
+              QueryResultTask queryTask = (QueryResultTask) task;
+              Queue<Object> queue = outcomingData.get(queryTask.getReturnShard());
+              queue.add(queryTask);
+
             }
           }
         }
@@ -271,6 +286,7 @@ class IncomingDataThread implements Runnable {
 
   @Override
   public void run() {
+    //NIE STARTUJE TEGO WATKU DLA PIERWSZEGO SERWERA
     log.debug("Startuje thread nasluchujaccy dane przychodzace od klienta! " + server.getServerDetails());
     ObjectInputStream ois;
 
@@ -285,6 +301,11 @@ class IncomingDataThread implements Runnable {
         if (data instanceof QueryTask) {
           log.debug("Odebralme(" + server.getServerDetails() + ") cos " + data.toString());
           server.getQueryExecutor().doTask((QueryTask) data);
+        }
+        //DOPISAC OBSLUGE TASKOW
+        if (data instanceof QueryResultTask) {
+          log.debug("Odebralme(" + server.getServerDetails() + ") cos " + data.toString());
+          server.getQueryExecutor().doTask((QueryResultTask) data);
         }
       } catch (IOException | ClassNotFoundException e) {
         e.printStackTrace();

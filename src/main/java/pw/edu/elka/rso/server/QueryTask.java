@@ -1,5 +1,6 @@
 package pw.edu.elka.rso.server;
 
+import pw.edu.elka.rso.logic.beans.QueryInfo;
 import pw.edu.elka.rso.storage.SqlDescription;
 
 import java.io.Serializable;
@@ -13,11 +14,19 @@ public class QueryTask extends Task<SqlDescription> implements Serializable {
 
   private QueryType queryType;
   private ShardDetails queryRoot;
+  private QueryInfo queryInfo;
 
   public ShardDetails getQueryRoot() {
     return queryRoot;
   }
 
+  public QueryInfo getQueryInfo() {
+    return queryInfo;
+  }
+
+  public void setQueryInfo(QueryInfo queryInfo) {
+    this.queryInfo = queryInfo;
+  }
 
   private transient LinkedList<ShardDetails> whereToExecuteQuery = new LinkedList<>();
 
