@@ -1,10 +1,15 @@
 package pw.edu.elka.rso.logic.beans;
 
 import org.apache.log4j.Logger;
+import pw.edu.elka.rso.core.communication.ClientServer;
 import pw.edu.elka.rso.logic.interfaces.IQueryExecutor;
 import pw.edu.elka.rso.logic.procedures.Procedure;
 import pw.edu.elka.rso.logic.procedures.ProceduresManager;
 import pw.edu.elka.rso.server.*;
+import pw.edu.elka.rso.server.tasks.ITaskManager;
+import pw.edu.elka.rso.server.tasks.QueryResultTask;
+import pw.edu.elka.rso.server.tasks.QueryTask;
+import pw.edu.elka.rso.server.tasks.SetConnectionTask;
 import pw.edu.elka.rso.storage.IDataShard;
 import pw.edu.elka.rso.storage.QueryResult;
 import pw.edu.elka.rso.storage.QueryResultReceiver;
@@ -34,6 +39,17 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
 
   //TODO: wywalic, testowe
   public Server DoTegoRootuj;
+
+  private ClientServer clientServer;
+
+  public ClientServer getClientServer() {
+    return clientServer;
+  }
+
+  public void setClientServer(ClientServer clientServer) {
+    this.clientServer = clientServer;
+  }
+
 
   public QueryExecutorImpl(Observable consoleObservable, IDataShard dataShard, Server server) {
     this.proceduresManager = ProceduresManager.getInstance();
@@ -231,9 +247,12 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
         for (Map.Entry<Long, LinkedList<String>> entry : queryResultManager.returnResult().entrySet()) {
           Long queryId = entry.getKey();
           LinkedList<String> value = entry.getValue();
+          StringBuilder sb = new StringBuilder();
           for (String val : value) {
+            sb.append(val);
             logger.debug("Rezultat:" + val);
           }
+          clientServer.pushToClientServer(sb.toString());
         }
 
       }

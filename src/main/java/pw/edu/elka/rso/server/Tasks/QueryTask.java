@@ -1,6 +1,9 @@
-package pw.edu.elka.rso.server;
+package pw.edu.elka.rso.server.tasks;
 
 import pw.edu.elka.rso.logic.beans.QueryInfo;
+import pw.edu.elka.rso.logic.beans.QueryType;
+import pw.edu.elka.rso.server.ShardDetails;
+import pw.edu.elka.rso.server.Task;
 import pw.edu.elka.rso.storage.SqlDescription;
 
 import java.io.Serializable;

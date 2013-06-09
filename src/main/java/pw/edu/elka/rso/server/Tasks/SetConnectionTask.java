@@ -1,4 +1,7 @@
-package pw.edu.elka.rso.server;
+package pw.edu.elka.rso.server.tasks;
+
+import pw.edu.elka.rso.server.ShardDetails;
+import pw.edu.elka.rso.server.Task;
 
 /**
  * Created with IntelliJ IDEA.

@@ -1,7 +1,6 @@
 package pw.edu.elka.rso.storage;
 
 import net.sf.jsqlparser.statement.Statement;
-import pw.edu.elka.rso.server.QueryType;
 
 import java.io.Serializable;
 
