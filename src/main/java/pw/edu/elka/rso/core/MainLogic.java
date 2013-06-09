@@ -1,18 +1,13 @@
 package pw.edu.elka.rso.core;
 
-import com.sun.corba.se.impl.activation.ServerMain;
+import pw.edu.elka.rso.core.communication.ClientServer;
 import pw.edu.elka.rso.logic.beans.InputManager;
 import pw.edu.elka.rso.logic.beans.QueryExecutorImpl;
 import pw.edu.elka.rso.logic.beans.QueryResultReceiverImpl;
 import pw.edu.elka.rso.server.Server;
-import pw.edu.elka.rso.server.SetConnectionTask;
-import pw.edu.elka.rso.server.ShardDetails;
-import pw.edu.elka.rso.server.Task;
 import pw.edu.elka.rso.storage.DataShard;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 
 /**
  * Created with IntelliJ IDEA.
@@ -25,23 +20,28 @@ public class MainLogic {
 
   public static void main(String args[]) throws UnknownHostException {
 
+    InputManager inputManager = new InputManager();
+    InputManager inputManager2 = new InputManager();
 
-//    inputManager.readInput("SelectFromClients");
     Server server1 = new Server(2222, 1);
     Server server2 = new Server(2223, 2);
+
+    ClientServer clientServer = new ClientServer(5000,100);
+    clientServer.setInputManager(inputManager);
 
 
     Thread thread1 = new Thread(server1);
     Thread thread2 = new Thread(server2);
     thread1.start();
     thread2.start();
+    Thread thread3 = new Thread(clientServer);
+    thread3.start();
 
 
     QueryResultReceiverImpl queryResultReceiver = new QueryResultReceiverImpl();
     QueryResultReceiverImpl queryResultReceiver2 = new QueryResultReceiverImpl();
 
-    InputManager inputManager = new InputManager();
-    InputManager inputManager2 = new InputManager();
+
 
     DataShard dataShard = new DataShard();
     dataShard.registerQueryResultReceiver(queryResultReceiver);
@@ -49,6 +49,7 @@ public class MainLogic {
     QueryExecutorImpl queryExecutor = new QueryExecutorImpl(inputManager, dataShard, server1);
     queryExecutor.setQueryResultReceiver(queryResultReceiver);
     queryExecutor.DoTegoRootuj = server2;
+    queryExecutor.setClientServer(clientServer);
 
     QueryExecutorImpl queryExecutor2 = new QueryExecutorImpl(inputManager2, dataShard, server2);
     queryExecutor2.setQueryResultReceiver(queryResultReceiver2);
@@ -66,7 +67,7 @@ public class MainLogic {
     //dataShard.start();
 
 
-    inputManager.readInput("SelectFromClients", QueryExecutorImpl.returnNewQueryId(), null);
+    //inputManager.readInput("SelectFromClients", QueryExecutorImpl.returnNewQueryId(), null);
 
 
   }

@@ -1,11 +1,11 @@
-package pw.edu.elka.rso.server;
+package pw.edu.elka.rso.server.tasks;
+
+import pw.edu.elka.rso.server.Task;
 
 /**
  * Created with IntelliJ IDEA.
  * User: michal
  * Date: 05.06.13
- * Time: 23:51
- * To change this template use File | Settings | File Templates.
  */
 public interface ITaskManager {
   public void doTask(Task task);

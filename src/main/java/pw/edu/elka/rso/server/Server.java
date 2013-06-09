@@ -1,7 +1,14 @@
 package pw.edu.elka.rso.server;
 
 import org.apache.log4j.Logger;
+import pw.edu.elka.rso.core.communication.ClientServer;
 import pw.edu.elka.rso.logic.beans.QueryExecutorImpl;
+import pw.edu.elka.rso.server.tasks.ITaskManager;
+import pw.edu.elka.rso.server.tasks.QueryResultTask;
+import pw.edu.elka.rso.server.tasks.QueryTask;
+import pw.edu.elka.rso.server.tasks.SetConnectionTask;
+import pw.edu.elka.rso.server.utils.IncomingConnectionsThread;
+import pw.edu.elka.rso.server.utils.IncomingDataThread;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -22,87 +29,33 @@ import java.util.concurrent.LinkedBlockingQueue;
  * Date: 04.06.13
  * Time: 01:14
  */
-public class Server implements Runnable, ITaskManager {
+public class Server extends AbstractServer implements Runnable, ITaskManager {
 
 
   static Logger log = Logger.getLogger(Server.class);
 
-  // The server socket.
-  private ServerSocket serverSocket = null;
-  private ShardDetails shardDetails;
-  // The client socket.
-
   private Map<ShardDetails, Socket> connections = new HashMap<>();
-  //kolejka danych
-  private Map<ShardDetails, Queue<Object>> outcomingData = new HashMap<>();
+
 
   private Queue<Task> tasks = new LinkedList<>();
 
-
   private QueryExecutorImpl queryExecutor;
 
-  public QueryExecutorImpl getQueryExecutor() {
-    return queryExecutor;
-  }
-
-  public Map<ShardDetails, Socket> getConnections() {
-    return connections;
-  }
-
-  public void setQueryExecutor(QueryExecutorImpl queryExecutor) {
-    this.queryExecutor = queryExecutor;
-  }
-
-
   public Server(int portNumber, int id) throws UnknownHostException {
-    shardDetails = new ShardDetails(portNumber, InetAddress.getLocalHost(), id);
-  }
-
-  public ServerSocket getServerSocket() {
-    return serverSocket;
-  }
-
-  public void setServerSocket(ServerSocket serverSocket) {
-    this.serverSocket = serverSocket;
-  }
-
-  public ServerSocket initServerSocket(int portNumber) {
-    ServerSocket serverSocket = null;
-    try {
-      serverSocket = new ServerSocket(portNumber);
-    } catch (IOException ex) {
-      log.debug("serwer nie wstal, gie gie");
-      ex.printStackTrace();
-    }
-    return serverSocket;
-  }
-
-  public Socket initConnectionToOtherShard(ShardDetails shardDetails) {
-    Socket clientSocket = null;
-    try {
-      clientSocket = new Socket(shardDetails.getHost(), shardDetails.getPortNumber());
-    } catch (IOException e) {
-      log.debug("shiet nie polaczylem sie z serwerem " + shardDetails.getHost().toString() + " na porcie " + shardDetails.getPortNumber());
-      e.printStackTrace();
-    }
-
-    return clientSocket;
+    super(portNumber, id);
   }
 
   public void initOutgoingConnections(ShardDetails shardDetail) {
 
 
     boolean connectionSucessfull = false;
-
     if (!connections.containsKey(shardDetail)) {
-
       Socket clientSocket = initConnectionToOtherShard(shardDetail);
-
       IncomingDataThread incData = new IncomingDataThread(this, clientSocket);
-
 
       ObjectOutputStream oos;
       ObjectInputStream ois;
+
       try {
         oos = new ObjectOutputStream(clientSocket.getOutputStream());
         oos.writeObject(this.getServerDetails());
@@ -142,7 +95,6 @@ public class Server implements Runnable, ITaskManager {
     ObjectInputStream ois;
     IncomingDataThread incData;
 
-
     try {
 
       Socket clientSocket = serverSocket.accept();
@@ -166,7 +118,6 @@ public class Server implements Runnable, ITaskManager {
 
 
   }
-
 
   @Override
   public void run() {
@@ -215,11 +166,6 @@ public class Server implements Runnable, ITaskManager {
             }
           }
         }
-        // DODAC OBSLUGE TASKOW
-
-
-        // DODA
-
 
         for (Map.Entry<ShardDetails, Socket> entry : connections.entrySet()) {
           Socket socket = entry.getValue();
@@ -251,66 +197,28 @@ public class Server implements Runnable, ITaskManager {
   public void doTask(Task task) {
     tasks.add(task);
   }
+
+  public QueryExecutorImpl getQueryExecutor() {
+    return queryExecutor;
+  }
+
+  public Map<ShardDetails, Socket> getConnections() {
+    return connections;
+  }
+
+  public void setQueryExecutor(QueryExecutorImpl queryExecutor) {
+    this.queryExecutor = queryExecutor;
+  }
+
+
+  public ServerSocket getServerSocket() {
+    return serverSocket;
+  }
+
+  public void setServerSocket(ServerSocket serverSocket) {
+    this.serverSocket = serverSocket;
+  }
 };
 
-class IncomingConnectionsThread implements Runnable {
 
-  static Logger log = Logger.getLogger(IncomingConnectionsThread.class);
 
-  private Server server;
-
-  IncomingConnectionsThread(Server server) {
-    this.server = server;
-  }
-
-  @Override
-  public void run() {
-    log.debug("Nasluchuje na przychodzace polacenia! " + server.getServerDetails());
-    while (true) {
-      server.manageIncomingConnections(server.getServerSocket());
-    }
-  }
-}
-
-class IncomingDataThread implements Runnable {
-
-  static Logger log = Logger.getLogger(IncomingDataThread.class);
-
-  private Server server;
-  private Socket clientSocket;
-
-  public IncomingDataThread(Server server, Socket clientSocket) {
-    this.server = server;
-    this.clientSocket = clientSocket;
-  }
-
-  @Override
-  public void run() {
-    //NIE STARTUJE TEGO WATKU DLA PIERWSZEGO SERWERA
-    log.debug("Startuje thread nasluchujaccy dane przychodzace od klienta! " + server.getServerDetails());
-    ObjectInputStream ois;
-
-    while (true) {
-      //odbierz to co masz odebrac dla socketa
-
-      try {
-        ois = new ObjectInputStream(clientSocket.getInputStream());
-        Object data = ois.readObject();
-
-        //DOPISAC OBSLUGE TASKOW
-        if (data instanceof QueryTask) {
-          log.debug("Odebralme(" + server.getServerDetails() + ") cos " + data.toString());
-          server.getQueryExecutor().doTask((QueryTask) data);
-        }
-        //DOPISAC OBSLUGE TASKOW
-        if (data instanceof QueryResultTask) {
-          log.debug("Odebralme(" + server.getServerDetails() + ") cos " + data.toString());
-          server.getQueryExecutor().doTask((QueryResultTask) data);
-        }
-      } catch (IOException | ClassNotFoundException e) {
-        e.printStackTrace();
-      }
-
-    }
-  }
-}

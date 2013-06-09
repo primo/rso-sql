@@ -1,4 +1,4 @@
-package pw.edu.elka.rso.server;
+package pw.edu.elka.rso.logic.beans;
 
 /**
  * Created with IntelliJ IDEA.
