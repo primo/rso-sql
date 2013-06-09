@@ -32,9 +32,23 @@ public class Procedure implements IQueryReader {
    * @param list of params to execute query
    * TODO return data type ???
    */
-  public String run(List<String> params) {
-    //execute statement
-    System.out.println("Pobieram dane z bazy!");
+  public String run(List<String> params){
+      logger.debug(statement.toString());
+      String tmpStatement = statement.toString();
+
+      for(String s : params){
+          tmpStatement = tmpStatement.replaceFirst("\\?", s);
+      }
+
+      Reader reader = new StringReader(tmpStatement);
+      try {
+          this.statement = parser.parse(reader);
+          logger.debug(tmpStatement);
+      } catch (JSQLParserException e) {
+          e.printStackTrace();
+      }
+
+
 
     return "To sa dane z procedury: " + name + " z parametrami: " + params.toString();
   }
@@ -50,12 +64,10 @@ public class Procedure implements IQueryReader {
          * maybe by executing it once?
          */
     if(!validateQuery(reader)){
-      throw new InvalidParameterException("Statment could not be parsed.");
+      throw new InvalidParameterException("Statement could not be parsed.");
     }else{
       procedure.statement = this.statement;
     }
-
-
     return procedure;
   }
 
@@ -73,5 +85,22 @@ public class Procedure implements IQueryReader {
 
   public Statement getParsedQuery() {
     return this.statement;
+  }
+
+  public void prepareParameters(List<String> params) {
+      logger.debug(statement.toString());
+      String tmpStatement = statement.toString();
+
+      for(String s : params){
+          tmpStatement = tmpStatement.replaceFirst("\\?", s);
+      }
+
+      Reader reader = new StringReader(tmpStatement);
+      try {
+          this.statement = parser.parse(reader);
+          logger.debug(tmpStatement);
+      } catch (JSQLParserException e) {
+          e.printStackTrace();
+      }
   }
 }

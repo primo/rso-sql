@@ -1,5 +1,6 @@
 package pw.edu.elka.rso.core;
 
+import net.sf.jsqlparser.JSQLParserException;
 import pw.edu.elka.rso.logic.procedures.ProceduresManager;
 import pw.edu.elka.rso.logic.procedures.SerializedProcedureCall;
 
@@ -54,6 +55,8 @@ class ClientThread extends Thread {
             } catch (ClassNotFoundException e) {
                 // TODO send ClassNotFoundException to client somehow
                 responseData = "Nie znaleziono takiej procedury!";
+            } catch (JSQLParserException e) {
+                responseData = "Błąd w osadzaniu parametrów!";
             }
             System.out.println("Sending to client: "+responseData);
             os.println(responseData + '\n');
