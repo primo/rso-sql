@@ -60,7 +60,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
       SqlDescription sqlDescription = new SqlDescription();
       sqlDescription.statement = procedure.getParsedQuery();
       sqlDescription.toStringQuery(procedureName);
-      sqlDescription.id = queryType == QueryType.RAW ? queryTaskReceived.getInput().id : QueryExecutorImpl.queryId++;
+      sqlDescription.id = queryType == QueryType.RAW ? queryTaskReceived.getInput().id : QueryExecutorImpl.returnNewQueryId();
 
 
       /**
@@ -251,6 +251,10 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
 
   public void setQueryResultReceiver(QueryResultReceiverImpl queryResultReceiver) {
     this.queryResultReceiver = queryResultReceiver;
+  }
+
+  public static long returnNewQueryId(){
+    return queryId++;
   }
 }
 
