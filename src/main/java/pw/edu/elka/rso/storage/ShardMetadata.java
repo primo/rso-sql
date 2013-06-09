@@ -23,17 +23,32 @@ public class ShardMetadata implements Serializable {
 
         return partitionMetadata.tailSet(null);
     }
+
+    /**
+     * @deprecated replaced by {@link #getPartitionsContaining(Object,String)}
+     */
+    public ArrayList<PartitionMetadata> getPartitionsContaining(Object element) {
+        ArrayList<PartitionMetadata> result = new ArrayList<PartitionMetadata>();
+        int hash = Math.abs(element.hashCode()) % hashMaxIndex;
+        for (PartitionMetadata p: partitionMetadata) {
+            if (p.getRangeStart() <= hash && p.getRangeEnd() >= hash) {
+                result.add(p);
+            }
+        }
+        return result;
+    }
     /**
      * Retrieves a list of partitions which may contain the specified element.
      *
      * @param element The specified element.
+     * @param tableName Table name.
      * @return an ArrayList of partitions.
      */
-    public ArrayList<PartitionMetadata> getPartitionsContaining(Object element) {
+    public ArrayList<PartitionMetadata> getPartitionsContaining(Object element,String tableName) {
         ArrayList<PartitionMetadata> result = new ArrayList<PartitionMetadata>();
-        int hash = element.hashCode() % hashMaxIndex;
+        int hash = Math.abs(element.hashCode()) % hashMaxIndex;
         for (PartitionMetadata p: partitionMetadata) {
-            if (p.getRangeStart() <= hash && p.getRangeEnd() >= hash) {
+            if (p.getRangeStart() <= hash && p.getRangeEnd() >= hash && tableName == p.tableName) {
                 result.add(p);
             }
         }
@@ -45,10 +60,12 @@ public class ShardMetadata implements Serializable {
 
 class PartitionMetadata implements Serializable, Comparable<PartitionMetadata> {
     public final long id;
+    public final String tableName;
     //Range is inclusive
-    public PartitionMetadata(int rangeStart, int rangeStop)
+    public PartitionMetadata(int rangeStart, int rangeStop, String tableName)
     {
         id = (long) (Math.random()*(1 << 60));
+        this.tableName = tableName;
         if (rangeStop > rangeStart &&
                 rangeStop >= 0 && rangeStart >= 0)
         {
