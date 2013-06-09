@@ -23,7 +23,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
   private Observable consoleObservable;
   // ta kolejka zawiera w sobie procedury ktory wysyla do nas zdalny klient
   // z niej sa zdemowane zadania ktore potem sa wykonywane wraz z logika
-  private LinkedBlockingQueue<String> clientProcedureQueue = new LinkedBlockingQueue<>();
+  private LinkedBlockingQueue<QueryInfo> clientProcedureQueue = new LinkedBlockingQueue<>();
   private ProceduresManager proceduresManager;
   private QueryResultManager queryResultManager;
 
@@ -48,8 +48,8 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
     this.queryResultManager = new QueryResultManager();
   }
 
-  public void executeProcedure(String procedureName, QueryType queryType, QueryTask queryTaskReceived) throws ClassNotFoundException {
-    Procedure procedure = proceduresManager.getProcedure(procedureName);
+  public void executeProcedure(QueryInfo queryInfo, QueryType queryType, QueryTask queryTaskReceived) throws ClassNotFoundException {
+    Procedure procedure = proceduresManager.getProcedure(queryInfo.getProcedureName());
     try {
       //logika powinna wiedziec gdzie jjuz jet polaczona
 
@@ -59,8 +59,8 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
        */
       SqlDescription sqlDescription = new SqlDescription();
       sqlDescription.statement = procedure.getParsedQuery();
-      sqlDescription.toStringQuery(procedureName);
-      sqlDescription.id = queryType == QueryType.RAW ? queryTaskReceived.getInput().id : QueryExecutorImpl.returnNewQueryId();
+      sqlDescription.toStringQuery(queryInfo.getProcedureName());
+      sqlDescription.id = queryType == QueryType.RAW ? queryTaskReceived.getInput().id : queryInfo.getQueryId();
 
 
       /**
@@ -99,6 +99,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
          */
         queryTask.getWhereToExecuteQuery().addAll(rootQueryHere);
         queryTask.setQueryRoot(server.getServerDetails());
+        queryTask.setQueryInfo(queryInfo);
         server.doTask(queryTask);
         //mozliwe ze zla kolejnosc wykonania
         rootQueryHere.add(server.getServerDetails());
@@ -143,7 +144,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
       logger.debug("Zostalem powiadomiony");
       InputManager console = (InputManager) o;
 
-      String query = console.getQueryQueue().poll();
+      QueryInfo query = console.getQueryQueue().poll();
       logger.debug("Dodaje do kolejki wykonanie procedury \"" + query.toString() + "\"");
 
       clientProcedureQueue.add(query);
@@ -160,7 +161,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
        * param QueryType.MANGED
        */
       if (clientProcedureQueue.size() > 0) {
-        String query = clientProcedureQueue.poll();
+        QueryInfo query = clientProcedureQueue.poll();
         logger.debug("Wykonuje procedure\"" + query + "\"");
         try {
           executeProcedure(query, QueryType.MANGED, null);
@@ -188,7 +189,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
             logger.debug("Dostalem(@" + server.getServerDetails() + ") zapytanie: " + queryTask.getInput().getProcedureName());
 
             try {
-              executeProcedure(queryTask.getInput().getProcedureName(), QueryType.RAW, queryTask);
+              executeProcedure(queryTask.getQueryInfo(), QueryType.RAW, queryTask);
             } catch (ClassNotFoundException e) {
               logger.debug("Wywalilem sie przy probie wykonania zapytania" + queryTask.getInput().getProcedureName());
               e.printStackTrace();

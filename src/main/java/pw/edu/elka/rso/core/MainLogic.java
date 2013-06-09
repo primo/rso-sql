@@ -66,7 +66,7 @@ public class MainLogic {
     //dataShard.start();
 
 
-    inputManager.readInput("SelectFromClients");
+    inputManager.readInput("SelectFromClients", QueryExecutorImpl.returnNewQueryId(), null);
 
 
   }

@@ -8,11 +8,11 @@ import java.util.Queue;
 
 public class InputManager extends Observable {
   static Logger logger = Logger.getLogger(InputManager.class);
-  private Queue<String> input = new LinkedList<String>();
+  private Queue<QueryInfo> input = new LinkedList<>();
 
-  public void readInput(String procedureName) {
-
-    input.add(procedureName);
+  public void readInput(String procedureName, Long queryId, LinkedList<String> parameters) {
+    QueryInfo queryInfo = new QueryInfo(procedureName, queryId, parameters);
+    input.add(queryInfo);
     update();
 
   }
@@ -26,8 +26,7 @@ public class InputManager extends Observable {
 
   }
 
-  public Queue<String> getQueryQueue() {
+  public Queue<QueryInfo> getQueryQueue() {
     return this.input;
   }
-
 }
