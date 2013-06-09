@@ -23,11 +23,13 @@ public class jsqlParserExample {
     public static void main(final String[] args) throws JSQLParserException {
 
         CCJSqlParserManager parser = new CCJSqlParserManager();
-        Reader reader = new StringReader("select tt.nazwisko, tz.nazwy from pracownicy tt join zupy tz on tz.id = tt.id where tt.id > 10;");
+        Reader reader = new StringReader("select tt.nazwisko, tz.nazwy, tz.kk from pracownicy as tt, zupy as tz join tg on tg.p = zupy.q;");
         Statement statement = parser.parse(reader);
         Vector<Statement> statements = new Vector<Statement>();
 
-        if("asdasd".equals("asd")) return;
+        if("asdasd".equals("asd")) {
+            return;
+        }
 //       }
     }
 
