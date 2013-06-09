@@ -22,19 +22,16 @@ public class Client {
     Socket clientSocket = AbstractServer.initConnectionToOtherShard(clientServer);
 
     ObjectOutputStream oos = new ObjectOutputStream(clientSocket.getOutputStream());
-    System.out.println("Polaczony do " + clientServer.toString());
+    System.out.println("Podłączony do " + clientServer.toString());
+    while(true) {
+        System.out.print("Enter procedureName [params,params]");
+        String input = br.readLine();
+        oos.writeObject(input);
 
-    System.out.print("Enter procedureName [params,params]");
-    String input = br.readLine();
-
-
-    oos.writeObject(input);
-
-    //czekamy na odpowiedz
-    ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
-    Object data = ois.readObject();
-    System.out.println(data.toString());
-
-
+        //czekamy na odpowiedz
+        ObjectInputStream ois = new ObjectInputStream(clientSocket.getInputStream());
+        Object data = ois.readObject();
+        System.out.println(data.toString());
+    }
   }
 }

@@ -1,7 +1,6 @@
 package pw.edu.elka.rso.storage.QueryExecution;
 
-import pw.edu.elka.rso.storage.DataRepresentation.DefaultTables;
-import pw.edu.elka.rso.storage.DataRepresentation.Table;
+import pw.edu.elka.rso.storage.DataRepresentation.*;
 import pw.edu.elka.rso.storage.QueryResult;
 import pw.edu.elka.rso.storage.SqlDescription;
 
@@ -19,6 +18,52 @@ public class QueryEngine {
         // TODO
         name2TableId = new HashMap<String, Integer>();
         tables = new HashMap<Integer,Table>();
+
+        TableSchema ts = new TableSchema();
+        ts.addColumn("ID", ColumnType.INT, 0);
+        ts.addColumn("TEST", ColumnType.INT, 0);
+
+        Table table = new Table(ts);
+        table.createIndex("ID");
+
+        Record record = table.newRecord();
+        record.setValue("ID", 0);
+        record.setValue("TEST", 100);
+        table.insert(record);
+
+        record.setValue("ID", 1);
+        record.setValue("TEST", 101);
+        table.insert(record);
+        record.setValue("ID", 2);
+        record.setValue("TEST", 102);
+        table.insert(record);
+        record.setValue("ID", 3);
+        record.setValue("TEST", 103);
+        table.insert(record);
+        record.setValue("ID", 4);
+        record.setValue("TEST", 104);
+        table.insert(record);
+        record.setValue("ID", 5);
+        record.setValue("TEST", 105);
+        table.insert(record);
+        record.setValue("ID", 6);
+        record.setValue("TEST", 106);
+        table.insert(record);
+        record.setValue("ID", 7);
+        record.setValue("TEST", 107);
+        table.insert(record);
+        record.setValue("ID", 8);
+        record.setValue("TEST", 108);
+        table.insert(record);
+        record.setValue("ID", 9);
+        record.setValue("TEST", 109);
+        table.insert(record);
+
+
+        int tableId = freeTableId++;
+        name2TableId.put("TEST", tableId);
+        tables.put(tableId, table);
+
     }
 
     public QueryResult query( SqlDescription query) {
