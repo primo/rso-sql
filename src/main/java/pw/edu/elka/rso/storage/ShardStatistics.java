@@ -8,18 +8,24 @@ import java.util.Hashtable;
 /** This class will hold local shard statistics like number of processed queries.
  */
 public class ShardStatistics {
-    public void incShardOpcount(int shardId) {
+    public void incShardOpcount(int shardId,int count) {
         if (!shardOpcount.contains(new Integer(shardId)))
         {
             shardOpcount.put(shardId,1);
         }
         else
         {
-            shardOpcount.put(shardId,shardOpcount.get(shardId)+1);
+            shardOpcount.put(shardId,shardOpcount.get(shardId)+count);
         }
     }
+    public void incShardOpcount(int shardId) {
+        incShardOpcount(shardId,1);
+    }
     public void incShardOpcount(ShardDetails shard) {
-        incShardOpcount(shard.getId());
+        incShardOpcount(shard.getId(),1);
+    }
+    public void incShardOpcountBy(ShardDetails shard,int count) {
+        incShardOpcount(shard.getId(),count);
     }
     public void resetShardOpcount(int shardId) {
         shardOpcount.put(shardId,0);
