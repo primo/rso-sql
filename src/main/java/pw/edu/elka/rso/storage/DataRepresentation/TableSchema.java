@@ -1,12 +1,13 @@
 package pw.edu.elka.rso.storage.DataRepresentation;
 
 
+import java.io.Serializable;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
 import java.security.InvalidParameterException;
 import java.util.*;
 
-public class TableSchema implements Cloneable{
+public class TableSchema implements Cloneable, Serializable {
     HashMap<String, TableColumn> specification = new HashMap<String, TableColumn>();
     int rLength = 1;
 

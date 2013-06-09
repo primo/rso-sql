@@ -1,8 +1,9 @@
 package pw.edu.elka.rso.storage.DataRepresentation;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 
-public abstract class TableColumn {
+public abstract class TableColumn implements Serializable {
 
     public int getLength() {
         return length;
@@ -22,7 +23,7 @@ public abstract class TableColumn {
     abstract Object getValue(ByteBuffer ba);
 }
 
-class IntTableColumn extends TableColumn {
+class IntTableColumn extends TableColumn implements Serializable {
     IntTableColumn(int position) {
         super(5, position, ColumnType.INT);
     }
@@ -51,7 +52,7 @@ class IntTableColumn extends TableColumn {
     }
 }
 
-class DoubleTableColumn extends TableColumn {
+class DoubleTableColumn extends TableColumn implements Serializable {
     DoubleTableColumn(int position) {
         super(9, position, ColumnType.DOUBLE);
     }
@@ -74,7 +75,7 @@ class DoubleTableColumn extends TableColumn {
     }
 }
 
-class CharTableColumn extends TableColumn {
+class CharTableColumn extends TableColumn implements Serializable {
     public CharTableColumn(int length, int position){
         super(2*(length)+1, position, ColumnType.CHAR);
     }

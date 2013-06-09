@@ -38,6 +38,8 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
   private QueryResultManager queryResultManager;
   //do tej kolejki pushowane sa zadania ktore logika ma wykonac, pushuje je serwer.
   private Queue<Task> tasks = new LinkedBlockingQueue<>();
+  //glupia nazwa dla serwera ktory jest odpowiedzilny za komunikacje z clientem
+  //T_T
   private ClientServer clientServer;
 
   public QueryExecutorImpl(Observable consoleObservable, IDataShard dataShard, Server server) {
@@ -71,6 +73,15 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
 
       /**
        *
+       * TUTAJ DODAJEMY LOGIKE PARTYCJONOWANIA
+       * ROOTOWANIA ZAPYTAN DO ODPOWIEDNICH SHARDOW
+       * ETCETC...
+       * SPROWADZA SIE TO DO UZUPELNIENIA LISTY PONIZJE
+       * rootQueryHere() WARTOSCIAMI ShardDetails mowiacymi GDZIE DANA PROCEDURA MAMY WYKONAC
+       * USTAWIAMY WARTOSC DLA executeQuereOnThisShard W ZALEZNOSCI CZY TA PROCEDURA SIE WYKONA TUTAJ
+       *
+       *
+       *
        */
       SqlDescription sqlDescription = new SqlDescription();
       sqlDescription.statement = procedure.getParsedQuery();
@@ -84,14 +95,14 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
 
 
       QueryTask queryTask = new QueryTask(sqlDescription);
+      boolean executeQuereOnThisShard = true;
 
       if (queryType == QueryType.MANGED) {
 
         LinkedList<ShardDetails> rootQueryHere = new LinkedList<>();
-        //rootQueryHere.add(DoTegoRootuj.getServerDetails());
+        rootQueryHere.add(DoTegoRootuj.getServerDetails());
         //TODO: ALL LOGIC GOES HERE
 
-        logger.debug("Doing some logic stuff.");
 
         /**
          * Tworzymy nowego taska do polaczenia z innym shardem dla warsty komunikacyjnej
@@ -125,24 +136,9 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
        * TUTAJ WYKONUJEMY ZAPYTANIE DO Sharda
        * !!!!!!!
        */
+      if(executeQuereOnThisShard)
+      dataShard.query(sqlDescription, queryTaskReceived);
 
-      dataShard.query(sqlDescription, new Object());
-
-//      QueryResult qr = new QueryResult();
-//      qr.queryId = sqlDescription.id;
-//      String result = "Wynik:" + server.getServerDetails() + "[id:" + sqlDescription.id+ "]";
-//      qr.stringResult = result;
-
-
-//      //TESTOWE!
-//      if (queryType == QueryType.MANGED) {
-//        queryResultReceiver.getTestResult().add(qr);
-//      } else if (queryType == QueryType.RAW) {
-//        //TO WPIAC W MIEJSCE W KTORY MA BYC TWRZONY TASK Z REZUTLATEM !111
-//        Task queryResultTask = new QueryResultTask(qr);
-//        ((QueryResultTask) queryResultTask).setReturnShard(queryTaskReceived.getQueryRoot());
-//        server.doTask(queryResultTask);
-//      }
 
     } catch (Exception ex) {
       //TODO: ladne obluzycy wyjatek
@@ -222,13 +218,22 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
        */
       if (!queryResultReceiver.getTestResult().isEmpty()) {
         logger.debug("Dostalem rezultat");
-        Queue<QueryResult> queryResult = queryResultReceiver.getTestResult();
+        Queue<AbstractMap.SimpleEntry<QueryResult, Object>> queryResult = queryResultReceiver.getTestResult();
         for (int i = 0; i < queryResult.size(); i++) {
-          QueryResult qr = queryResult.poll();
-          //if(qr.) stworzyc taska do wysylania wynikow jesli to jest lokalne zadanie
-
-          logger.debug("Dodaje rezultat zapytania " + qr.toString());
-          queryResultManager.insertResult(qr.queryId, qr.output);
+          AbstractMap.SimpleEntry<QueryResult, Object> qr = queryResult.poll();
+          QueryResult queryResultValue = qr.getKey();
+          Object queryContext = qr.getValue();
+          // jesli kontekt rozny od null, znaczy sie ze to zadanie przyszlo z zewnetrz nalezy wynik odeslac wlascicielowi
+          if (queryContext != null) {
+            QueryTask queryTask = (QueryTask) queryContext;
+            QueryResultTask queryResultTask = new QueryResultTask(queryResultValue);
+            queryResultTask.setReturnShard(queryTask.getQueryRoot());
+            server.doTask(queryResultTask);
+          } else {
+            // w przeciwym wypadku wrzucamy rezultat
+            logger.debug("Dodaje rezultat zapytania " + qr.toString());
+            queryResultManager.insertResult(queryResultValue.queryId, queryResultValue.output);
+          }
         }
       }
 
@@ -247,6 +252,11 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
             sb.append(val.toString());
             logger.debug("Rezultat:" + val);
           }
+          /**
+           * ODKOMENTOWAC ZEBY WYSLAC WYNIK DO server'a ktory komunikuje sie z klientem
+           * NARAZIE POMIJANY
+           *
+           */
           //clientServer.pushToClientServer(sb.toString());
         }
 

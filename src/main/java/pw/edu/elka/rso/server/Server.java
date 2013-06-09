@@ -1,7 +1,6 @@
 package pw.edu.elka.rso.server;
 
 import org.apache.log4j.Logger;
-import pw.edu.elka.rso.core.communication.ClientServer;
 import pw.edu.elka.rso.logic.beans.QueryExecutorImpl;
 import pw.edu.elka.rso.server.tasks.ITaskManager;
 import pw.edu.elka.rso.server.tasks.QueryResultTask;
@@ -13,7 +12,6 @@ import pw.edu.elka.rso.server.utils.IncomingDataThread;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -136,7 +134,7 @@ public class Server extends AbstractServer implements Runnable, ITaskManager {
 
           for (int i = 0; i < tasks.size(); i++) {
             Task task = tasks.poll();
-            log.debug("Wykonuje zadanie " + task.toString());
+            log.debug("Wykonuje zadanie " + task.input.toString());
             /**
              * DODAC OBSLUGE WSZYSTKICH TYPOW TASKOW
              */

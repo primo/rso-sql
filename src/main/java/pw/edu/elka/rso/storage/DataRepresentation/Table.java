@@ -1,11 +1,12 @@
 package pw.edu.elka.rso.storage.DataRepresentation;
 
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.*;
 
-public class Table implements Iterable<Record>{
+public class Table implements Iterable<Record>, Serializable {
     final TableSchema tableSchema;
-    List<ByteBuffer> mainList;
+    transient List<ByteBuffer> mainList;
     Map<String, Index> indexes;
 
     public Table(TableSchema table_schema){
@@ -82,23 +83,27 @@ public class Table implements Iterable<Record>{
 
     @Override
     public String toString() {
-        Set<String> columns = tableSchema.getColumnNames();
-        Iterator<Record> it = iterator();
-        StringBuilder builder = new StringBuilder();
+      Set<String> columns = tableSchema.getColumnNames();
+      Iterator<Record> it = iterator();
+      StringBuilder builder = new StringBuilder();
+      builder.append("\n");
+      for (String s : columns) {
+        builder.append(s + "\t");
+      }
+
+      builder.append("\n");
+      for (String s : columns) {
+        builder.append("---\t");
+      }
+      builder.append("\n");
+
+      while (it.hasNext()) {
+        Record r = it.next();
         for (String s : columns) {
-            builder.append(s);
-            builder.append("\t");
+          builder.append(r.getValue(s) + "\t");
         }
         builder.append("\n");
-        for (String s : columns) {
-            builder.append("\t---");
-        }
-        while(it.hasNext()) {
-            Record r = it.next();
-            for (String s : columns) {
-                builder.append(r.getValue(s));
-            }
-        }
-        return builder.toString();
+      }
+      return builder.toString();
     }
 }

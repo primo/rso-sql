@@ -38,12 +38,10 @@ public class QueryResultManager {
 
   public void insertResult(Long queryId, Table queryResult) {
 
-    logger.debug("Dostalem wynik zapytania id[" + queryId + "] : " + queryResult);
+//    logger.debug("Dostalem wynik zapytania id[" + queryId + "] : " + queryResult);
     LinkedList<Table> queryResultList = queryResults.containsKey(queryId) ? queryResults.get(queryId) : new LinkedList<Table>();
-//    List<Table> currentWorkingQuery = queryResults.containsKey(sqlDescription.id) ? queryResults.get(sqlDescription.id) : new LinkedList<Table>();
 
     queryResultList.add(queryResult);
-    //queryResultList.add(queryResult.output);
 
     //dodjamy do mapy wynikow
     Long currentCount = shardCountInQuery.get(queryId);
@@ -55,8 +53,6 @@ public class QueryResultManager {
      * Przed musimy polaczyc wyniki i cos z nimi zrobic, narazie to sobie darujemy
      */
     if (currentCount == 1) {
-//      queryResultList.add(queryResult);
-//        queryResultList.add(queryResult.output);
 
       //tworzymy pare id zapytania - wynik
       Map<Long, LinkedList<Table>> result = new HashMap<>();

@@ -44,12 +44,15 @@ public class MainSelect {
     DataShard dataShard = new DataShard();
     dataShard.registerQueryResultReceiver(queryResultReceiver);
 
+    DataShard dataShard2 = new DataShard();
+    dataShard2.registerQueryResultReceiver(queryResultReceiver2);
+
     QueryExecutorImpl queryExecutor = new QueryExecutorImpl(inputManager, dataShard, server1);
     queryExecutor.setQueryResultReceiver(queryResultReceiver);
     queryExecutor.DoTegoRootuj = server2;
     queryExecutor.setClientServer(clientServer);
 
-    QueryExecutorImpl queryExecutor2 = new QueryExecutorImpl(inputManager2, dataShard, server2);
+    QueryExecutorImpl queryExecutor2 = new QueryExecutorImpl(inputManager2, dataShard2, server2);
     queryExecutor2.setQueryResultReceiver(queryResultReceiver2);
     queryExecutor2.DoTegoRootuj = server1;
 //
@@ -58,12 +61,11 @@ public class MainSelect {
 
     Thread queryExecutorThread = new Thread(queryExecutor);
     queryExecutorThread.start();
-    //dataShard.start();
+    dataShard.start();
 
     Thread queryExecutorThread2 = new Thread(queryExecutor2);
     queryExecutorThread2.start();
-
-//    dataShard.start();
+    dataShard2.start();
 
 
     inputManager.readInput("SelectFromClients", QueryExecutorImpl.returnNewQueryId(), null);
