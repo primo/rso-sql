@@ -61,7 +61,7 @@ public class QueryEngine {
 
 
         int tableId = freeTableId++;
-        name2TableId.put("TEST", tableId);
+        name2TableId.put("test", tableId);
         tables.put(tableId, table);
 
     }
@@ -76,7 +76,7 @@ public class QueryEngine {
     }
 
     Table getTable( String name) {
-        Integer key = name2TableId.get(name);
+        Integer key = name2TableId.get(name.toLowerCase());
         assert key != null;
         return tables.get(key);
     }
