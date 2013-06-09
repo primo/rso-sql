@@ -19,28 +19,20 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class QueryResultReceiverImpl implements QueryResultReceiver {
 
   private QueryResult qr;
-  private Map<Long, Table> queryResult = new HashMap<>();
-  //TO WYRZUCIC PO STESTACH!111111s
-  private LinkedBlockingQueue<QueryResult> testResult = new LinkedBlockingQueue<>();
+  private LinkedBlockingQueue<QueryResult> results = new LinkedBlockingQueue<>();
 
   @Override
   public void complete(QueryResult qr, Object queryContext) {
 
-    if (qr.result) {
-      Long queryId = qr.queryId;
-      Table outputTable = qr.output;
-
-      queryResult.put(queryId, outputTable);
-
-      testResult.add(qr);
-
-    } else {
+//    if (qr.result) {
+      results.add(qr);
+//    } else {
       //TODO: obsluzyc bledne wywolanie procedury
-    }
+//    }
   }
 
   public LinkedBlockingQueue<QueryResult> getTestResult() {
-    return testResult;
+    return results;
   }
 
 }

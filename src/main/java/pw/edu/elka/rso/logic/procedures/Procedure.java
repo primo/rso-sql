@@ -21,10 +21,8 @@ import java.util.List;
 public class Procedure implements IQueryReader {
 
   static Logger logger = Logger.getLogger(Procedure.class);
-
   public String name;
   private Statement statement;
-
   private CCJSqlParserManager parser = new CCJSqlParserManager();
 
   /*
@@ -32,22 +30,21 @@ public class Procedure implements IQueryReader {
    * @param list of params to execute query
    * TODO return data type ???
    */
-  public String run(List<String> params){
-      logger.debug(statement.toString());
-      String tmpStatement = statement.toString();
+  public String run(List<String> params) {
+    logger.debug(statement.toString());
+    String tmpStatement = statement.toString();
 
-      for(String s : params){
-          tmpStatement = tmpStatement.replaceFirst("\\?", s);
-      }
+    for (String s : params) {
+      tmpStatement = tmpStatement.replaceFirst("\\?", s);
+    }
 
-      Reader reader = new StringReader(tmpStatement);
-      try {
-          this.statement = parser.parse(reader);
-          logger.debug(tmpStatement);
-      } catch (JSQLParserException e) {
-          e.printStackTrace();
-      }
-
+    Reader reader = new StringReader(tmpStatement);
+    try {
+      this.statement = parser.parse(reader);
+      logger.debug(tmpStatement);
+    } catch (JSQLParserException e) {
+      e.printStackTrace();
+    }
 
 
     return "To sa dane z procedury: " + name + " z parametrami: " + params.toString();
@@ -63,9 +60,9 @@ public class Procedure implements IQueryReader {
          * @TODO check if all statement tables, fields etc. exist
          * maybe by executing it once?
          */
-    if(!validateQuery(reader)){
+    if (!validateQuery(reader)) {
       throw new InvalidParameterException("Statement could not be parsed.");
-    }else{
+    } else {
       procedure.statement = this.statement;
     }
     return procedure;
@@ -88,19 +85,21 @@ public class Procedure implements IQueryReader {
   }
 
   public void prepareParameters(List<String> params) {
-      logger.debug(statement.toString());
-      String tmpStatement = statement.toString();
+    logger.debug(statement.toString());
+    String tmpStatement = statement.toString();
 
-      for(String s : params){
-          tmpStatement = tmpStatement.replaceFirst("\\?", s);
+    if (params != null) {
+      for (String s : params) {
+        tmpStatement = tmpStatement.replaceFirst("\\?", s);
       }
 
       Reader reader = new StringReader(tmpStatement);
       try {
-          this.statement = parser.parse(reader);
-          logger.debug(tmpStatement);
+        this.statement = parser.parse(reader);
+        logger.debug(tmpStatement);
       } catch (JSQLParserException e) {
-          e.printStackTrace();
+        e.printStackTrace();
       }
+    }
   }
 }

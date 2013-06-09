@@ -66,7 +66,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
   }
 
   public void executeProcedure(QueryInfo queryInfo, QueryType queryType, QueryTask queryTaskReceived) throws ClassNotFoundException {
-    Procedure procedure = proceduresManager.getProcedure(queryInfo.getProcedureName());
+    Procedure procedure = proceduresManager.getProcedure(queryInfo.getProcedureName(), queryInfo.getParameters());
     try {
 
       /**
@@ -88,7 +88,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
       if (queryType == QueryType.MANGED) {
 
         LinkedList<ShardDetails> rootQueryHere = new LinkedList<>();
-        rootQueryHere.add(DoTegoRootuj.getServerDetails());
+        //rootQueryHere.add(DoTegoRootuj.getServerDetails());
         //TODO: ALL LOGIC GOES HERE
 
         logger.debug("Doing some logic stuff.");
@@ -126,7 +126,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
        * !!!!!!!
        */
 
-      dataShard.query(sqlDescription, queryTaskReceived);
+      dataShard.query(sqlDescription, new Object());
 
 //      QueryResult qr = new QueryResult();
 //      qr.queryId = sqlDescription.id;
@@ -225,7 +225,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
         Queue<QueryResult> queryResult = queryResultReceiver.getTestResult();
         for (int i = 0; i < queryResult.size(); i++) {
           QueryResult qr = queryResult.poll();
-          //if(qr.) stworzyc taska
+          //if(qr.) stworzyc taska do wysylania wynikow jesli to jest lokalne zadanie
 
           logger.debug("Dodaje rezultat zapytania " + qr.toString());
           queryResultManager.insertResult(qr.queryId, qr.output);
@@ -247,7 +247,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
             sb.append(val.toString());
             logger.debug("Rezultat:" + val);
           }
-          clientServer.pushToClientServer(sb.toString());
+          //clientServer.pushToClientServer(sb.toString());
         }
 
       }

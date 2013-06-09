@@ -15,7 +15,7 @@ public class SelectFromClients extends Procedure {
 
     public final String procedureName = "SelectFromClients";
 
-    public final String sql = "SELECT client FROM pracownicy;";
+    public final String sql = "SELECT ID, TEST from test;";
 
     public Procedure prepareProcedure() throws JSQLParserException {
         return super.prepareProcedure(procedureName, sql);
