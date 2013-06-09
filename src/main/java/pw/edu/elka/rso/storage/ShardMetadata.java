@@ -50,7 +50,7 @@ class PartitionMetadata implements Serializable, Comparable<PartitionMetadata> {
     {
         id = (long) (Math.random()*(1 << 60));
         if (rangeStop > rangeStart &&
-                rangeStop > 0 && rangeStart > 0)
+                rangeStop >= 0 && rangeStart >= 0)
         {
             hashRange[0] = rangeStart;
             hashRange[1] = rangeStop;
