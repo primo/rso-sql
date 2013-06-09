@@ -39,14 +39,14 @@ public class ProceduresManager{
     * @param procedure - name of procedure to execute
     * TODO return data type ???
      */
-    public String executeProcedure(String procedure) throws ClassNotFoundException {
+    public String executeProcedure(String procedure, List<String> params) throws ClassNotFoundException {
         //TODO change to some structure to find by name, like associative array
         Iterator<Procedure> it = procedures.iterator();
         while(it.hasNext())
         {
             Procedure p = it.next();
             if(p.name.equals(procedure)){
-                return p.run();
+                return p.run(params);
                 //return p.run();
             }
         }

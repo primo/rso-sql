@@ -1,11 +1,15 @@
 package pw.edu.elka.rso.core;
 
 import pw.edu.elka.rso.logic.procedures.ProceduresManager;
+import pw.edu.elka.rso.logic.procedures.SerializedProcedureCall;
 
 import java.io.DataInputStream;
+import java.io.ObjectInputStream;
 import java.io.PrintStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,7 +22,7 @@ class ClientThread extends Thread {
 
     private final ClientThread[] threads;
     private ProceduresManager proceduresManager;
-    private DataInputStream is = null;
+    private ObjectInputStream is = null;
     private PrintStream os = null;
     private Socket clientSocket = null;
     private int maxClientsCount;
@@ -41,12 +45,12 @@ class ClientThread extends Thread {
           /*
            * Create input and output streams for this client.
            */
-            is = new DataInputStream(clientSocket.getInputStream());
+            is = new ObjectInputStream(clientSocket.getInputStream());
             os = new PrintStream(clientSocket.getOutputStream());
-            String procedureName = is.readLine().trim();
-            System.out.println("Client wants to execute procedure: "+procedureName);
+            SerializedProcedureCall procedureCall = (SerializedProcedureCall)is.readObject();
+            System.out.println("Client wants to execute procedure: "+procedureCall.getName());
             try {
-                responseData = proceduresManager.executeProcedure(procedureName);
+                responseData = proceduresManager.executeProcedure(procedureCall.getName(), procedureCall.getParams());
             } catch (ClassNotFoundException e) {
                 // TODO send ClassNotFoundException to client somehow
                 responseData = "Nie znaleziono takiej procedury!";
@@ -71,6 +75,8 @@ class ClientThread extends Thread {
             os.close();
             clientSocket.close();
         } catch (IOException e) {
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
 }

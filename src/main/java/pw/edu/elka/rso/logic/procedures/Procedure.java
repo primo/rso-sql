@@ -9,6 +9,7 @@ import pw.edu.elka.rso.logic.interfaces.IQueryReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.security.InvalidParameterException;
+import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,10 +32,11 @@ public class Procedure implements IQueryReader {
    * @param list of params to execute query
    * TODO return data type ???
    */
-  public String run() {
+  public String run(List<String> params) {
     //execute statement
     System.out.println("Pobieram dane z bazy!");
-    return "To sa dane z procedury: " + name;
+
+    return "To sa dane z procedury: " + name + " z parametrami: " + params.toString();
   }
 
   public Procedure prepareProcedure(String name, String sql) throws JSQLParserException {
