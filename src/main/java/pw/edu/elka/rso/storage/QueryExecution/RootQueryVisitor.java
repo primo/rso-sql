@@ -181,7 +181,7 @@ class RootQueryVisitor implements StatementVisitor {
         queryEngine.tables.put(tableId, table);
         LOG.trace("Table " + tableName +" created with id:"+String.valueOf(tableId)+" using"
         + "SQL query: " + createTable.toString());
-        queryResult = new QueryResult(0); // FIXME
+        queryResult = new QueryResult();
         queryResult.result = true;
     }
 
