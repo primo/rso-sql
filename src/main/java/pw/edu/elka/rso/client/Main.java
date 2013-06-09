@@ -17,9 +17,9 @@ public class Main {
         BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
         List<String> params = new ArrayList<>();
-        params.add("Pierwszy");
-        params.add("Drugi");
-        params.add("Trzeci");
+        params.add("0");
+        params.add("1");
+        params.add("2");
         SerializedProcedureCall procedure = new SerializedProcedureCall("InsertIntoWorkers",params);
 
         outToServer.writeObject(procedure);

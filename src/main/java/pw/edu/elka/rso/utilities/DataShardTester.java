@@ -49,20 +49,20 @@ public class DataShardTester implements QueryResultReceiver{
         List<Statement> statements = new Vector<Statement>();
         CCJSqlParserManager parser = new CCJSqlParserManager();
         Statement statement = null;
-        statement = parser.parse(new StringReader("CREATE TABLE TEST (id INTEGER, test INTEGER);"));
+        statement = parser.parse(new StringReader("CREATE TABLE TEST2 (id INTEGER, test INTEGER);"));
         statements.add(statement);
-        Reader reader = new StringReader("SELECT id, test from TEST;");
+        Reader reader = new StringReader("SELECT id, test from TEST2;");
         statement = parser.parse(reader);
         statements.add(statement);
-        statement = parser.parse(new StringReader("INSERT INTO TEST VALUES(1,2);"));
+        statement = parser.parse(new StringReader("INSERT INTO TEST2 VALUES(1,2);"));
         statements.add(statement);
-        statement = parser.parse(new StringReader("INSERT INTO TEST VALUES(2,2);"));
+        statement = parser.parse(new StringReader("INSERT INTO TEST2 VALUES(2,2);"));
         statements.add(statement);
-        statement = parser.parse(new StringReader("INSERT INTO TEST VALUES(3,2);"));
+        statement = parser.parse(new StringReader("INSERT INTO TEST2 VALUES(3,2);"));
         statements.add(statement);
-        statement = parser.parse(new StringReader("INSERT INTO TEST VALUES(4,2);"));
+        statement = parser.parse(new StringReader("INSERT INTO TEST2 VALUES(4,2);"));
         statements.add(statement);
-        statement = parser.parse(new StringReader("SELECT id, test from TEST;"));
+        statement = parser.parse(new StringReader("SELECT id, test from TEST2;"));
         statements.add(statement);
         return statements;
     }

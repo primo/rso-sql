@@ -6,6 +6,8 @@ package pw.edu.elka.rso.logic.procedures; /**
  * To change this template use File | Settings | File Templates.
  */
 
+import net.sf.jsqlparser.JSQLParserException;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -39,7 +41,7 @@ public class ProceduresManager{
     * @param procedure - name of procedure to execute
     * TODO return data type ???
      */
-    public String executeProcedure(String procedure, List<String> params) throws ClassNotFoundException {
+    public String executeProcedure(String procedure, List<String> params) throws ClassNotFoundException, JSQLParserException {
         //TODO change to some structure to find by name, like associative array
         Iterator<Procedure> it = procedures.iterator();
         while(it.hasNext())
@@ -54,13 +56,14 @@ public class ProceduresManager{
         return null;
     }
 
-  public Procedure getProcedure(String procedure) throws ClassNotFoundException {
+  public Procedure getProcedure(String procedure,List<String> params) throws ClassNotFoundException {
     //TODO change to some structure to find by name, like associative array
     Iterator<Procedure> it = procedures.iterator();
     while(it.hasNext())
     {
       Procedure p = it.next();
       if(p.name.equals(procedure)){
+        p.prepareParameters(params);
         return p;
         //return p.run();
       }

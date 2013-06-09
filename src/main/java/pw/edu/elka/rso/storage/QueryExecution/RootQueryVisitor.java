@@ -81,7 +81,7 @@ class RootQueryVisitor implements StatementVisitor {
     @Override
     public void visit(Insert insert) {
         // 1. Fetch the table object
-        String tableName = insert.getTable().getName();
+        String tableName = insert.getTable().getName().toLowerCase();
         int tableId = queryEngine.name2TableId.get(tableName);
         Table table = queryEngine.tables.get(tableId);
 
@@ -141,7 +141,7 @@ class RootQueryVisitor implements StatementVisitor {
     @Override
     public void visit(CreateTable createTable) {
         // 1. Check if table name is valid and available
-        String tableName = createTable.getTable().getName();
+        String tableName = createTable.getTable().getName().toLowerCase();
         assert  createTable.getTable().getSchemaName() == ""; //FIXME We do not provide schema support
         // TODO
 
