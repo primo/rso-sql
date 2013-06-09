@@ -1,6 +1,7 @@
 package pw.edu.elka.rso.storage;
 
 import net.sf.jsqlparser.statement.Statement;
+import pw.edu.elka.rso.server.QueryType;
 
 import java.io.Serializable;
 
@@ -18,6 +19,31 @@ public class SqlDescription implements Serializable {
 
   public String getProcedureName() {
     return procedureName;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    SqlDescription that = (SqlDescription) o;
+
+    if (id != that.id) return false;
+
+    return true;
+  }
+
+  @Override
+  public int hashCode() {
+    return (int) (id ^ (id >>> 32));
+  }
+
+  @Override
+  public String toString() {
+    return "SqlDescription{" +
+        "statement=" + statement +
+        ", id=" + id +
+        '}';
   }
 }
 

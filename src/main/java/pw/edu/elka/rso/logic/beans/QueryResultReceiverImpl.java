@@ -1,5 +1,6 @@
 package pw.edu.elka.rso.logic.beans;
 
+import pw.edu.elka.rso.storage.DataRepresentation.Table;
 import pw.edu.elka.rso.storage.QueryResult;
 import pw.edu.elka.rso.storage.QueryResultReceiver;
 
@@ -7,6 +8,8 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created with IntelliJ IDEA.
@@ -16,25 +19,28 @@ import java.util.Map;
 public class QueryResultReceiverImpl implements QueryResultReceiver {
 
   private QueryResult qr;
-  private Map<Long, LinkedList<ByteBuffer>> queryResult = new HashMap<Long, LinkedList<ByteBuffer>>();
+  private Map<Long, Table> queryResult = new HashMap<>();
+  //TO WYRZUCIC PO STESTACH!111111s
+  private LinkedBlockingQueue<QueryResult> testResult = new LinkedBlockingQueue<>();
 
   @Override
   public void complete(QueryResult qr) {
 
     if (qr.result) {
       Long queryId = qr.queryId;
-      LinkedList<ByteBuffer> result = !(queryResult.containsKey(queryId)) ? new LinkedList<ByteBuffer>() : queryResult.get(queryId);
-      result.addAll(qr.output);
-    }else{
-     //TODO: obsluzyc bledne wywolanie procedury
+      Table outputTable = qr.output;
+
+      queryResult.put(queryId, outputTable);
+
+      testResult.add(qr);
+
+    } else {
+      //TODO: obsluzyc bledne wywolanie procedury
     }
   }
 
-  public Map<Long, LinkedList<ByteBuffer>> getQueryResult() {
-    return queryResult;
+  public LinkedBlockingQueue<QueryResult> getTestResult() {
+    return testResult;
   }
 
-  public void setQueryResult(Map<Long, LinkedList<ByteBuffer>> queryResult) {
-    this.queryResult = queryResult;
-  }
 }
