@@ -82,8 +82,23 @@ public class Table implements Iterable<Record>{
 
     @Override
     public String toString() {
-        return "Table{" +
-                "mainList=" + mainList +
-                '}';
+        Set<String> columns = tableSchema.getColumnNames();
+        Iterator<Record> it = iterator();
+        StringBuilder builder = new StringBuilder();
+        for (String s : columns) {
+            builder.append(s);
+            builder.append("\t");
+        }
+        builder.append("\n");
+        for (String s : columns) {
+            builder.append("\t---");
+        }
+        while(it.hasNext()) {
+            Record r = it.next();
+            for (String s : columns) {
+                builder.append(r.getValue(s));
+            }
+        }
+        return builder.toString();
     }
 }
