@@ -64,4 +64,26 @@ public class Table implements Iterable<Record>{
     public Iterator<Record> iterator() {
         return new TableIterator(this, mainList, mainList.size());
     }
+
+    public boolean merge(Table other) {
+        TableSchema s2 = other.getTableSchema();
+        // Check if schemas are identical
+        Set<String> n1 = tableSchema.getColumnNames();
+        Set<String> n2 = s2.getColumnNames();
+        if (!n1.equals(n2))
+            return false;
+        for(String s : n1) {
+            if (tableSchema.getColumnType(s) != s2.getColumnType(s))
+                return false;
+        }
+        // Copy other content
+        return mainList.addAll(other.mainList);
+    }
+
+    @Override
+    public String toString() {
+        return "Table{" +
+                "mainList=" + mainList +
+                '}';
+    }
 }
