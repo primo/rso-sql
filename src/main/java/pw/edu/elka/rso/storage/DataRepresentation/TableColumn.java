@@ -32,7 +32,13 @@ class IntTableColumn extends TableColumn {
             buffer.put(position, (byte) 0);
             return;
         }
-        int new_value = (Integer) value;
+
+        final int new_value ;
+        if (value instanceof Integer)
+            new_value = (Integer) value;
+        else {
+            new_value = ((Long)value).intValue();
+        }
         buffer.put(position, (byte) 1);
         buffer.putInt(position+1, new_value);
     }

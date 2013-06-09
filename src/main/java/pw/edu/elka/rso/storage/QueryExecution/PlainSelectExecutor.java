@@ -45,7 +45,7 @@ public class PlainSelectExecutor {
         aliases.put(fe.tableAlias, fe.tableName);
         tablesList.add(new SimpleEntry<String, Table>(fe.tableName, targetTable));
 
-        if (!joins.isEmpty()) {
+        if (null != joins && !joins.isEmpty()) {
             // table1 is also joined, it's a strange jsqlparser custom to split join clause in this way
             // so perform a join
             String leftTable = fe.tableName;
@@ -91,9 +91,6 @@ public class PlainSelectExecutor {
             for (Entry<String,String> p : selectItems) {
                 String sourceTable = p.getKey();
                 // Assuming that if we join tables then we prefix columns with its names
-                if (null == sourceTable) {
-                    throw new IllegalArgumentException("");
-                }
                 String columnName = sourceTable!=null?sourceTable+"."+p.getValue():p.getValue();
                 ColumnType type = table.getTableSchema().getColumnType(columnName);
                 int length = 0;
@@ -106,13 +103,17 @@ public class PlainSelectExecutor {
                 schema.addColumn(p.getValue(), type ,length);
             }
             output = new Table(schema);
-            Iterator<Record> it1 = tablesList.get(0).getValue().iterator();
+            Iterator<Record> it1 = table.iterator();
             for (;it1.hasNext();) {
                 Record r = it1.next();
                 // TODO setup ei
                 currentLines.put(tableName, r);
-                whereExpressions.accept(ei);
-                if (!ei.isTrue()) continue;
+                // Check WHERE condition if given
+                if (null != whereExpressions ) {
+                    whereExpressions.accept(ei);
+                    if (!ei.isTrue())
+                        continue;
+                }
 
                 // Select items
                 Record out = output.newRecord();

@@ -5,14 +5,15 @@ import pw.edu.elka.rso.storage.QueryExecution.QueryEngine;
 
 import java.security.InvalidParameterException;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 
 /**
  * Provides interface to data base content.
  */
 public class DataShard implements IDataShard, Runnable {
 
-  private ConcurrentLinkedQueue<SqlDescription> tasks;
-  ConcurrentLinkedQueue<QueryResult> results;
+  private LinkedBlockingDeque<SqlDescription> tasks;
+  LinkedBlockingDeque<QueryResult> results;
   private QueryResultReceiver queryResultReceiver = null;
   private Thread qrDispatcherThread = null;
   private Thread shardExecutor = null;
@@ -62,9 +63,13 @@ public class DataShard implements IDataShard, Runnable {
   @Override
   public void run() {
     while (!stopped) {
-      LOG.debug("inside");
-      SqlDescription query = tasks.poll();
-      QueryResult qr = engine.query(query);
+        SqlDescription query = null;
+        try {
+            query = tasks.take();
+        } catch (InterruptedException e) {
+            LOG.error(e.getMessage());
+        }
+        QueryResult qr = engine.query(query);
       results.offer(qr);
     }
   }
@@ -77,8 +82,8 @@ public class DataShard implements IDataShard, Runnable {
         qrDispatcherThread = new Thread(dispatcher);
         shardExecutor = new Thread(this);
         engine = new QueryEngine();
-        tasks = new ConcurrentLinkedQueue<SqlDescription>();
-        results = new ConcurrentLinkedQueue<QueryResult>();
+        tasks = new LinkedBlockingDeque<SqlDescription>();
+        results = new LinkedBlockingDeque<QueryResult>();
     	shardExecutor.start();
     	qrDispatcherThread.start();
         LOG.trace("DataShard started successfully.");
@@ -117,11 +122,14 @@ class QueryResultDispatcher implements Runnable {
    */
   @Override
   public void run() {
-    LOG.debug("WALALAL");
     while (!managedObj.stopped) {
-      LOG.debug("inside2");
-      QueryResult qr = managedObj.results.poll();
-      queryResultReceiver.complete(qr);
+        QueryResult qr = null;
+        try {
+            qr = managedObj.results.take();
+        } catch (InterruptedException e) {
+            LOG.error(e.getMessage());
+        }
+        queryResultReceiver.complete(qr);
     }
   }
 }

@@ -1,5 +1,7 @@
 package pw.edu.elka.rso.storage;
 
+import pw.edu.elka.rso.storage.DataRepresentation.Table;
+
 import java.nio.ByteBuffer;
 import java.util.List;
 
@@ -8,7 +10,7 @@ import java.util.List;
 public class QueryResult {
     public long queryId;
     public boolean result;
-    public List<ByteBuffer> output;
+    public Table output;
 
     public QueryResult(long queryId) {
         this.queryId = queryId;

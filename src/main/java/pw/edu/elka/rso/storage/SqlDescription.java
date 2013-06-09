@@ -7,6 +7,11 @@ import net.sf.jsqlparser.statement.Statement;
 public class SqlDescription {
     public long id;
     public Statement statement;
+
+    public SqlDescription() {}
+    public SqlDescription(Statement statement) {
+        this.statement = statement;
+    }
 }
 
 enum SqlAction{

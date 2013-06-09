@@ -28,6 +28,7 @@ import java.nio.ByteBuffer;
 import java.security.InvalidParameterException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /** Vists a JSQL Statement and describes its content in QueryEngine understandable
  * form.
@@ -89,20 +90,32 @@ class RootQueryVisitor implements StatementVisitor {
 
         // 2. Create new record
         Record record = table.newRecord();
-        List<Column> columns = insert.getColumns();
+
         ItemsList items = insert.getItemsList();
         QueryItemsExtractor ie = new QueryItemsExtractor();
         items.accept(ie);
 
         Iterator iter = ie.items.iterator();
-        assert ie.items.size() == columns.size();
-        for( Column c: columns) {
-            String colName = c.getColumnName();
-            record.setValue(colName, iter.next());
+        List<Column> columns = insert.getColumns();
+        if (null != columns) {
+            assert ie.items.size() == columns.size();
+            for( Column c: columns) {
+                String colName = c.getColumnName();
+                record.setValue(colName, iter.next());
+            }
+        } else {
+            // Get the columns from the table schema
+            Set<String> cols = table.getTableSchema().getColumnNames();
+            assert ie.items.size() == cols.size();
+            for( String col: cols) {
+                record.setValue(col, iter.next());
+            }
         }
-
         // 3. Complete
         table.insert(record);
+        queryResult = new QueryResult();
+        queryResult.result = true;
+        queryResult.output = null;
     }
 
     @Override
@@ -152,10 +165,13 @@ class RootQueryVisitor implements StatementVisitor {
             schema.addColumn(def.getColumnName(), internalDataType, 0);
         }
         Table table = new Table(schema);
-        for (Index indexDef : (List<Index>)createTable.getIndexes()) {
-            List<String> cols = indexDef.getColumnsNames();
-            for (String s : cols) {
-                table.createIndex(s);
+        List<Index> indexes = createTable.getIndexes();
+        if (null != indexes) {
+            for (Index indexDef : indexes) {
+                List<String> cols = indexDef.getColumnsNames();
+                for (String s : cols) {
+                    table.createIndex(s);
+                }
             }
         }
 
