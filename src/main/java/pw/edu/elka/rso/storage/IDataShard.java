@@ -8,7 +8,7 @@ package pw.edu.elka.rso.storage;
  * To change this template use File | Settings | File Templates.
  */
 public interface IDataShard {
-    long query( SqlDescription query);
+    void query( SqlDescription query, Object queryContext);
     ShardMetadata getMetadata();
     ShardStatistics getStatistics();
     boolean registerQueryResultReceiver( QueryResultReceiver queryResultReceiver);

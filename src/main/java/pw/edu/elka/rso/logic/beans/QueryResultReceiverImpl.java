@@ -24,7 +24,7 @@ public class QueryResultReceiverImpl implements QueryResultReceiver {
   private LinkedBlockingQueue<QueryResult> testResult = new LinkedBlockingQueue<>();
 
   @Override
-  public void complete(QueryResult qr) {
+  public void complete(QueryResult qr, Object queryContext) {
 
     if (qr.result) {
       Long queryId = qr.queryId;

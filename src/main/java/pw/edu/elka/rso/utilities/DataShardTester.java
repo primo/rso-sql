@@ -21,6 +21,8 @@ import java.util.Vector;
 public class DataShardTester implements QueryResultReceiver{
 
     private int received = 0;
+    private int nextId = 0;
+
 
     public static void main(String[] args) throws InterruptedException, JSQLParserException {
         List<Statement> statements = prepare();
@@ -29,8 +31,10 @@ public class DataShardTester implements QueryResultReceiver{
         ds.registerQueryResultReceiver(dst) ;
         ds.start();
         for (Statement s : statements) {
-            long query = ds.query(new SqlDescription(s));
-            System.out.println(s.toString()+" given "+query+" ID");
+            SqlDescription job = new SqlDescription(s);
+            job.id = dst.nextId++;
+            ds.query(job, null);
+            System.out.println(s.toString()+" given "+(dst.nextId-1)+" ID");
         }
 
         synchronized (dst) {
@@ -65,7 +69,7 @@ public class DataShardTester implements QueryResultReceiver{
 
 
     @Override
-    public void complete(QueryResult qr) {
+    public void complete(QueryResult qr, Object queryContext) {
         if (qr==null) {
             System.out.println("QR returned null");
             return;
