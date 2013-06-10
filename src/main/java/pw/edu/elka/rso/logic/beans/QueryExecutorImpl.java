@@ -232,6 +232,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
             QueryResultTask queryResultTask = (QueryResultTask) task;
             logger.debug("Dostalem(@" + server.getServerDetails() + ") odpowiedz  " + queryResultTask.getInput());
             QueryResult queryResult = queryResultTask.getInput();
+            queryResult.prepareForReading();
             queryResultManager.insertResult(queryResult.queryId, queryResult.output);
           }
           else if (task instanceof MetadataUpdateTask) {
