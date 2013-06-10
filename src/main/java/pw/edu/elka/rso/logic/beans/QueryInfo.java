@@ -35,4 +35,11 @@ public class QueryInfo implements Serializable {
     this.parameters = parameters;
   }
 
+  @Override
+  public String toString() {
+    return "QueryInfo{" +
+        "queryId=" + queryId +
+        ", procedureName='" + procedureName + '\'' +
+        '}';
+  }
 }

@@ -45,6 +45,7 @@ public class QueryTask extends Task<SqlDescription> implements Serializable {
   public String toString() {
     return "QueryTask{" +
         "queryRoot=" + queryRoot +
+        ", queryInfo=" + queryInfo +
         '}';
   }
 

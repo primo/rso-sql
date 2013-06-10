@@ -258,20 +258,24 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
         for (Map.Entry<Long, LinkedList<Table>> entry : queryResultManager.returnResult().entrySet()) {
           Long queryId = entry.getKey();
           LinkedList<Table> value = entry.getValue();
-          StringBuilder sb = new StringBuilder();
 
-          for (Table val : value) {
-            if (val != null) {
-              sb.append(val.toString());
-              logger.debug("Rezultat:" + val);
-            }
+          Table resultTable = null;
+
+          if(value.size() > 1){
+            resultTable = value.get(0);
           }
+
+          for (int i = 1; i < value.size(); i++) {
+            resultTable.merge(value.get(i));
+          }
+
+//          System.out.println(resultTable.toString());
           /**
            * ODKOMENTOWAC ZEBY WYSLAC WYNIK DO server'a ktory komunikuje sie z klientem
            * NARAZIE POMIJANY
            *
            */
-          //clientServer.pushToClientServer(sb.toString());
+          clientServer.pushToClientServer(resultTable.toString());
         }
 
       }

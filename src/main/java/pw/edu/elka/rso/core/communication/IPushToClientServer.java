@@ -8,5 +8,5 @@ package pw.edu.elka.rso.core.communication;
  * To change this template use File | Settings | File Templates.
  */
 public interface IPushToClientServer {
-  public void pushToClientServer(String result);
+  public void pushToClientServer(Object result);
 }

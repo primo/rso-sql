@@ -122,7 +122,7 @@ public class ClientServer extends AbstractServer implements Runnable, IPushToCli
   }
 
   @Override
-  public void pushToClientServer(String result) {
+  public void pushToClientServer(Object result) {
     Queue<Object> queue = getDataQueue();
     queue.add(result);
   }
@@ -143,12 +143,16 @@ class ClientRequestThread implements Runnable {
   public void run() {
 
     log.debug("Startuje thread nasluchujaccy dane przychodzace od klienta!");
-    ObjectInputStream ois;
+    ObjectInputStream ois = null;
 
+    try {
+      ois = new ObjectInputStream(clientSocket.getInputStream());
+    } catch (IOException e) {
+      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+    }
 
     while (true) {
       try {
-        ois = new ObjectInputStream(clientSocket.getInputStream());
         Object data = ois.readObject();
 
         if (data instanceof String) {
@@ -169,6 +173,7 @@ class ClientRequestThread implements Runnable {
 
         }
       } catch (ClassNotFoundException | IOException e) {
+        log.debug("WTH tutaj?");
         e.printStackTrace();
       }
 

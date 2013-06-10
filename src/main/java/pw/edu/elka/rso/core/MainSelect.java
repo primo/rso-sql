@@ -71,11 +71,11 @@ public class MainSelect {
     queryExecutorThread2.start();
     dataShard2.start();
 
-    LinkedList<String> params = new LinkedList<>();
-    params.add("999");
-    params.add("999");
-    inputManager.readInput("InsertIntoTest", QueryExecutorImpl.returnNewQueryId(), params);
-    inputManager.readInput("SelectFromClients", QueryExecutorImpl.returnNewQueryId(), null);
+//    LinkedList<String> params = new LinkedList<>();
+//    params.add("999");
+//    params.add("999");
+//    inputManager.readInput("InsertIntoTest", QueryExecutorImpl.returnNewQueryId(), params);
+//    inputManager.readInput("SelectFromClients", QueryExecutorImpl.returnNewQueryId(), null);
 
   }
 }

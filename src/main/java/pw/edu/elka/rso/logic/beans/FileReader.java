@@ -1,5 +1,11 @@
 package pw.edu.elka.rso.logic.beans;
-
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Vector;
+import java.util.Scanner;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 /**
  * Created with IntelliJ IDEA.
  * User: Maciek
@@ -57,10 +63,4 @@ public class FileReader {
     }
 }
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Vector;
-import java.util.Scanner;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
