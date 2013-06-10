@@ -42,8 +42,6 @@ public class MainLogic {
     QueryResultReceiverImpl queryResultReceiver = new QueryResultReceiverImpl();
     QueryResultReceiverImpl queryResultReceiver2 = new QueryResultReceiverImpl();
 
-
-
     DataShard dataShard = new DataShard();
     dataShard.registerQueryResultReceiver(queryResultReceiver);
 

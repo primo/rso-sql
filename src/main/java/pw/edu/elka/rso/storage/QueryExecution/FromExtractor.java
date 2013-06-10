@@ -5,13 +5,6 @@ import net.sf.jsqlparser.statement.select.FromItemVisitor;
 import net.sf.jsqlparser.statement.select.SubJoin;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
-/**
- * Created with IntelliJ IDEA.
- * User: primo
- * Date: 6/3/13
- * Time: 6:22 PM
- * To change this template use File | Settings | File Templates.
- */
 class FromExtractor implements FromItemVisitor {
     String tableName;
     String tableAlias;

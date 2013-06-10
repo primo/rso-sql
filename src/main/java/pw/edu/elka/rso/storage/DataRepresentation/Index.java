@@ -8,6 +8,9 @@ import java.util.*;
 import static java.lang.System.*;
 
 //Nie przyjmuje nulli jako wartosci v
+/*
+Klasa rozpinająca indeks na tabeli przez wartości danej kolumny.
+ */
 class Index implements Iterable<ByteBuffer>{
     NavigableMap<Object, Collection<ByteBuffer>> index;
     TableColumn column;

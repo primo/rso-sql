@@ -94,6 +94,10 @@ public class Metadata{
         return partition2nodes.get(partition_id);
     }
 
+    public void addNode(int node_ID){
+        replicasCount.add(new RepCount(node_ID));
+    }
+
     void updateLoad(int node_id, float new_load){
         currentLoad.put(node_id, new_load);
     }
