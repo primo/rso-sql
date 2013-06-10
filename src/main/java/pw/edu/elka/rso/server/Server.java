@@ -219,7 +219,7 @@ public class Server extends AbstractServer implements Runnable, ITaskManager {
   public void setServerSocket(ServerSocket serverSocket) {
     this.serverSocket = serverSocket;
   }
-};
+}
 
 
 
