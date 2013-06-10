@@ -119,11 +119,11 @@ class RootQueryVisitor implements StatementVisitor {
             table.insert(record);
             queryResult = new QueryResult();
             queryResult.result = true;
-            queryResult.output = null;
+            queryResult.output = QueryEngine.RESULT_SUCCESS;
         } catch (Exception e) {
             queryResult = new QueryResult();
             queryResult.result = false;
-            queryResult.output = null;
+            queryResult.output = QueryEngine.RESULT_FAILURE;
             queryResult.information = e.getMessage();
         }
     }
@@ -201,11 +201,13 @@ class RootQueryVisitor implements StatementVisitor {
                     + "SQL query: " + createTable.toString());
             queryResult = new QueryResult();
             queryResult.result = true;
+            queryResult.output = QueryEngine.RESULT_SUCCESS;
         } catch (Exception e) {
             queryResult = new QueryResult();
             queryResult.result = false;
             queryResult.output = null;
             queryResult.information = e.getMessage();
+            queryResult.output = QueryEngine.RESULT_SUCCESS;
         }
     }
 

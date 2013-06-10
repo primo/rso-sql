@@ -1,7 +1,5 @@
 package pw.edu.elka.rso.logic.beans;
 
-import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.select.Select;
 import org.apache.log4j.Logger;
 import pw.edu.elka.rso.core.communication.ClientServer;
 import pw.edu.elka.rso.logic.QueryExecution.Metadata;
@@ -12,23 +10,22 @@ import pw.edu.elka.rso.server.Server;
 import pw.edu.elka.rso.server.ShardDetails;
 import pw.edu.elka.rso.server.Task;
 import pw.edu.elka.rso.server.tasks.*;
-import pw.edu.elka.rso.storage.*;
 import pw.edu.elka.rso.storage.DataRepresentation.Table;
+import pw.edu.elka.rso.storage.IDataShard;
+import pw.edu.elka.rso.storage.QueryResult;
+import pw.edu.elka.rso.storage.QueryResultReceiver;
+import pw.edu.elka.rso.storage.SqlDescription;
 
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, ITaskManager {
   static Logger logger = Logger.getLogger(QueryExecutorImpl.class);
-
   private static long queryId = 0;
   //TODO: wywalic, testowe
   public Server DoTegoRootuj;
 
   //TODO; Przyjmie obiekt QueryInfo i z niego zwroci np. stringa ktory ma uzupelnione wartosci  ? ? ?
-
   private IDataShard dataShard;
   private QueryResultReceiverImpl queryResultReceiver;
   private Server server;
@@ -44,7 +41,6 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
   //glupia nazwa dla serwera ktory jest odpowiedzilny za komunikacje z clientem
   //T_T
   private ClientServer clientServer;
-
   private Metadata metadata;
 
   public QueryExecutorImpl(Observable consoleObservable, IDataShard dataShard, Server server, Metadata new_metadata) {
@@ -93,7 +89,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
        *
        *
        */
-      LinkedList<ShardDetails> rootQueryHere = new LinkedList<ShardDetails>();
+      LinkedList<ShardDetails> rootQueryHere = new LinkedList<>();
       SqlDescription sqlDescription = new SqlDescription();
       sqlDescription.statement = procedure.getParsedQuery();
 
@@ -148,8 +144,8 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
        * TUTAJ WYKONUJEMY ZAPYTANIE DO Sharda
        * !!!!!!!
        */
-      if(executeQuereOnThisShard)
-      dataShard.query(sqlDescription, queryTaskReceived);
+      if (executeQuereOnThisShard)
+        dataShard.query(sqlDescription, queryTaskReceived);
 
 
     } catch (Exception ex) {
@@ -213,15 +209,13 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
               logger.debug("Wywalilem sie przy probie wykonania zapytania" + queryTask.getInput().getProcedureName());
               e.printStackTrace();
             }
-          }
-          else if (task instanceof QueryResultTask) {
+          } else if (task instanceof QueryResultTask) {
             QueryResultTask queryResultTask = (QueryResultTask) task;
             logger.debug("Dostalem(@" + server.getServerDetails() + ") odpowiedz  " + queryResultTask.getInput());
             QueryResult queryResult = queryResultTask.getInput();
             queryResult.prepareForReading();
             queryResultManager.insertResult(queryResult.queryId, queryResult.output);
-          }
-          else if (task instanceof MetadataUpdateTask) {
+          } else if (task instanceof MetadataUpdateTask) {
             logger.debug("Dostalem(@" + server.getServerDetails() + ") odpowiedz  " + task.getInput());
             metadata.updateMetadata(((MetadataUpdateTask) task).getInput());
           }
@@ -265,9 +259,12 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
           Long queryId = entry.getKey();
           LinkedList<Table> value = entry.getValue();
           StringBuilder sb = new StringBuilder();
+
           for (Table val : value) {
-            sb.append(val.toString());
-            logger.debug("Rezultat:" + val);
+            if (val != null) {
+              sb.append(val.toString());
+              logger.debug("Rezultat:" + val);
+            }
           }
           /**
            * ODKOMENTOWAC ZEBY WYSLAC WYNIK DO server'a ktory komunikuje sie z klientem

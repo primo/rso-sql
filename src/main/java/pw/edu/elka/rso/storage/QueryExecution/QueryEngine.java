@@ -8,8 +8,6 @@ import pw.edu.elka.rso.storage.ShardMetadata;
 import pw.edu.elka.rso.storage.SqlDescription;
 
 import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.HashMap;
 
 /** Interface of shard's data layer
@@ -18,6 +16,26 @@ public class QueryEngine {
     protected HashMap<String, Integer> name2TableId = null;
     protected HashMap<Integer, Table> tables = null;
     protected int freeTableId = DefaultTables.__MAX__.ordinal();
+    public final static Table RESULT_SUCCESS;
+    public final static Table RESULT_FAILURE;
+
+    static {
+        // Default success and failure result table
+        TableSchema temps = new TableSchema();
+        temps.addColumn("Result", ColumnType.INT,0);
+        Table tempt = new Table(temps);
+        Record r = tempt.newRecord();
+        r.setValue("Result",1);
+        tempt.insert(r);
+        RESULT_SUCCESS = tempt;
+        temps = new TableSchema();
+        temps.addColumn("Result", ColumnType.INT,0);
+        tempt = new Table(temps);
+        r = tempt.newRecord();
+        r.setValue("Result",0);
+        tempt.insert(r);
+        RESULT_FAILURE = tempt;
+    }
 
     public QueryEngine() {
         // 1. Setup metadata and statistic
