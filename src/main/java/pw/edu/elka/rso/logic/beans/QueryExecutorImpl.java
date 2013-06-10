@@ -79,22 +79,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
 
 
 
-        /*
-        ShardMetadata metadata = dataShard.getMetadata();
-        String queryStr = procedure.getParsedQuery().toString();
-        Pattern p = Pattern.compile("SELECT.*FROM\\s([a-zA-Z]*)");
-        Matcher m = p.matcher(queryStr);
-        if (m.find()) {
-            String table = m.group(1);
-            ArrayList<PartitionMetadata> pm=  metadata.getPartitionsContaining(table);
-            for(PartitionMetadata pp: pm)
-            {
-                for (ShardDetails sd: pp.getReplicas())
-                {
-                    rootQueryHere.add(sd);
-                }
-            }
-        }*/
+
 
       /**
        *
@@ -111,6 +96,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
       LinkedList<ShardDetails> rootQueryHere = new LinkedList<ShardDetails>();
       SqlDescription sqlDescription = new SqlDescription();
       sqlDescription.statement = procedure.getParsedQuery();
+
       sqlDescription.toStringQuery(queryInfo.getProcedureName());
       sqlDescription.id = queryType == QueryType.RAW ? queryTaskReceived.getInput().id : queryInfo.getQueryId();
 
