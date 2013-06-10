@@ -23,9 +23,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, ITaskManager {
   static Logger logger = Logger.getLogger(QueryExecutorImpl.class);
+
   private static long queryId = 0;
   //TODO: wywalic, testowe
   public Server DoTegoRootuj;
+
+  //TODO; Przyjmie obiekt QueryInfo i z niego zwroci np. stringa ktory ma uzupelnione wartosci  ? ? ?
+
   private IDataShard dataShard;
   private QueryResultReceiverImpl queryResultReceiver;
   private Server server;
