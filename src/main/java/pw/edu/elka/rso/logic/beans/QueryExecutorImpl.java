@@ -45,7 +45,10 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
   //T_T
   private ClientServer clientServer;
 
-  public QueryExecutorImpl(Observable consoleObservable, IDataShard dataShard, Server server) {
+  private Metadata metadata;
+
+  public QueryExecutorImpl(Observable consoleObservable, IDataShard dataShard, Server server, Metadata new_metadata) {
+    metadata = new_metadata;
     this.proceduresManager = ProceduresManager.getInstance();
     proceduresManager.prepareProcedures();
 
@@ -233,7 +236,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
           }
           else if (task instanceof MetadataUpdateTask) {
             logger.debug("Dostalem(@" + server.getServerDetails() + ") odpowiedz  " + task.getInput());
-            Metadata.metadata.updateMetadata(((MetadataUpdateTask) task).getInput());
+            metadata.updateMetadata(((MetadataUpdateTask) task).getInput());
           }
         }
       }

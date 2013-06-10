@@ -1,6 +1,7 @@
 package pw.edu.elka.rso.core;
 
 import pw.edu.elka.rso.core.communication.ClientServer;
+import pw.edu.elka.rso.logic.QueryExecution.Metadata;
 import pw.edu.elka.rso.logic.beans.InputManager;
 import pw.edu.elka.rso.logic.beans.QueryExecutorImpl;
 import pw.edu.elka.rso.logic.beans.QueryResultReceiverImpl;
@@ -40,7 +41,8 @@ public class ExampleServer {
     DataShard dataShard = new DataShard();
     dataShard.registerQueryResultReceiver(queryResultReceiver);
 
-    QueryExecutorImpl queryExecutor = new QueryExecutorImpl(inputManager, dataShard, shardServer);
+      Metadata metadata = new Metadata(shardServer);
+    QueryExecutorImpl queryExecutor = new QueryExecutorImpl(inputManager, dataShard, shardServer, metadata);
     queryExecutor.setQueryResultReceiver(queryResultReceiver);
     //queryExecutor.DoTegoRootuj = clientServer;
 
