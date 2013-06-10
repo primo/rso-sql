@@ -30,7 +30,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-/** Vists a JSQL Statement and describes its content in QueryEngine understandable
+/**
+ * Vists a JSQL Statement and describes its content in QueryEngine understandable
  * form.
  */
 class RootQueryVisitor implements StatementVisitor {
@@ -40,8 +41,9 @@ class RootQueryVisitor implements StatementVisitor {
 
     static Logger LOG = Logger.getLogger(RootQueryVisitor.class);
 
-    /** C-tor.
-     *
+    /**
+     * C-tor.
+     * <p/>
      * A reference to QueryEngine is passed so the Visitor can
      * execute requests directly on data.
      *
@@ -51,8 +53,9 @@ class RootQueryVisitor implements StatementVisitor {
         this.queryEngine = queryEngine;
     }
 
-    /** Executes a select sql statement.
-     *
+    /**
+     * Executes a select sql statement.
+     * <p/>
      * FIXME:
      * + parse UNIONS
      * + understand WITH statement
@@ -62,7 +65,7 @@ class RootQueryVisitor implements StatementVisitor {
      */
     @Override
     public void visit(Select select) {
-        GeneralSelectExecutor executor =  new GeneralSelectExecutor(queryEngine);
+        GeneralSelectExecutor executor = new GeneralSelectExecutor(queryEngine);
         SelectBody selectBody = select.getSelectBody();
         selectBody.accept(executor);
         queryResult = executor.queryResult;
@@ -80,42 +83,49 @@ class RootQueryVisitor implements StatementVisitor {
 
     @Override
     public void visit(Insert insert) {
-        // 1. Fetch the table object
-        String tableName = insert.getTable().getName().toLowerCase();
-        int tableId = queryEngine.name2TableId.get(tableName);
-        Table table = queryEngine.tables.get(tableId);
+        try {
+            // 1. Fetch the table object
+            String tableName = insert.getTable().getName().toLowerCase();
+            int tableId = queryEngine.name2TableId.get(tableName);
+            Table table = queryEngine.tables.get(tableId);
 
-        // 1.a Validate the schema
-        // TODO
+            // 1.a Validate the schema
+            // TODO
 
-        // 2. Create new record
-        Record record = table.newRecord();
+            // 2. Create new record
+            Record record = table.newRecord();
 
-        ItemsList items = insert.getItemsList();
-        QueryItemsExtractor ie = new QueryItemsExtractor();
-        items.accept(ie);
+            ItemsList items = insert.getItemsList();
+            QueryItemsExtractor ie = new QueryItemsExtractor();
+            items.accept(ie);
 
-        Iterator iter = ie.items.iterator();
-        List<Column> columns = insert.getColumns();
-        if (null != columns) {
-            assert ie.items.size() == columns.size();
-            for( Column c: columns) {
-                String colName = c.getColumnName();
-                record.setValue(colName, iter.next());
+            Iterator iter = ie.items.iterator();
+            List<Column> columns = insert.getColumns();
+            if (null != columns) {
+                assert ie.items.size() == columns.size();
+                for (Column c : columns) {
+                    String colName = c.getColumnName().toLowerCase();
+                    record.setValue(colName, iter.next());
+                }
+            } else {
+                // Get the columns from the table schema
+                Set<String> cols = table.getTableSchema().getColumnNames();
+                assert ie.items.size() == cols.size();
+                for (String col : cols) {
+                    record.setValue(col, iter.next());
+                }
             }
-        } else {
-            // Get the columns from the table schema
-            Set<String> cols = table.getTableSchema().getColumnNames();
-            assert ie.items.size() == cols.size();
-            for( String col: cols) {
-                record.setValue(col, iter.next());
-            }
+            // 3. Complete
+            table.insert(record);
+            queryResult = new QueryResult();
+            queryResult.result = true;
+            queryResult.output = null;
+        } catch (Exception e) {
+            queryResult = new QueryResult();
+            queryResult.result = false;
+            queryResult.output = null;
+            queryResult.information = e.getMessage();
         }
-        // 3. Complete
-        table.insert(record);
-        queryResult = new QueryResult();
-        queryResult.result = true;
-        queryResult.output = null;
     }
 
     @Override
@@ -134,55 +144,63 @@ class RootQueryVisitor implements StatementVisitor {
     }
 
 
-    /** Executes SQL create query
+    /**
+     * Executes SQL create query
      *
      * @param createTable SQL Create query in JSQLParser structure
      */
     @Override
     public void visit(CreateTable createTable) {
-        // 1. Check if table name is valid and available
-        String tableName = createTable.getTable().getName().toLowerCase();
-        assert  createTable.getTable().getSchemaName() == ""; //FIXME We do not provide schema support
-        // TODO
+        try {
+            // 1. Check if table name is valid and available
+            String tableName = createTable.getTable().getName().toLowerCase();
+            assert createTable.getTable().getSchemaName() == ""; //FIXME We do not provide schema support
+            // TODO
 
-        // 2. Modify Metadata global table - add new record
-        // TODO
+            // 2. Modify Metadata global table - add new record
+            // TODO
 
-        // 3. Create table, its schema
-        TableSchema schema = new TableSchema();
-        for (ColumnDefinition def : (List<ColumnDefinition>)createTable.getColumnDefinitions()) {
-            ColDataType dataType =  def.getColDataType();
-            ColumnType internalDataType;
-            if (dataType.getDataType().contentEquals("INTEGER")) {
-                internalDataType = ColumnType.INT;
-            } else if(dataType.getDataType().contentEquals("DOUBLE")) {
-                internalDataType = ColumnType.DOUBLE;
-            } else if (dataType.getDataType().contentEquals("CHAR")) {
-                internalDataType = ColumnType.CHAR;
-            } else {
-                throw new InvalidParameterException("Unsupported data type");
+            // 3. Create table, its schema
+            TableSchema schema = new TableSchema();
+            for (ColumnDefinition def : (List<ColumnDefinition>) createTable.getColumnDefinitions()) {
+                ColDataType dataType = def.getColDataType();
+                ColumnType internalDataType;
+                if (dataType.getDataType().contentEquals("INTEGER")) {
+                    internalDataType = ColumnType.INT;
+                } else if (dataType.getDataType().contentEquals("DOUBLE")) {
+                    internalDataType = ColumnType.DOUBLE;
+                } else if (dataType.getDataType().contentEquals("CHAR")) {
+                    internalDataType = ColumnType.CHAR;
+                } else {
+                    throw new InvalidParameterException("Unsupported data type");
+                }
+                schema.addColumn(def.getColumnName().toLowerCase(), internalDataType, 0);
             }
-            schema.addColumn(def.getColumnName(), internalDataType, 0);
-        }
-        Table table = new Table(schema);
-        List<Index> indexes = createTable.getIndexes();
-        if (null != indexes) {
-            for (Index indexDef : indexes) {
-                List<String> cols = indexDef.getColumnsNames();
-                for (String s : cols) {
-                    table.createIndex(s);
+            Table table = new Table(schema);
+            List<Index> indexes = createTable.getIndexes();
+            if (null != indexes) {
+                for (Index indexDef : indexes) {
+                    List<String> cols = indexDef.getColumnsNames();
+                    for (String s : cols) {
+                        table.createIndex(s);
+                    }
                 }
             }
-        }
 
-        // 4. Complete creation by adding it to the QE collections
-        int tableId = queryEngine.freeTableId++;
-        queryEngine.name2TableId.put(tableName, tableId);
-        queryEngine.tables.put(tableId, table);
-        LOG.trace("Table " + tableName +" created with id:"+String.valueOf(tableId)+" using"
-        + "SQL query: " + createTable.toString());
-        queryResult = new QueryResult();
-        queryResult.result = true;
+            // 4. Complete creation by adding it to the QE collections
+            int tableId = queryEngine.freeTableId++;
+            queryEngine.name2TableId.put(tableName, tableId);
+            queryEngine.tables.put(tableId, table);
+            LOG.trace("Table " + tableName + " created with id:" + String.valueOf(tableId) + " using"
+                    + "SQL query: " + createTable.toString());
+            queryResult = new QueryResult();
+            queryResult.result = true;
+        } catch (Exception e) {
+            queryResult = new QueryResult();
+            queryResult.result = false;
+            queryResult.output = null;
+            queryResult.information = e.getMessage();
+        }
     }
 
     /* Accessors */

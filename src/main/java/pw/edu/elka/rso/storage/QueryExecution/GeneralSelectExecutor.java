@@ -31,16 +31,21 @@ public class GeneralSelectExecutor implements SelectVisitor {
             queryResult.result = true;
             queryResult.output = output;
         } catch (Exception e) {
-            LOG.error(e.getLocalizedMessage());
+            LOG.error(e.getMessage());
             queryResult = new QueryResult();
             queryResult.result = false;
             queryResult.output = null;
+            queryResult.information = e.getCause() + e.getMessage();
         }
     }
 
     @Override
     public void visit(Union union) {
-        throw new UnsupportedOperationException("UNIONs are not yet supported.");
+        LOG.error("UNIONs are not yet supported.");
+        queryResult = new QueryResult();
+        queryResult.result = false;
+        queryResult.output = null;
+        queryResult.information = "UNIONs are not yet supported.";
     }
 }
 

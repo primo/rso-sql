@@ -11,7 +11,7 @@ public class PlanningLoadBalancer {
         Set<Integer> nodes_with_1 = Metadata.metadata.getPartitionNodes(part1);
         Set<Integer> nodes_with_2 = Metadata.metadata.getPartitionNodes(part2);
 
-        Set<Integer> candidates = new HashSet<Integer>(nodes_with_1);
+        Set<Integer> candidates = new HashSet<>(nodes_with_1);
         candidates.retainAll(nodes_with_2);
 
         //Jesli nie istnieje wezel z oboma - wez dowolny

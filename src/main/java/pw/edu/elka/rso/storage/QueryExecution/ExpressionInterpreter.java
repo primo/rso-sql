@@ -19,6 +19,7 @@ import pw.edu.elka.rso.storage.DataRepresentation.Table;
 public class ExpressionInterpreter implements ExpressionVisitor {
 
     public static final Object NullObject = new Object();
+    public static final String DEFAULT_TABLE = "##DEFAULT##";
 
     private HashMap<String, Record> currentLines;
     private HashMap<String, Table>  subjectTables ;
@@ -37,7 +38,7 @@ public class ExpressionInterpreter implements ExpressionVisitor {
 
     @Override
     public void visit(NullValue nullValue) {
-        elements.add(NullObject);
+        elements.push(NullObject);
     }
 
     @Override
@@ -57,12 +58,12 @@ public class ExpressionInterpreter implements ExpressionVisitor {
 
     @Override
     public void visit(DoubleValue doubleValue) {
-        elements.add(doubleValue.getValue());
+        elements.push(doubleValue.getValue());
     }
 
     @Override
     public void visit(LongValue longValue) {
-        elements.add(longValue.getValue());
+        elements.push(longValue.getValue());
     }
 
     @Override
@@ -88,7 +89,7 @@ public class ExpressionInterpreter implements ExpressionVisitor {
 
     @Override
     public void visit(StringValue stringValue) {
-        elements.add(stringValue.getValue());
+        elements.push(stringValue.getValue());
     }
 
     @Override
@@ -99,7 +100,7 @@ public class ExpressionInterpreter implements ExpressionVisitor {
         r.accept(this);
         Object ro = elements.pop();
         Object lo = elements.pop();
-        // TODO elements.add(r+l)
+        // TODO elements.push(r+l)
     }
 
     @Override
@@ -123,7 +124,7 @@ public class ExpressionInterpreter implements ExpressionVisitor {
         Expression r  = andExpression.getRightExpression();
         l.accept(this);
         r.accept(this);
-        elements.add( (Boolean)elements.pop() && (Boolean)elements.pop());
+        elements.push( (Boolean)elements.pop() && (Boolean)elements.pop());
     }
 
     @Override
@@ -132,7 +133,7 @@ public class ExpressionInterpreter implements ExpressionVisitor {
         Expression r  = orExpression.getRightExpression();
         l.accept(this);
         r.accept(this);
-        elements.add( (Boolean)elements.pop() || (Boolean)elements.pop());
+        elements.push( (Boolean)elements.pop() || (Boolean)elements.pop());
     }
 
     @Override
@@ -149,15 +150,17 @@ public class ExpressionInterpreter implements ExpressionVisitor {
         // Equality is symmetric
         Comparable rc = (Comparable) elements.pop();
         Comparable lc = (Comparable) elements.pop();
-
+        Entry<Comparable,Comparable> e = coerce(lc,rc);
+        lc = e.getKey();
+        rc = e.getValue();
         try {
             if (0 == lc.compareTo(rc)) {
-                elements.add(Boolean.valueOf(true));
+                elements.push(Boolean.valueOf(true));
             } else {
-                elements.add(Boolean.valueOf(false));
+                elements.push(Boolean.valueOf(false));
             }
         } catch (ClassCastException ce) {
-            elements.add(Boolean.valueOf(false));
+            elements.push(Boolean.valueOf(false));
         }
     }
 
@@ -170,15 +173,17 @@ public class ExpressionInterpreter implements ExpressionVisitor {
         // Equality is symmetric
         Comparable rc = (Comparable) elements.pop();
         Comparable lc = (Comparable) elements.pop();
-
+        Entry<Comparable,Comparable> e = coerce(lc,rc);
+        lc = e.getKey();
+        rc = e.getValue();
         try {
-            if (0 <= lc.compareTo(rc)) {
-                elements.add(Boolean.valueOf(true));
+            if (0 < lc.compareTo(rc)) {
+                elements.push(Boolean.valueOf(true));
             } else {
-                elements.add(Boolean.valueOf(false));
+                elements.push(Boolean.valueOf(false));
             }
         } catch (ClassCastException ce) {
-            elements.add(Boolean.valueOf(false));
+            elements.push(Boolean.valueOf(false));
         }
     }
 
@@ -191,15 +196,17 @@ public class ExpressionInterpreter implements ExpressionVisitor {
         // Equality is symmetric
         Comparable rc = (Comparable) elements.pop();
         Comparable lc = (Comparable) elements.pop();
-
+        Entry<Comparable,Comparable> e = coerce(lc,rc);
+        lc = e.getKey();
+        rc = e.getValue();
         try {
-            if (0 < lc.compareTo(rc)) {
-                elements.add(Boolean.valueOf(true));
+            if (0 <= lc.compareTo(rc)) {
+                elements.push(Boolean.valueOf(true));
             } else {
-                elements.add(Boolean.valueOf(false));
+                elements.push(Boolean.valueOf(false));
             }
         } catch (ClassCastException ce) {
-            elements.add(Boolean.valueOf(false));
+            elements.push(Boolean.valueOf(false));
         }
     }
 
@@ -212,7 +219,7 @@ public class ExpressionInterpreter implements ExpressionVisitor {
     public void visit(IsNullExpression isNullExpression) {
         Expression l = isNullExpression.getLeftExpression();
         l.accept(this);
-        elements.add( (elements.pop() == NullObject && !isNullExpression.isNot()) ||
+        elements.push( (elements.pop() == NullObject && !isNullExpression.isNot()) ||
                 (elements.pop() != NullObject && isNullExpression.isNot()));
     }
 
@@ -230,15 +237,17 @@ public class ExpressionInterpreter implements ExpressionVisitor {
         // Equality is symmetric
         Comparable rc = (Comparable) elements.pop();
         Comparable lc = (Comparable) elements.pop();
-
+        Entry<Comparable,Comparable> e = coerce(lc,rc);
+        lc = e.getKey();
+        rc = e.getValue();
         try {
             if (0 > lc.compareTo(rc)) {
-                elements.add(Boolean.valueOf(true));
+                elements.push(Boolean.valueOf(true));
             } else {
-                elements.add(Boolean.valueOf(false));
+                elements.push(Boolean.valueOf(false));
             }
         } catch (ClassCastException ce) {
-            elements.add(Boolean.valueOf(false));
+            elements.push(Boolean.valueOf(false));
         }
     }
 
@@ -251,15 +260,17 @@ public class ExpressionInterpreter implements ExpressionVisitor {
         // Equality is symmetric
         Comparable rc = (Comparable) elements.pop();
         Comparable lc = (Comparable) elements.pop();
-
+        Entry<Comparable,Comparable> e = coerce(lc,rc);
+        lc = e.getKey();
+        rc = e.getValue();
         try {
             if (0 >= lc.compareTo(rc)) {
-                elements.add(Boolean.valueOf(true));
+                elements.push(Boolean.valueOf(true));
             } else {
-                elements.add(Boolean.valueOf(false));
+                elements.push(Boolean.valueOf(false));
             }
         } catch (ClassCastException ce) {
-            elements.add(Boolean.valueOf(false));
+            elements.push(Boolean.valueOf(false));
         }
 
     }
@@ -273,24 +284,32 @@ public class ExpressionInterpreter implements ExpressionVisitor {
         // Equality is symmetric
         Comparable rc = (Comparable) elements.pop();
         Comparable lc = (Comparable) elements.pop();
-
+        Entry<Comparable,Comparable> e = coerce(lc,rc);
+        lc = e.getKey();
+        rc = e.getValue();
         try {
             if (0 != lc.compareTo(rc)) {
-                elements.add(Boolean.valueOf(true));
+                elements.push(Boolean.valueOf(true));
             } else {
-                elements.add(Boolean.valueOf(false));
+                elements.push(Boolean.valueOf(false));
             }
         } catch (ClassCastException ce) {
-            elements.add(Boolean.valueOf(false));
+            elements.push(Boolean.valueOf(false));
         }
     }
 
     @Override
     public void visit(Column column) {
         // Get column value
-        final String colname = column.getColumnName();
-        final String tabname = column.getTable().getName();
-        final String tabalias = column.getTable().getName();
+        final String colname = column.getColumnName().toLowerCase();
+        String tabname = column.getTable().getName();
+        String tabalias = column.getTable().getName();
+        if (null!=tabname) {
+            tabname.toLowerCase();
+        }
+        if (null!=tabalias) {
+            tabalias.toLowerCase();
+        }
         Object out = null;
         if (null != tabname) {
             Record r = currentLines.get(tabname);
@@ -299,12 +318,15 @@ public class ExpressionInterpreter implements ExpressionVisitor {
             String name = aliases.get(tabalias);
             Record r = currentLines.get(tabname);
             out = r.getValue(colname);
+        } else if (null != columnMapping.get(colname)) {
+            final String temp = columnMapping.get(colname);
+            final Record r = currentLines.get(temp);
+            out = r.getValue(colname);
         } else {
-            String temp = columnMapping.get(colname);
-            Record r = currentLines.get(tabname);
+            final Record r = currentLines.get(DEFAULT_TABLE);
             out = r.getValue(colname);
         }
-        elements.add(out);
+        elements.push(out);
     }
 
     @Override
@@ -365,4 +387,22 @@ public class ExpressionInterpreter implements ExpressionVisitor {
     public boolean isTrue() {
         return (Boolean)elements.pop();
     }
+
+    protected Entry<Comparable,Comparable> coerce(Comparable o1, Comparable o2) {
+        if (o1 instanceof Integer && o2 instanceof Long) {
+            o1 = Long.valueOf((Integer)o1);
+        } else if (o1 instanceof Long && o2 instanceof Integer) {
+            o2 = Long.valueOf((Integer)o2);
+        } else if (o1 instanceof Integer && o2 instanceof Double) {
+            o1 = Double.valueOf((Integer)o1);
+        } else if (o1 instanceof Double && o2 instanceof Integer) {
+            o2 = Double.valueOf((Integer)o2);
+        } else if (o1 instanceof Long && o2 instanceof Double) {
+            o1 = Double.valueOf((Long)o1);
+        } else if (o1 instanceof Double && o2 instanceof Long) {
+            o2 = Double.valueOf((Long)o2);
+        }
+        return new AbstractMap.SimpleEntry<Comparable, Comparable>(o1,o2);
+    }
+
 }

@@ -8,7 +8,9 @@ import java.security.InvalidParameterException;
 import java.util.*;
 
 public class TableSchema implements Cloneable, Serializable {
-    HashMap<String, TableColumn> specification = new HashMap<String, TableColumn>();
+    // It is vital that we use LinkedHashMap because we want to maintain the insertion order during the
+    // iteration
+    HashMap<String, TableColumn> specification = new LinkedHashMap<String, TableColumn>();
     int rLength = 1;
 
     public void addColumn(String column_name, ColumnType column_type, int length){
