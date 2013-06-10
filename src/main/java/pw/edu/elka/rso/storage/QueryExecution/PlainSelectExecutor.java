@@ -173,7 +173,11 @@ public class PlainSelectExecutor {
         SelectItemsExtractor extractor = new SelectItemsExtractor();
         for (SelectItem si : items) {
             si.accept(extractor);
-            ret.add(new SimpleEntry<String, String>(extractor.table, extractor.column));
+            if (null != extractor.table) {
+                extractor.table.toLowerCase();
+            }
+            SimpleEntry temp = new SimpleEntry<String, String>(extractor.table, extractor.column.toLowerCase());
+            ret.add(temp);
         }
         return ret;
     }

@@ -20,49 +20,49 @@ public class QueryEngine {
         tables = new HashMap<Integer,Table>();
 
         TableSchema ts = new TableSchema();
-        ts.addColumn("ID", ColumnType.INT, 0);
-        ts.addColumn("TEST", ColumnType.INT, 0);
+        ts.addColumn("id", ColumnType.INT, 0);
+        ts.addColumn("test", ColumnType.INT, 0);
 
         Table table = new Table(ts);
-        table.createIndex("ID");
+        table.createIndex("id");
 
         Record record = table.newRecord();
-        record.setValue("ID", 0);
-        record.setValue("TEST", 100);
+        record.setValue("id", 0);
+        record.setValue("test", 100);
         table.insert(record);
 
-        record.setValue("ID", 1);
-        record.setValue("TEST", 101);
+        record.setValue("id", 1);
+        record.setValue("test", 101);
         table.insert(record);
-        record.setValue("ID", 2);
-        record.setValue("TEST", 102);
+        record.setValue("id", 2);
+        record.setValue("test", 102);
         table.insert(record);
-        record.setValue("ID", 3);
-        record.setValue("TEST", 103);
+        record.setValue("id", 3);
+        record.setValue("test", 103);
         table.insert(record);
-        record.setValue("ID", 4);
-        record.setValue("TEST", 104);
+        record.setValue("id", 4);
+        record.setValue("test", 104);
         table.insert(record);
-        record.setValue("ID", 5);
-        record.setValue("TEST", 105);
+        record.setValue("id", 5);
+        record.setValue("test", 105);
         table.insert(record);
-        record.setValue("ID", 6);
-        record.setValue("TEST", 106);
+        record.setValue("id", 6);
+        record.setValue("test", 106);
         table.insert(record);
-        record.setValue("ID", 7);
-        record.setValue("TEST", 107);
+        record.setValue("id", 7);
+        record.setValue("test", 107);
         table.insert(record);
-        record.setValue("ID", 8);
-        record.setValue("TEST", 108);
+        record.setValue("id", 8);
+        record.setValue("test", 108);
         table.insert(record);
-        record.setValue("ID", 9);
-        record.setValue("TEST", 109);
+        record.setValue("id", 9);
+        record.setValue("test", 109);
         table.insert(record);
 
 
-        int tableId = freeTableId++;
-        name2TableId.put("test", tableId);
-        tables.put(tableId, table);
+        int tableid = freeTableId++;
+        name2TableId.put("test", tableid);
+        tables.put(tableid, table);
 
     }
 

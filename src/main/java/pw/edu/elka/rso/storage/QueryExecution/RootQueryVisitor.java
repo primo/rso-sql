@@ -100,7 +100,7 @@ class RootQueryVisitor implements StatementVisitor {
         if (null != columns) {
             assert ie.items.size() == columns.size();
             for( Column c: columns) {
-                String colName = c.getColumnName();
+                String colName = c.getColumnName().toLowerCase();
                 record.setValue(colName, iter.next());
             }
         } else {
@@ -162,7 +162,7 @@ class RootQueryVisitor implements StatementVisitor {
             } else {
                 throw new InvalidParameterException("Unsupported data type");
             }
-            schema.addColumn(def.getColumnName(), internalDataType, 0);
+            schema.addColumn(def.getColumnName().toLowerCase(), internalDataType, 0);
         }
         Table table = new Table(schema);
         List<Index> indexes = createTable.getIndexes();
