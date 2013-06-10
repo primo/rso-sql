@@ -160,8 +160,9 @@ public class Server extends AbstractServer implements Runnable, ITaskManager {
               queue.add(queryTask);
 
             }
-            //Metadata Update
-            // @author: PZ
+            // -- Metadata Update --
+            // Idzie update do wszystkich węzłów.
+            // @author PZ
             else if (task instanceof MetadataUpdateTask) {
                 for (ShardDetails shardDetail : connections.keySet())
                     outcomingData.get(shardDetail).add(task);
