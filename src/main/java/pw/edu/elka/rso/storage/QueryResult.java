@@ -45,7 +45,6 @@ public class QueryResult implements Serializable {
         "queryId=" + queryId +
         ", result=" + result +
         ", information='" + information + '\'' +
-        //", output=" + output +
         '}';
   }
 }
