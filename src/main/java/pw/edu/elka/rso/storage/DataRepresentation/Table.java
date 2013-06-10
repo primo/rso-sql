@@ -1,13 +1,18 @@
 package pw.edu.elka.rso.storage.DataRepresentation;
 
-import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.*;
 
-public class Table implements Iterable<Record>, Serializable {
+public class Table implements Iterable<Record>{
     final TableSchema tableSchema;
     transient List<ByteBuffer> mainList;
     Map<String, Index> indexes;
+
+    protected Table(TableSchema table_schema, List<ByteBuffer> mainList, Map<String, Index> indexes) {
+        this.tableSchema = table_schema;
+        this.mainList = mainList;
+        this.indexes = indexes;
+    }
 
     public Table(TableSchema table_schema){
         tableSchema = table_schema;
@@ -106,4 +111,6 @@ public class Table implements Iterable<Record>, Serializable {
       }
       return builder.toString();
     }
+
+
 }
