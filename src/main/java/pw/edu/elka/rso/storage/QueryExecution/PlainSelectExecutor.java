@@ -136,7 +136,7 @@ public class PlainSelectExecutor {
             for (;it1.hasNext();) {
                 Record r = it1.next();
                 // TODO setup ei
-                currentLines.put(tableName, r);
+                currentLines.put(ExpressionInterpreter.DEFAULT_TABLE, r);
                 // Check WHERE condition if given
                 if (null != whereExpressions ) {
                     whereExpressions.accept(ei);

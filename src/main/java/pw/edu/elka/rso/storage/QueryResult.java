@@ -23,13 +23,14 @@ public class QueryResult implements Serializable {
   }
 
   public boolean prepareForTransport() {
-      assert transportableOutput == null;
+      if (null == output)
+          return false;
       transportableOutput = TableCarrier.convertToCarrier(output);
       return true;
   }
 
   public boolean prepareForReading() {
-      if (transportableOutput == null)
+      if (null == transportableOutput)
           return false;
       output = TableCarrier.convertToTable(transportableOutput);
       return true;

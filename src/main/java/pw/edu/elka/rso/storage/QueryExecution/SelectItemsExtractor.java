@@ -33,6 +33,9 @@ class SelectItemsExtractor implements SelectItemVisitor {
     @Override
     public void visit(AllTableColumns allTableColumns) {
         table = allTableColumns.getTable().getName();
+        if (null!=table) {
+            table.toLowerCase();
+        }
         column = "*";
         this.allColumns = true;
     }
@@ -49,5 +52,8 @@ class SelectItemsExtractor implements SelectItemVisitor {
         Entry<String,String> item = (Entry<String, String>) qie.items.get(0);
         table = item.getKey();
         column = item.getValue();
+        if (null!=table) {
+            table.toLowerCase();
+        }
     }
 }

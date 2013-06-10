@@ -38,7 +38,7 @@ public class DataShardTester implements QueryResultReceiver{
         }
 
         synchronized (dst) {
-            while (dst.received != 11) {
+            while (dst.received != statements.size()) {
                 dst.wait();
             }
         }
@@ -72,6 +72,20 @@ public class DataShardTester implements QueryResultReceiver{
         statements.add(statement);
         statement = parser.parse(new StringReader("select Test2.* from Test2;"));
         statements.add(statement);
+        statement = parser.parse(new StringReader("select Test2.* from Test2 WHERE ID > 2;"));
+        statements.add(statement);
+        statement = parser.parse(new StringReader("select Test2.* from Test2 WHERE ID >= 2;"));
+        statements.add(statement);
+        statement = parser.parse(new StringReader("select Test2.* from Test2 WHERE ID < 2;"));
+        statements.add(statement);
+        statement = parser.parse(new StringReader("select Test2.* from Test2 WHERE ID <= 2;"));
+        statements.add(statement);
+        statement = parser.parse(new StringReader("select Test2.* from Test2 WHERE ID = 2;"));
+        statements.add(statement);
+        statement = parser.parse(new StringReader("select Test2.* from Test2 WHERE ID != 2 AND ID != 3;"));
+        statements.add(statement);
+        statement = parser.parse(new StringReader("select Test2.* from Test2 WHERE ID != 2 OR ID != 3;"));
+        statements.add(statement);
         return statements;
     }
 
@@ -84,17 +98,10 @@ public class DataShardTester implements QueryResultReceiver{
         }
         System.out.println(Long.valueOf(qr.queryId).toString()+" resulted in: " + qr.result);
         if (null != qr.output) {
-//            Iterator<Record> it = qr.output.iterator();
-//            Set<String> columns = qr.output.getTableSchema().getColumnNames();
-//            while (it.hasNext()) {
-//                Record r = it.next();
-//                for (String column : columns) {
-//                    System.out.print(r.getValue(column));
-//                    System.out.print(",");
-//                }
-//                System.out.println();
-//            }
             System.out.println(qr.output.toString());
+        }
+        if (null != qr.information) {
+            System.out.println(qr.information);
         }
         synchronized (this) {
             received++;
