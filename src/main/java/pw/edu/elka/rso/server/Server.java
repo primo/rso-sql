@@ -2,10 +2,7 @@ package pw.edu.elka.rso.server;
 
 import org.apache.log4j.Logger;
 import pw.edu.elka.rso.logic.beans.QueryExecutorImpl;
-import pw.edu.elka.rso.server.tasks.ITaskManager;
-import pw.edu.elka.rso.server.tasks.QueryResultTask;
-import pw.edu.elka.rso.server.tasks.QueryTask;
-import pw.edu.elka.rso.server.tasks.SetConnectionTask;
+import pw.edu.elka.rso.server.tasks.*;
 import pw.edu.elka.rso.server.utils.IncomingConnectionsThread;
 import pw.edu.elka.rso.server.utils.IncomingDataThread;
 
@@ -143,8 +140,7 @@ public class Server extends AbstractServer implements Runnable, ITaskManager {
               initOutgoingConnections(connectionTask.input);
             }
 
-
-            if (task instanceof QueryTask) {
+            else if (task instanceof QueryTask) {
 
               QueryTask queryTask = (QueryTask) task;
 
@@ -155,12 +151,18 @@ public class Server extends AbstractServer implements Runnable, ITaskManager {
               }
             }
 
-            if (task instanceof QueryResultTask) {
+            else if (task instanceof QueryResultTask) {
 
               QueryResultTask queryTask = (QueryResultTask) task;
               Queue<Object> queue = outcomingData.get(queryTask.getReturnShard());
               queue.add(queryTask);
 
+            }
+            //Metadata Update
+            // @author: PZ
+            else if (task instanceof MetadataUpdateTask) {
+                for (ShardDetails shardDetail : connections.keySet())
+                    outcomingData.get(shardDetail).add(task);
             }
           }
         }
@@ -207,7 +209,6 @@ public class Server extends AbstractServer implements Runnable, ITaskManager {
   public void setQueryExecutor(QueryExecutorImpl queryExecutor) {
     this.queryExecutor = queryExecutor;
   }
-
 
   public ServerSocket getServerSocket() {
     return serverSocket;

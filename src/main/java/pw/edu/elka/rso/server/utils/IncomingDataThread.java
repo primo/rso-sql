@@ -2,9 +2,7 @@ package pw.edu.elka.rso.server.utils;
 
 import org.apache.log4j.Logger;
 import pw.edu.elka.rso.server.Server;
-import pw.edu.elka.rso.server.tasks.QueryResultTask;
-import pw.edu.elka.rso.server.tasks.QueryTask;
-
+import pw.edu.elka.rso.server.Task;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.Socket;
@@ -28,25 +26,16 @@ public class IncomingDataThread implements Runnable {
 
   @Override
   public void run() {
-    log.debug("Startuje thread nasluchujaccy dane przychodzace od klienta! " + server.getServerDetails());
+    log.debug("Startuje thread nasluchujacy dane przychodzace od klienta. " + server.getServerDetails());
     ObjectInputStream ois;
 
     while (true) {
       //odbierz to co masz odebrac dla socketa
       try {
         ois = new ObjectInputStream(clientSocket.getInputStream());
-        Object data = ois.readObject();
-
-        //DOPISAC OBSLUGE TASKOW
-        if (data instanceof QueryTask) {
-          log.debug("Odebralme(" + server.getServerDetails() + ") cos " + data.toString());
-          server.getQueryExecutor().doTask((QueryTask) data);
-        }
-        //DOPISAC OBSLUGE TASKOW
-        if (data instanceof QueryResultTask) {
-          log.debug("Odebralme(" + server.getServerDetails() + ") cos " + data.toString());
-          server.getQueryExecutor().doTask((QueryResultTask) data);
-        }
+          Task data = (Task) ois.readObject();
+          log.debug("Odebrane(" + server.getServerDetails() + ") cos " + data.toString());
+          server.getQueryExecutor().doTask(data);
       } catch (IOException | ClassNotFoundException e) {
         e.printStackTrace();
       }

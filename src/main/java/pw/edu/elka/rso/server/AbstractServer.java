@@ -21,7 +21,7 @@ public abstract class AbstractServer {
   // The server socket.
   protected ServerSocket serverSocket = null;
   protected ShardDetails shardDetails;
-  protected Map<ShardDetails, Queue<Object>> outcomingData = new HashMap<>();
+  protected Map<ShardDetails, Queue<Object>> outcomingData = new HashMap<ShardDetails, Queue<Object>>();
   // The client socket.
 
   public AbstractServer(int portNumber, int id) throws UnknownHostException {
