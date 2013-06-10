@@ -9,6 +9,7 @@ import pw.edu.elka.rso.server.Server;
 import pw.edu.elka.rso.storage.DataShard;
 
 import java.net.UnknownHostException;
+import java.util.LinkedList;
 
 /**
  * Created with IntelliJ IDEA.
@@ -70,7 +71,10 @@ public class MainSelect {
     queryExecutorThread2.start();
     dataShard2.start();
 
-
+    LinkedList<String> params = new LinkedList<>();
+    params.add("999");
+    params.add("999");
+    inputManager.readInput("InsertIntoTest", QueryExecutorImpl.returnNewQueryId(), params);
     inputManager.readInput("SelectFromClients", QueryExecutorImpl.returnNewQueryId(), null);
 
   }
