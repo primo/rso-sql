@@ -2,16 +2,14 @@ package pw.edu.elka.rso.logic.beans;
 
 import org.apache.log4j.Logger;
 import pw.edu.elka.rso.core.communication.ClientServer;
+import pw.edu.elka.rso.logic.QueryExecution.Metadata;
 import pw.edu.elka.rso.logic.interfaces.IQueryExecutor;
 import pw.edu.elka.rso.logic.procedures.Procedure;
 import pw.edu.elka.rso.logic.procedures.ProceduresManager;
 import pw.edu.elka.rso.server.Server;
 import pw.edu.elka.rso.server.ShardDetails;
 import pw.edu.elka.rso.server.Task;
-import pw.edu.elka.rso.server.tasks.ITaskManager;
-import pw.edu.elka.rso.server.tasks.QueryResultTask;
-import pw.edu.elka.rso.server.tasks.QueryTask;
-import pw.edu.elka.rso.server.tasks.SetConnectionTask;
+import pw.edu.elka.rso.server.tasks.*;
 import pw.edu.elka.rso.storage.DataRepresentation.Table;
 import pw.edu.elka.rso.storage.IDataShard;
 import pw.edu.elka.rso.storage.QueryResult;
@@ -206,11 +204,15 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
               e.printStackTrace();
             }
           }
-          if (task instanceof QueryResultTask) {
+          else if (task instanceof QueryResultTask) {
             QueryResultTask queryResultTask = (QueryResultTask) task;
             logger.debug("Dostalem(@" + server.getServerDetails() + ") odpowiedz  " + queryResultTask.getInput());
             QueryResult queryResult = queryResultTask.getInput();
             queryResultManager.insertResult(queryResult.queryId, queryResult.output);
+          }
+          else if (task instanceof MetadataUpdateTask) {
+            logger.debug("Dostalem(@" + server.getServerDetails() + ") odpowiedz  " + task.getInput());
+            Metadata.metadata.updateMetadata(((MetadataUpdateTask) task).getInput());
           }
         }
       }
