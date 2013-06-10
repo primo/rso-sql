@@ -86,6 +86,16 @@ public class DataShardTester implements QueryResultReceiver{
         statements.add(statement);
         statement = parser.parse(new StringReader("select Test2.* from Test2 WHERE ID != 2 OR ID != 3;"));
         statements.add(statement);
+        statement = parser.parse(new StringReader("CREATE TABLE TEST3 (id INTEGER, test CHAR(20));"));
+        statements.add(statement);
+        statement = parser.parse(new StringReader("INSERT INTO TEST3 VALUES(1,'TEST44444');"));
+        statements.add(statement);
+        statement = parser.parse(new StringReader("INSERT INTO TEST3 VALUES(2,'TEST444');"));
+        statements.add(statement);
+        statement = parser.parse(new StringReader("INSERT INTO TEST3 VALUES(13,'TEST3');"));
+        statements.add(statement);
+        statement = parser.parse(new StringReader("select Test3.* from Test3 ;"));
+        statements.add(statement);
         return statements;
     }
 

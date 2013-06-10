@@ -165,16 +165,22 @@ class RootQueryVisitor implements StatementVisitor {
             for (ColumnDefinition def : (List<ColumnDefinition>) createTable.getColumnDefinitions()) {
                 ColDataType dataType = def.getColDataType();
                 ColumnType internalDataType;
+                int length = 0;
                 if (dataType.getDataType().contentEquals("INTEGER")) {
                     internalDataType = ColumnType.INT;
                 } else if (dataType.getDataType().contentEquals("DOUBLE")) {
                     internalDataType = ColumnType.DOUBLE;
                 } else if (dataType.getDataType().contentEquals("CHAR")) {
                     internalDataType = ColumnType.CHAR;
+                    if (null == dataType.getArgumentsStringList()) {
+                        throw new IllegalArgumentException("Invalid CHAR column length.");
+                    }
+                    String len = (String)dataType.getArgumentsStringList().get(0);
+                    length = Integer.valueOf(len);
                 } else {
                     throw new InvalidParameterException("Unsupported data type");
                 }
-                schema.addColumn(def.getColumnName().toLowerCase(), internalDataType, 0);
+                schema.addColumn(def.getColumnName().toLowerCase(), internalDataType, length);
             }
             Table table = new Table(schema);
             List<Index> indexes = createTable.getIndexes();

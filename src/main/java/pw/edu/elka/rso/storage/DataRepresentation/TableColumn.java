@@ -104,11 +104,12 @@ class CharTableColumn extends TableColumn implements Serializable {
             return null;
         int chars = length/2;
         char[] output = new char[chars];
-        for(int i = 0; i < chars; i++){
+        int i = 0;
+        for(; i < chars; i++){
             output[i] = buffer.getChar();
             if(output[i] == '\0')
                 break;
         }
-        return new String(output);
+        return new String(output,0,i);
     }
 }
