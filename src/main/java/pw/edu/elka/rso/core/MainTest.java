@@ -1,6 +1,7 @@
 package pw.edu.elka.rso.core;
 
 import pw.edu.elka.rso.logic.QueryExecution.Metadata;
+import pw.edu.elka.rso.logic.QueryExecution.PartitionMetadata;
 
 import java.util.Map;
 import java.util.Set;
@@ -20,9 +21,9 @@ public class MainTest {
 
         //Nowa tabela
         String name = "tabela";
-        Set<Integer> parts = new TreeSet<>();
-        parts.add(1);
-        parts.add(2);
+        Set<PartitionMetadata> parts = new TreeSet<>();
+        parts.add(new PartitionMetadata(0, 30000,"tabela",1));
+        parts.add(new PartitionMetadata(30001, 70000,"tabela",1));
         Set<Integer> replicas = new TreeSet<>();
         replicas.add(3);
         replicas.add(4);

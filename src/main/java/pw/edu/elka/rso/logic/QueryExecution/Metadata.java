@@ -1,5 +1,16 @@
 package pw.edu.elka.rso.logic.QueryExecution;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.LongValue;
+import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
+import net.sf.jsqlparser.expression.operators.relational.ItemsList;
+import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.insert.Insert;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectBody;
 import pw.edu.elka.rso.server.Server;
+import pw.edu.elka.rso.server.ShardDetails;
+import pw.edu.elka.rso.storage.SqlDescription;
 
 import java.util.*;
 
@@ -18,6 +29,7 @@ public class Metadata{
 
     private Map<String, Set<Integer>> table2partitions = new HashMap<>();
     private Map<Integer, Set<Integer>> partition2nodes = new HashMap<>();
+    private Map<Integer, PartitionMetadata> partitions = new HashMap<>();
     private Map<Integer, Float> currentLoad = new HashMap<>();
     PriorityQueue<RepCount> replicasCount = new PriorityQueue<>();
 
@@ -37,8 +49,9 @@ public class Metadata{
     @param partition_IDs IDki partycji, które składają sie na tabelę table_name.
     @param replication_mapping Mapowanie ID_Partycji -> ID_Nodów. Na każdym nodzie jest utrzymywana kopia danej partycji.
      */
-    public void updateMetadata(String table_name, Set<Integer> partition_IDs, Map<Integer, Set<Integer>> replication_mapping){
-        MetadataUpdatePack metadata_update_pack = new MetadataUpdatePack(table_name, partition_IDs, replication_mapping);
+    public void updateMetadata(String table_name, Set<PartitionMetadata> partitions, Map<Integer, Set<Integer>> replication_mapping){
+
+        MetadataUpdatePack metadata_update_pack = new MetadataUpdatePack(table_name, partitions, replication_mapping);
         updateMetadata(metadata_update_pack);
 
         //server.doTask(new MetadataUpdateTask(metadata_update_pack));
@@ -48,7 +61,18 @@ public class Metadata{
     Alternatywna forma aktualizacji - bez dzielenia się nową wiedzą z innymi nodami.
      */
     public void updateMetadata(MetadataUpdatePack metadata_update_pack){
-        table2partitions.put(metadata_update_pack.tableName, metadata_update_pack.partitionIDs);
+        TreeSet<Integer> ids = new TreeSet<Integer>();
+
+        for(PartitionMetadata p: metadata_update_pack.partitions)
+        {
+            ids.add(p.getId());
+            if(!partition2nodes.containsKey(p.getId()))
+            {
+                partition2nodes.put(p.getId(),new TreeSet<Integer>());
+            }
+            partition2nodes.get(p.getId()).add(p.getNodeId());
+        }
+        table2partitions.put(metadata_update_pack.tableName, ids);
         partition2nodes.putAll(metadata_update_pack.replicationMapping);
 
         //Zliczanie inkrementacji
@@ -104,5 +128,48 @@ public class Metadata{
 
     float getLoad(int node_id){
         return currentLoad.get(node_id);
+    }
+
+    public Set<Integer> getNodesContaining(SqlDescription sql)
+    {
+        Statement statement = sql.statement;
+        Set<Integer> prts = null;
+        Set<Integer> result = new TreeSet<Integer>();
+        if (statement instanceof Select)
+        {
+            SelectBody body =((Select) statement).getSelectBody();
+            if (body instanceof PlainSelect)
+            {
+                prts = this.getTablePartitions( ((PlainSelect)body).getFromItem().toString() );
+            }
+
+            if (prts == null) return result;
+
+            for (Integer partId : prts){
+                result.addAll(partition2nodes.get(partId));
+            }
+            return result;
+        }
+
+        if (statement instanceof Insert)
+        {
+            prts = this.getTablePartitions( ((Insert) statement).getTable().getName() );
+            ExpressionList list = (ExpressionList)((Insert) statement).getItemsList();
+            PartitionMetadata partition;
+            for(Integer id: prts)
+            {
+                partition = partitions.get(id);
+                for(Expression e: ((ArrayList < Expression >)list.getExpressions()))
+                {
+                    if (partition.contains(e))
+                    {
+                        result.add(id);
+                    }
+                }
+            }
+            return result;
+        }
+
+        return result;
     }
 }
