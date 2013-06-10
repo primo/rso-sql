@@ -10,7 +10,7 @@ import java.net.InetAddress;
  * Time: 02:25
  * To change this template use File | Settings | File Templates.
  */
-public class ShardDetails implements Serializable {
+public class ShardDetails implements Serializable, Comparable<ShardDetails> {
   private int portNumber;
   private InetAddress host;
   private int id;
@@ -32,7 +32,6 @@ public class ShardDetails implements Serializable {
 
     return true;
   }
-
 
 
   @Override
@@ -71,5 +70,11 @@ public class ShardDetails implements Serializable {
         ", host=" + host +
         ", id=" + id +
         '}';
+  }
+
+  public int compareTo(ShardDetails sd) {
+      if (id < sd.id) return -1;
+      if (id > sd.id) return 1;
+      return 0;
   }
 }

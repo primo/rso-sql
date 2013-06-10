@@ -1,4 +1,6 @@
 package pw.edu.elka.rso.logic.QueryExecution;
+import pw.edu.elka.rso.server.Server;
+
 import java.util.*;
 
 /*
@@ -8,26 +10,16 @@ DMLami.
 Dostęp z dowolnego miejsca przez Metadata.metadata
  */
 public class Metadata{
+    Server server;
     //One instance
-    public static Metadata metadata = new Metadata();
-    private Metadata(){}
+    public Metadata(Server a_server){
+        server = a_server;
+    }
 
     private Map<String, Set<Integer>> table2partitions = new HashMap<>();
     private Map<Integer, Set<Integer>> partition2nodes = new HashMap<>();
     private Map<Integer, Float> currentLoad = new HashMap<>();
     PriorityQueue<RepCount> replicasCount = new PriorityQueue<>();
-
-    private static Integer curr_ID = Integer.MIN_VALUE;
-
-    /*
-    Przydziela unikalne IDki dla partycji, nodów etc.
-    Unikalność w skali węzła, nie klastra.
-
-    @see pw.edu.elka.rso.logic.QueryExecution.Metadata
-     */
-    public static Integer assignUID(){
-        return curr_ID++;
-    }
 
     /*
     Zwraca IDki partycji, które składają się na daną tabelę.
@@ -48,16 +40,50 @@ public class Metadata{
     public void updateMetadata(String table_name, Set<Integer> partition_IDs, Map<Integer, Set<Integer>> replication_mapping){
         MetadataUpdatePack metadata_update_pack = new MetadataUpdatePack(table_name, partition_IDs, replication_mapping);
         updateMetadata(metadata_update_pack);
-        //@TODO jak wywołać to na bieżącym serwerze ?
+
         //server.doTask(new MetadataUpdateTask(metadata_update_pack));
     }
 
     /*
-    Alternatywna forma aktualizacji - bez dzielenia się nową wiedzą.
+    Alternatywna forma aktualizacji - bez dzielenia się nową wiedzą z innymi nodami.
      */
     public void updateMetadata(MetadataUpdatePack metadata_update_pack){
         table2partitions.put(metadata_update_pack.tableName, metadata_update_pack.partitionIDs);
         partition2nodes.putAll(metadata_update_pack.replicationMapping);
+
+        //Zliczanie inkrementacji
+        class MutableInt {
+            int value = 1; // note that we start at 1 since we're counting
+            public void increment () { ++value;      }
+            public int  get ()       { return value; }
+        }
+        Map<Integer, MutableInt> freq = new HashMap<>();
+
+        //dla kazdej partycji
+        for (Set<Integer> rep_count : metadata_update_pack.replicationMapping.values()) {
+            //dla kazdej kopii
+            for (Integer node_id : rep_count){
+                MutableInt count = freq.get(node_id);
+                if (count == null)
+                    freq.put(node_id, new MutableInt());
+                else
+                    count.increment();
+            }
+        }
+
+        //Inkrementacja
+        List<RepCount> updated_rep_counts = new ArrayList<>(metadata_update_pack.replicationMapping.size() * ReplicationManager.replicationFactor);
+        for (Iterator<RepCount> iterator = replicasCount.iterator(); iterator.hasNext(); ) {
+            RepCount rep_count = iterator.next();
+            if (freq.containsKey(rep_count.nodeId)){
+                iterator.remove();
+                rep_count.repCount += freq.get(rep_count.nodeId).get();
+            }
+        }
+
+        //Dodanie nowych wartości
+        for(RepCount rep_count : updated_rep_counts)
+            replicasCount.add(rep_count);
     }
 
     /*

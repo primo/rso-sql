@@ -25,19 +25,6 @@ public class ShardMetadata implements Serializable {
     }
 
     /**
-     * @deprecated replaced by {@link #getPartitionsContaining(Object,String)}
-     */
-    public ArrayList<PartitionMetadata> getPartitionsContaining(Object element) {
-        ArrayList<PartitionMetadata> result = new ArrayList<PartitionMetadata>();
-        int hash = Math.abs(element.hashCode()) % hashMaxIndex;
-        for (PartitionMetadata p: partitionMetadata) {
-            if (p.getRangeStart() <= hash && p.getRangeEnd() >= hash) {
-                result.add(p);
-            }
-        }
-        return result;
-    }
-    /**
      * Retrieves a list of partitions which may contain the specified element.
      *
      * @param element The specified element.
@@ -54,53 +41,15 @@ public class ShardMetadata implements Serializable {
         }
         return result;
     }
-
-    private TreeSet<PartitionMetadata> partitionMetadata = new TreeSet<PartitionMetadata>();
-}
-
-class PartitionMetadata implements Serializable, Comparable<PartitionMetadata> {
-    public final long id;
-    public final String tableName;
-    //Range is inclusive
-    public PartitionMetadata(int rangeStart, int rangeStop, String tableName)
-    {
-        id = (long) (Math.random()*(1 << 60));
-        this.tableName = tableName;
-        if (rangeStop > rangeStart &&
-                rangeStop >= 0 && rangeStart >= 0)
-        {
-            hashRange[0] = rangeStart;
-            hashRange[1] = rangeStop;
+    public ArrayList<PartitionMetadata> getPartitionsContaining(String tableName) {
+        ArrayList<PartitionMetadata> result = new ArrayList<PartitionMetadata>();
+        for (PartitionMetadata p: partitionMetadata) {
+            if (tableName.toLowerCase().equals(p.tableName.toLowerCase())) {
+                result.add(p);
+            }
         }
+        return result;
     }
-    public int getRangeStart() {
-        return hashRange[0];
-    }
-    public int getRangeEnd() {
-        return hashRange[1];
-    }
-    public void setHashRange(int start,int end)
-    {
-        hashRange[0] = Math.max(0,Math.min(ShardMetadata.hashMaxIndex,start));
-        hashRange[1] = Math.max(0,Math.min(hashRange[0],end));
-    }
-    public boolean addReplica(ShardDetails e) {
-        return replicaShards.add(e);
-    }
-    public boolean removeReplica(ShardDetails e) {
-        return replicaShards.remove(e);
-    }
-    public boolean equals(PartitionMetadata p) {
-        if (id == p.id)
-            return true;
-        return false;
-    }
-    public int compareTo(PartitionMetadata to) {
-        if (to == null) return 1;
-        if (id > to.id) return 1;
-        if (id < to.id) return -1;
-        return 0;
-    }
-    private int[] hashRange = {0,0};
-    private TreeSet<ShardDetails> replicaShards;
+
+    private static TreeSet<PartitionMetadata> partitionMetadata = new TreeSet<PartitionMetadata>();
 }

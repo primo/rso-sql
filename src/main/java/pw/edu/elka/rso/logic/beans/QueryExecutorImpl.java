@@ -1,5 +1,7 @@
 package pw.edu.elka.rso.logic.beans;
 
+import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.select.Select;
 import org.apache.log4j.Logger;
 import pw.edu.elka.rso.core.communication.ClientServer;
 import pw.edu.elka.rso.logic.QueryExecution.Metadata;
@@ -10,14 +12,13 @@ import pw.edu.elka.rso.server.Server;
 import pw.edu.elka.rso.server.ShardDetails;
 import pw.edu.elka.rso.server.Task;
 import pw.edu.elka.rso.server.tasks.*;
+import pw.edu.elka.rso.storage.*;
 import pw.edu.elka.rso.storage.DataRepresentation.Table;
-import pw.edu.elka.rso.storage.IDataShard;
-import pw.edu.elka.rso.storage.QueryResult;
-import pw.edu.elka.rso.storage.QueryResultReceiver;
-import pw.edu.elka.rso.storage.SqlDescription;
 
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, ITaskManager {
   static Logger logger = Logger.getLogger(QueryExecutorImpl.class);
@@ -73,6 +74,25 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
     Procedure procedure = proceduresManager.getProcedure(queryInfo.getProcedureName(), queryInfo.getParameters());
     try {
 
+
+
+        /*
+        ShardMetadata metadata = dataShard.getMetadata();
+        String queryStr = procedure.getParsedQuery().toString();
+        Pattern p = Pattern.compile("SELECT.*FROM\\s([a-zA-Z]*)");
+        Matcher m = p.matcher(queryStr);
+        if (m.find()) {
+            String table = m.group(1);
+            ArrayList<PartitionMetadata> pm=  metadata.getPartitionsContaining(table);
+            for(PartitionMetadata pp: pm)
+            {
+                for (ShardDetails sd: pp.getReplicas())
+                {
+                    rootQueryHere.add(sd);
+                }
+            }
+        }*/
+
       /**
        *
        * TUTAJ DODAJEMY LOGIKE PARTYCJONOWANIA
@@ -85,6 +105,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
        *
        *
        */
+      LinkedList<ShardDetails> rootQueryHere = new LinkedList<ShardDetails>();
       SqlDescription sqlDescription = new SqlDescription();
       sqlDescription.statement = procedure.getParsedQuery();
       sqlDescription.toStringQuery(queryInfo.getProcedureName());
@@ -101,7 +122,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
 
       if (queryType == QueryType.MANGED) {
 
-        LinkedList<ShardDetails> rootQueryHere = new LinkedList<>();
+
         rootQueryHere.add(DoTegoRootuj.getServerDetails());
         //TODO: ALL LOGIC GOES HERE
 

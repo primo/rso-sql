@@ -51,5 +51,5 @@ public class ShardStatistics {
         }
         return shard;
     }
-    private Hashtable<Integer,Integer> shardOpcount = new Hashtable<Integer,Integer>();
+    private static Hashtable<Integer,Integer> shardOpcount = new Hashtable<Integer,Integer>();
 }
