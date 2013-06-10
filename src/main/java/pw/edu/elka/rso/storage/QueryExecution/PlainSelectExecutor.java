@@ -231,6 +231,7 @@ class SelectItemDescription {
         this.column = column;
         this.type = type;
     }
+}
 
 class SelectRange {
     public String table;
