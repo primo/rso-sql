@@ -28,6 +28,5 @@ public class ExecutionLoadBalancer {
     public void resetOperationCount(int shardId) {
         statistics.resetShardOpcount(shardId);
     }
-    //Singleton
-    private static ShardStatistics statistics = new ShardStatistics();
+    private ShardStatistics statistics = new ShardStatistics();
 }

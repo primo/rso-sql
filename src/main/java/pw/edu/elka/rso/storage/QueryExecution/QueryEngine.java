@@ -1,9 +1,15 @@
 package pw.edu.elka.rso.storage.QueryExecution;
 
+import pw.edu.elka.rso.server.ShardDetails;
 import pw.edu.elka.rso.storage.DataRepresentation.*;
+import pw.edu.elka.rso.storage.PartitionMetadata;
 import pw.edu.elka.rso.storage.QueryResult;
+import pw.edu.elka.rso.storage.ShardMetadata;
 import pw.edu.elka.rso.storage.SqlDescription;
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 
 /** Interface of shard's data layer
@@ -16,6 +22,12 @@ public class QueryEngine {
     public QueryEngine() {
         // 1. Setup metadata and statistic
         // TODO
+        ShardMetadata metadata = new ShardMetadata();
+        PartitionMetadata p = new PartitionMetadata(0,ShardMetadata.hashMaxIndex,"TEST");
+        p.addReplica(new ShardDetails(2222, Inet4Address.getLoopbackAddress(),1));
+
+        metadata.addPartition(p);
+
         name2TableId = new HashMap<String, Integer>();
         tables = new HashMap<Integer,Table>();
 

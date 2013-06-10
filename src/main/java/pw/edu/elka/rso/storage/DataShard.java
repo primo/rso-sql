@@ -35,12 +35,12 @@ public class DataShard implements IDataShard, Runnable {
 
     @Override
     public ShardMetadata getMetadata() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return new ShardMetadata();
     }
 
     @Override
     public ShardStatistics getStatistics() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return new ShardStatistics();
     }
 
     @Override
