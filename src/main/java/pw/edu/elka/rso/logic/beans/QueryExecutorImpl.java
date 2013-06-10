@@ -73,7 +73,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
   public void executeProcedure(QueryInfo queryInfo, QueryType queryType, QueryTask queryTaskReceived) throws ClassNotFoundException {
     Procedure procedure = proceduresManager.getProcedure(queryInfo.getProcedureName(), queryInfo.getParameters());
     try {
-        LinkedList<ShardDetails> rootQueryHere = new LinkedList<>();
+        /*
         ShardMetadata metadata = dataShard.getMetadata();
         String queryStr = procedure.getParsedQuery().toString();
         Pattern p = Pattern.compile("SELECT.*FROM\\s([a-zA-Z]*)");
@@ -88,7 +88,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
                     rootQueryHere.add(sd);
                 }
             }
-        }
+        }*/
 
       /**
        *
@@ -102,6 +102,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
        *
        *
        */
+      LinkedList<ShardDetails> rootQueryHere = new LinkedList<ShardDetails>();
       SqlDescription sqlDescription = new SqlDescription();
       sqlDescription.statement = procedure.getParsedQuery();
       sqlDescription.toStringQuery(queryInfo.getProcedureName());
