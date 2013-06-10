@@ -1,10 +1,9 @@
 package pw.edu.elka.rso.storage;
 
 import pw.edu.elka.rso.storage.DataRepresentation.Table;
+import pw.edu.elka.rso.storage.DataRepresentation.TableCarrier;
 
 import java.io.Serializable;
-import java.nio.ByteBuffer;
-import java.util.List;
 
 /**
  */
@@ -12,14 +11,28 @@ public class QueryResult implements Serializable {
   public long queryId;
   public boolean result;
   //moze sie przydac, do np. zwracania kodu bledu, tudziesz informacji
-  public String stringResult;
-  public Table output;
+  public String information;
+  transient public Table output;
+  private TableCarrier transportableOutput;
 
 
   public QueryResult(long queryId) {
     this.queryId = queryId;
     this.result = false;
     this.output = null;
+  }
+
+  public boolean prepareForTransport() {
+      assert transportableOutput == null;
+      transportableOutput = TableCarrier.convertToCarrier(output);
+      return true;
+  }
+
+  public boolean prepareForReading() {
+      if (transportableOutput == null)
+          return false;
+      output = TableCarrier.convertToTable(transportableOutput);
+      return true;
   }
 
   public QueryResult() {
@@ -30,7 +43,7 @@ public class QueryResult implements Serializable {
     return "QueryResult{" +
         "queryId=" + queryId +
         ", result=" + result +
-        ", stringResult='" + stringResult + '\'' +
+        ", information='" + information + '\'' +
         //", output=" + output +
         '}';
   }

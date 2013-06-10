@@ -45,7 +45,11 @@ public class IncomingDataThread implements Runnable {
         //DOPISAC OBSLUGE TASKOW
         if (data instanceof QueryResultTask) {
           log.debug("Odebralme(" + server.getServerDetails() + ") cos " + data.toString());
-          server.getQueryExecutor().doTask((QueryResultTask) data);
+          // Force the QueryResult to convert its content from a serializable but inaccessible form to
+          // standard Table object that is accessible from outside of the class
+          QueryResultTask resultTask = (QueryResultTask) data;
+          resultTask.getInput().prepareForReading();
+          server.getQueryExecutor().doTask(resultTask);
         }
       } catch (IOException | ClassNotFoundException e) {
         e.printStackTrace();
