@@ -9,8 +9,6 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
 import java.util.*;
-import java.util.Map.Entry;
-import java.util.AbstractMap.SimpleEntry;
 
 enum Operation {
     EQ, NEQ, LT, LTE, GT, GTE
@@ -20,41 +18,94 @@ enum Operation {
  */
 public class ColumnRangeExtractor implements ExpressionVisitor{
 
-    private Deque<SelectRange> ranges;
+    private List<SelectRange> ranges;
     private String lastTable;
     private String lastColumn;
     private Operation lastOperation;
     private Object lastArgument;
 
+    private boolean fullScan;
+
+    SelectRange rangeAnd(SelectRange s1, SelectRange s2) {
+        Object resultantFrom = null;
+        Object resultantTo = null;
+        boolean resFromIncl = false;
+        boolean resToIncl = false;
+        if (null == s1.from) {
+            resultantFrom = s2.from;
+            resFromIncl = s2.fromInclusive;
+        }
+        if (null == s2.from) {
+            resultantFrom = s1.from;
+            resFromIncl = s1.fromInclusive;
+        }
+        if (null == s1.to) {
+            resultantTo = s2.to;
+            resFromIncl = s2.toInclusive;
+        }
+        if (null == s2.to) {
+            resultantTo = s1.to;
+            resFromIncl = s1.toInclusive;
+        }
+        Comparable from = (Comparable)resultantFrom;
+        Comparable to = (Comparable)resultantTo;
+        if (from.compareTo(to) < 0 ) {
+                                return  null;
+        }
+        SelectRange temp = new SelectRange();
+        temp.from = resultantFrom;
+        temp.to = resultantTo;
+        temp.table = s1.table;
+        temp.column = s1.column;
+        temp.fromInclusive = resFromIncl;
+        temp.toInclusive = resToIncl;
+        return temp;
+    }
 
     /** Returns map of SelectRanges
      * TableName => List of 'SelectRange's
      * @return
      */
     public Map<String, List<SelectRange>> getRanges() {
-//            FIXME
+        // TODO make it possible to check different columns
+        // TODO OR and serious AND :)
         Map<String, List<SelectRange>> ret = new HashMap<String, List<SelectRange>>();
-//        // First group by tables
-//        for (SelectRange sr : ranges) {
-//            List<SelectRange> selectRanges = ret.get(sr.table);
-//            if (null == selectRanges) {
-//                // Fill the Map
-//                selectRanges = new ArrayList<SelectRange>();
-//                ret.put(sr.table, selectRanges);
-//            }
-//            selectRanges.add(sr);
-//        }
-//        // Merge selectRanges and sort them
-//        SortedMap<Integer, SelectRange> index = new TreeMap<Integer, SelectRange>();
-//        for (List<SelectRange> lsr : ret.values()) {
-//
-//            index.clear();
-//        }
+        // First group by tables
+        for (SelectRange sr : ranges) {
+            List<SelectRange> selectRanges = ret.get(sr.table);
+            if (null == selectRanges) {
+                // Fill the Map
+                selectRanges = new ArrayList<SelectRange>();
+                ret.put(sr.table, selectRanges);
+            }
+            selectRanges.add(sr);
+        }
+        for (List<SelectRange> lsr : ret.values()) {
+            // For a single column
+            final int size = lsr.size();
+            if (2 < size) {
+                throw new IllegalArgumentException("Illegal WHERE clause - only two elements are allowed.");
+            }
+            if (2 == size) {
+                SelectRange s1 = lsr.get(0);
+                SelectRange s2 = lsr.get(1);
+                lsr.clear();
+                SelectRange temp = rangeAnd(s1,s2);
+                if (null != temp) {
+                    lsr.add(temp);
+                }
+            }
+        }
         return ret;
     }
 
+
+    public boolean isFullScan() {
+        return fullScan;
+    }
+
     public ColumnRangeExtractor() {
-        ranges = new ArrayDeque<SelectRange>();
+        ranges = new ArrayList<SelectRange>();
 
     }
 
@@ -109,7 +160,7 @@ public class ColumnRangeExtractor implements ExpressionVisitor{
         sr.to = lastArgument;
         sr.toInclusive = true;
         sr.op = Operation.NEQ;
-        ranges.push(sr);
+        ranges.add(sr);
     }
 
     @Override
@@ -120,9 +171,9 @@ public class ColumnRangeExtractor implements ExpressionVisitor{
         sr.table = lastTable;
         greaterThan.getRightExpression().accept(this);
         sr.from = lastArgument;
-        sr.toInclusive = false;
+        sr.fromInclusive = false;
         sr.op = Operation.GT;
-        ranges.push(sr);
+        ranges.add(sr);
     }
 
     @Override
@@ -133,9 +184,9 @@ public class ColumnRangeExtractor implements ExpressionVisitor{
         sr.table = lastTable;
         greaterThanEquals.getRightExpression().accept(this);
         sr.from = lastArgument;
-        sr.toInclusive = true;
+        sr.fromInclusive = true;
         sr.op = Operation.GTE;
-        ranges.push(sr);
+        ranges.add(sr);
     }
 
     @Override
@@ -149,6 +200,7 @@ public class ColumnRangeExtractor implements ExpressionVisitor{
     public void visit(OrExpression orExpression) {
         orExpression.getLeftExpression().accept(this);
         orExpression.getRightExpression().accept(this);
+        fullScan = true;
     }
 
     @Override
