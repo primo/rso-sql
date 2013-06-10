@@ -15,7 +15,7 @@ public class InsertIntoWorkers extends Procedure {
 
     public final String procedureName = "InsertIntoWorkers";
 
-    public final String sql = "INSERT INTO workers VALUES (?,?,?);"; //firstname, lastname, salary
+    public final String sql = "INSERT INTO TEST VALUES (?,?);"; //firstname, lastname, salary
 
     public Procedure prepareProcedure() throws JSQLParserException {
         return super.prepareProcedure(procedureName, sql);
