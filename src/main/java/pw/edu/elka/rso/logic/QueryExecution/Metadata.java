@@ -1,5 +1,11 @@
 package pw.edu.elka.rso.logic.QueryExecution;
+import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectBody;
 import pw.edu.elka.rso.server.Server;
+import pw.edu.elka.rso.server.ShardDetails;
+import pw.edu.elka.rso.storage.SqlDescription;
 
 import java.util.*;
 
@@ -18,6 +24,7 @@ public class Metadata{
 
     private Map<String, Set<Integer>> table2partitions = new HashMap<>();
     private Map<Integer, Set<Integer>> partition2nodes = new HashMap<>();
+    private Map<Integer, PartitionMetadata> partitions = new HashMap<>();
     private Map<Integer, Float> currentLoad = new HashMap<>();
     PriorityQueue<RepCount> replicasCount = new PriorityQueue<>();
 
@@ -100,5 +107,26 @@ public class Metadata{
 
     float getLoad(int node_id){
         return currentLoad.get(node_id);
+    }
+
+    public Set<Integer> getNodesContaining(SqlDescription sql)
+    {
+        Statement statement = sql.statement;
+        Set<Integer> prts = null;
+        Set<Integer> result = new TreeSet<Integer>();
+        if (statement instanceof Select)
+        {
+            SelectBody body =((Select) statement).getSelectBody();
+            if (body instanceof PlainSelect)
+            {
+                prts = this.getTablePartitions( ((PlainSelect)body).getFromItem().toString() );
+            }
+        }
+
+        for (Integer partId : prts){
+            result.addAll(partition2nodes.get(partId));
+        }
+
+        return result;
     }
 }
