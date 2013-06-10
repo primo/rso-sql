@@ -34,7 +34,7 @@ public class GeneralSelectExecutor implements SelectVisitor {
             LOG.error(e.getMessage());
             queryResult = new QueryResult();
             queryResult.result = false;
-            queryResult.output = null;
+            queryResult.output = QueryEngine.RESULT_FAILURE;
             queryResult.information = e.getCause() + e.getMessage();
         }
     }
@@ -44,7 +44,7 @@ public class GeneralSelectExecutor implements SelectVisitor {
         LOG.error("UNIONs are not yet supported.");
         queryResult = new QueryResult();
         queryResult.result = false;
-        queryResult.output = null;
+        queryResult.output = QueryEngine.RESULT_FAILURE;
         queryResult.information = "UNIONs are not yet supported.";
     }
 }
