@@ -154,6 +154,8 @@ public class Server extends AbstractServer implements Runnable, ITaskManager {
             else if (task instanceof QueryResultTask) {
 
               QueryResultTask queryTask = (QueryResultTask) task;
+              // Force the QueryResult to convert its content to a serializable form
+              queryTask.getInput().prepareForTransport();
               Queue<Object> queue = outcomingData.get(queryTask.getReturnShard());
               queue.add(queryTask);
 

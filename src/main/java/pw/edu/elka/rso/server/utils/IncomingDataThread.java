@@ -2,6 +2,8 @@ package pw.edu.elka.rso.server.utils;
 
 import org.apache.log4j.Logger;
 import pw.edu.elka.rso.server.Server;
+import pw.edu.elka.rso.server.tasks.QueryResultTask;
+import pw.edu.elka.rso.server.tasks.QueryTask;
 import pw.edu.elka.rso.server.Task;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -35,6 +37,10 @@ public class IncomingDataThread implements Runnable {
         ois = new ObjectInputStream(clientSocket.getInputStream());
           Task data = (Task) ois.readObject();
           log.debug("Odebrane(" + server.getServerDetails() + ") cos " + data.toString());
+          if (data instanceof QueryResultTask)
+              // Force the QueryResult to convert its content from a serializable but inaccessible form to
+              // standard Table object that is accessible from outside of the class
+              ((QueryResultTask) data).getInput().prepareForReading();
           server.getQueryExecutor().doTask(data);
       } catch (IOException | ClassNotFoundException e) {
         e.printStackTrace();
