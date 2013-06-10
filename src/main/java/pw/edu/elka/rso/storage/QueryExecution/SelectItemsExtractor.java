@@ -19,6 +19,7 @@ class SelectItemsExtractor implements SelectItemVisitor {
 
     public String table;
     public String column;
+    public boolean allColumns;
 
     public SelectItemsExtractor() {}
 
@@ -26,12 +27,14 @@ class SelectItemsExtractor implements SelectItemVisitor {
     public void visit(AllColumns allColumns) {
         table = "*";
         column = "*";
+        this.allColumns = true;
     }
 
     @Override
     public void visit(AllTableColumns allTableColumns) {
         table = allTableColumns.getTable().getName();
         column = "*";
+        this.allColumns = true;
     }
 
     @Override

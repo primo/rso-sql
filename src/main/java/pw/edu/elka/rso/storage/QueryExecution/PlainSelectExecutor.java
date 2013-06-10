@@ -32,6 +32,7 @@ public class PlainSelectExecutor {
 
     Table execute(PlainSelect select) {
         Table targetTable = null;
+        boolean noJoin = false;
 
         // Parsed objects
         FromItem table1 = select.getFromItem();
@@ -72,34 +73,62 @@ public class PlainSelectExecutor {
                 }
                 leftTable = resultTable;
             }
+        } else {
+            noJoin = true;
         }
         // now evaluate where clause and prepare a filter
         whereExpressions = select.getWhere();
 
         // select required columns
-        List<SimpleEntry<String,String>> selectItems = extractSelectItems(select.getSelectItems());
-        List<SelectItemDescription> outputItems = new LinkedList<SelectItemDescription>();
+        SimpleEntry<List<SimpleEntry<String,String>>,Boolean> selectItemsInfo = extractSelectItems(select.getSelectItems());
+        List<SimpleEntry<String,String>> selectItems = selectItemsInfo.getKey();
+        final boolean allColumnsTarget = selectItemsInfo.getValue();
 
         Table output = null;
-        if ( 1 == tables.size()) {
+        if ( noJoin && 1 == tables.size()) {
             // No join
             Entry<String, Table> e = tables.entrySet().iterator().next();
             String tableName = e.getKey();
             Table table = e.getValue();
             // Create output schema
             TableSchema schema = new TableSchema();
+            if (allColumnsTarget) {
+                Iterator<SimpleEntry<String, String>> it = selectItems.iterator();
+                while (it.hasNext()) {
+                    final SimpleEntry<String, String> next = it.next();
+                    if (next.getValue().equals("*")) {
+                        // Add all columns to the set
+                        // FIXME what if the single table is a result of join
+                        if (!next.getKey().equals("*") && !next.getKey().equals(tableName)) {
+                            // The table name must be equal to the current
+                            throw new IllegalArgumentException("Table "+next.getKey()+" given in SELECT " +
+                                    "is different that one specified in FROM clause: "+tableName);
+                        }
+                        it.remove();
+                        final Set<String> columnNames = table.getTableSchema().getColumnNames();
+                        for (String columnName : columnNames) {
+                            selectItems.add(new SimpleEntry<String, String>(null, columnName));
+                        }
+                        // We are assuming that no one will ever give two * in a select to one table
+                        // FIXME, making a collection of iterators to remove and columns to add is a bit unnecessary work
+                        break;
+                    }
+                }
+            }
             for (Entry<String,String> p : selectItems) {
-                String sourceTable = p.getKey();
+                final String sourceTable = p.getKey();
+                if (sourceTable != null && sourceTable != tableName) {
+                    throw new IllegalArgumentException("Table prefix: " + sourceTable+" is different from" +
+                            " table given in FROM clause.");
+
+                }
                 // Assuming that if we join tables then we prefix columns with its names
-                String columnName = sourceTable!=null?sourceTable+"."+p.getValue():p.getValue();
+                final String columnName = p.getValue();
                 ColumnType type = table.getTableSchema().getColumnType(columnName);
                 int length = 0;
                 if (type == ColumnType.CHAR) {
                     length = (table.getTableSchema().getTableColumn(columnName).getLength() - 1) / 2;
                 }
-
-                SelectItemDescription desc = new SelectItemDescription(sourceTable, p.getValue(), type);
-                outputItems.add(desc);
                 schema.addColumn(p.getValue(), type ,length);
             }
             output = new Table(schema);
@@ -168,18 +197,26 @@ public class PlainSelectExecutor {
         return output;
     }
 
-    List<SimpleEntry<String,String>> extractSelectItems( List<SelectItem> items ) {
+    /** Extracts target columns from a Select statement
+     *
+     * @param items
+     * @return
+     */
+    SimpleEntry<List<SimpleEntry<String,String>>, Boolean>
+    extractSelectItems( List<SelectItem> items ) {
         List<SimpleEntry<String,String>> ret = new LinkedList<SimpleEntry<String, String>>();
         SelectItemsExtractor extractor = new SelectItemsExtractor();
+        boolean allColumns = false;
         for (SelectItem si : items) {
             si.accept(extractor);
             if (null != extractor.table) {
                 extractor.table.toLowerCase();
             }
+            allColumns |= extractor.allColumns;
             SimpleEntry temp = new SimpleEntry<String, String>(extractor.table, extractor.column.toLowerCase());
             ret.add(temp);
         }
-        return ret;
+        return new SimpleEntry<List<SimpleEntry<String, String>>, Boolean>(ret,allColumns);
     }
 }
 

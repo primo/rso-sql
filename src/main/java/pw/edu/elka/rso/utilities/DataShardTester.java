@@ -38,7 +38,7 @@ public class DataShardTester implements QueryResultReceiver{
         }
 
         synchronized (dst) {
-            while (dst.received != 9) {
+            while (dst.received != 11) {
                 dst.wait();
             }
         }
@@ -67,6 +67,10 @@ public class DataShardTester implements QueryResultReceiver{
         statement = parser.parse(new StringReader("select ID, TEST from Test2;"));
         statements.add(statement);
         statement = parser.parse(new StringReader("select TEST, ID from Test2;"));
+        statements.add(statement);
+        statement = parser.parse(new StringReader("select * from Test2;"));
+        statements.add(statement);
+        statement = parser.parse(new StringReader("select Test2.* from Test2;"));
         statements.add(statement);
         return statements;
     }
