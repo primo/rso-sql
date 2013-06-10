@@ -232,3 +232,13 @@ class SelectItemDescription {
         this.type = type;
     }
 }
+
+class SelectRange {
+    public String table;
+    public String column;
+    public Object from;
+    public boolean fromInclusive;
+    public Object to;
+    public boolean toInclusive;
+    public Operation op;
+}
