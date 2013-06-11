@@ -29,6 +29,7 @@ public class RunServer {
 
 
     ShardDetails thisServer = server.getServerDetails();
+    //UZUPELNIC InetAddress.getLocalHost() WARTOSCIAMI KOLEGOW
     ShardDetails server1 = new ShardDetails(2222, InetAddress.getLocalHost(), 3);
     ShardDetails server2 = new ShardDetails(2222, InetAddress.getLocalHost(), 4);
     ShardDetails server3 = new ShardDetails(2222, InetAddress.getLocalHost(), 5);
