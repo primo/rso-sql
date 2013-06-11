@@ -177,7 +177,17 @@ public class Metadata{
 
         if (statement instanceof CreateTable)
         {
-            //((CreateTable)statement).getTable().getName();
+            String table = ((CreateTable)statement).getTable().getName();
+            int rangeNum = 0;
+            int rangeCiach = (int)Math.ceil(PartitionMetadata.hashMaxIndex/shards.size()+1);
+            for (Integer id: shards.keySet())
+            {
+                PartitionMetadata part = new PartitionMetadata(rangeNum*rangeCiach,(rangeNum-1)*rangeCiach,table,id);
+                partitions.put(part.getId(),part);
+                if (partition2nodes == null) partition2nodes.put(id,new TreeSet<Integer>());
+                partition2nodes.get(part.getId()).add(id);
+                rangeNum++;
+            }
         }
 
         return result;
