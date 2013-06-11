@@ -68,11 +68,11 @@ public class Metadata{
         for(PartitionMetadata p: metadata_update_pack.partitions)
         {
             ids.add(p.getId());
-            if(!partition2nodes.containsKey(p.getId()))
+            if(!partition2nodes.containsKey(p.getNodeId()))
             {
-                partition2nodes.put(p.getId(),new TreeSet<Integer>());
+                partition2nodes.put(p.getNodeId(),new TreeSet<Integer>());
             }
-            partition2nodes.get(p.getId()).add(p.getNodeId());
+            partition2nodes.get(p.getNodeId()).add(p.getId());
         }
         table2partitions.put(metadata_update_pack.tableName, ids);
         partition2nodes.putAll(metadata_update_pack.replicationMapping);
@@ -148,10 +148,14 @@ public class Metadata{
                 prts = this.getTablePartitions( ((PlainSelect)body).getFromItem().toString() );
             }
 
-            if (prts != null) return result;
+            if (prts == null) return result;
 
             for (Integer partId : prts){
-                result.add(shards.get(partition2nodes.get(partId)));
+                nodes.add(partitions.get(partId).getNodeId());
+            }
+            for (Integer node: nodes )
+            {
+                result.add(shards.get(node));
             }
             return result;
         }
@@ -177,7 +181,17 @@ public class Metadata{
 
         if (statement instanceof CreateTable)
         {
-            //((CreateTable)statement).getTable().getName();
+            String table = ((CreateTable)statement).getTable().getName();
+            int rangeNum = 0;
+            int rangeCiach = (int)Math.ceil(PartitionMetadata.hashMaxIndex/shards.size()+1);
+            for (Integer id: shards.keySet())
+            {
+                PartitionMetadata part = new PartitionMetadata(rangeNum*rangeCiach,(rangeNum-1)*rangeCiach,table,id);
+                partitions.put(part.getId(),part);
+                if (partition2nodes == null) partition2nodes.put(id,new TreeSet<Integer>());
+                partition2nodes.get(part.getNodeId()).add(part.getId());
+                rangeNum++;
+            }
         }
 
         return result;

@@ -25,6 +25,9 @@
         <module name="rso" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="rso" target="1.7" />
+    </bytecodeTargetLevel>
   </component>
 </project>
 
