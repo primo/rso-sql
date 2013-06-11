@@ -51,15 +51,15 @@ public class SetupClassTest {
     serverThread = new Thread(server);
     serverToClientThread = new Thread(clientServer);
 
-    queryResultReceiver = new QueryResultReceiverImpl();
-    dataShard = new DataShard();
-    dataShard.registerQueryResultReceiver(queryResultReceiver);
-
     metadata = new Metadata(server);
     queryExecutor = new QueryExecutorImpl(inputManager, dataShard, server, metadata);
     queryExecutor.setQueryResultReceiver(queryResultReceiver);
     queryExecutor.setClientServer(clientServer);
     queryExecutorThread = new Thread(queryExecutor);
+
+    queryResultReceiver = new QueryResultReceiverImpl();
+    dataShard = new DataShard(metadata);
+    dataShard.registerQueryResultReceiver(queryResultReceiver);
 
 
     serverThread.start();
