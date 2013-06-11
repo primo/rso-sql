@@ -34,7 +34,7 @@ public class PlainSelectExecutor {
         this.queryEngine = queryEngine;
     }
 
-    Table execute(PlainSelect select) {
+    Table execute(PlainSelect select) throws CloneNotSupportedException {
         Table targetTable = null;
         final String lTable;
         boolean noJoin = false;
@@ -174,6 +174,7 @@ public class PlainSelectExecutor {
                 Record r = it1.next();
                 // TODO setup ei
                 currentLines.put(ExpressionInterpreter.DEFAULT_TABLE, r);
+                currentLines.put(tableName, r);
                 // Check WHERE condition if given
                 if (null != whereExpressions) {
                     whereExpressions.accept(ei);
@@ -229,6 +230,16 @@ public class PlainSelectExecutor {
         Iterator<Record> it1;
         if (sr == null) {
             return table.iterator();
+        }
+        // Cast to integer if necessary
+        if (table.getTableSchema().getColumnType(sr.column)==ColumnType.INT) {
+            if (sr.from != null && sr.from instanceof Long) {
+                long temp = (long)sr.from;
+                sr.from = Integer.valueOf((int)temp);
+            } else if (sr.to != null && sr.to instanceof Long) {
+                long temp = (long)sr.to;
+                sr.to = Integer.valueOf((int)temp);
+            }
         }
         if (sr.from == null) {
             it1 = table.indexedIteratorTo(sr.column, sr.to, sr.toInclusive);
@@ -341,7 +352,7 @@ public class PlainSelectExecutor {
             Expression onExpr,
             Expression whereExpressions,
             Map<String, List<SelectRange>> ranges
-    ) {
+    ) throws CloneNotSupportedException {
         Set<String> baseColumns = base.getTableSchema().getColumnNames();
         Set<String> subjectColumns = subject.getTableSchema().getColumnNames();
         TableSchema schema = null;

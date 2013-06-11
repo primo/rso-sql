@@ -86,7 +86,7 @@ public class DataShardTester implements QueryResultReceiver{
         statements.add(statement);
         statement = parser.parse(new StringReader("select Test2.* from Test2 WHERE ID != 2 OR ID != 3;"));
         statements.add(statement);
-        statement = parser.parse(new StringReader("CREATE TABLE TEST3 (id INTEGER, test CHAR(20));"));
+        statement = parser.parse(new StringReader("CREATE TABLE TEST3 (id INTEGER, test CHAR(20), PRIMARY KEY(id));"));
         statements.add(statement);
         statement = parser.parse(new StringReader("INSERT INTO TEST3 VALUES(1,'TEST44444');"));
         statements.add(statement);
@@ -94,7 +94,7 @@ public class DataShardTester implements QueryResultReceiver{
         statements.add(statement);
         statement = parser.parse(new StringReader("INSERT INTO TEST3 VALUES(4,'TEST3');"));
         statements.add(statement);
-        statement = parser.parse(new StringReader("select Test3.* from Test3 ;"));
+        statement = parser.parse(new StringReader("select Test3.* from Test3 WHERE test3.id > 1;"));
         statements.add(statement);
         statement = parser.parse(new StringReader("CREATE TABLE TEST4 (id INTEGER, test DOUBLE, lala CHAR(10));"));
         statements.add(statement);
