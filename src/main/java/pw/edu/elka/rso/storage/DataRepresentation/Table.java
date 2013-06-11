@@ -46,6 +46,10 @@ public class Table implements Iterable<Record>{
         indexes.put(column_name, index);
     }
 
+    public  boolean hasIndex(String column_name) {
+        return indexes.containsKey(column_name);
+    }
+
     public Iterator<Record> indexedIterator(String column_name) {
         Index ndx = indexes.get(column_name);
         return new TableIterator(this, ndx, ndx.estimate());
