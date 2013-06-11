@@ -3,14 +3,14 @@ package pw.edu.elka.rso.storage.DataRepresentation;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 
-public abstract class TableColumn implements Serializable {
+public abstract class TableColumn implements Serializable, Cloneable {
 
     public int getLength() {
         return length;
     }
 
     final int length;
-    final int position;
+    /*final*/ int position;
     final public ColumnType columnType;
 
     protected TableColumn(int length, int position, ColumnType columnType) {
@@ -21,6 +21,11 @@ public abstract class TableColumn implements Serializable {
 
     abstract void setValue(ByteBuffer ba, Object value);
     abstract Object getValue(ByteBuffer ba);
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 }
 
 class IntTableColumn extends TableColumn implements Serializable {
@@ -50,6 +55,11 @@ class IntTableColumn extends TableColumn implements Serializable {
         else
             return buffer.getInt(position + 1);
     }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 }
 
 class DoubleTableColumn extends TableColumn implements Serializable {
@@ -72,6 +82,11 @@ class DoubleTableColumn extends TableColumn implements Serializable {
             return null;
         else
             return buffer.getDouble(position + 1);
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }
 
@@ -111,5 +126,10 @@ class CharTableColumn extends TableColumn implements Serializable {
                 break;
         }
         return new String(output,0,i);
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

@@ -1,6 +1,7 @@
 
 import org.junit.Before;
 import org.junit.BeforeClass;
+import pw.edu.elka.rso.core.ShowInterfa;
 import pw.edu.elka.rso.core.communication.ClientServer;
 import pw.edu.elka.rso.logic.QueryExecution.Metadata;
 import pw.edu.elka.rso.logic.beans.InputManager;
@@ -43,8 +44,8 @@ public class SetupClassTest {
   @BeforeClass
   public static void setupData() throws IOException {
     inputManager = new InputManager();
-    server = new Server(2222, 1);
-    clientServer = new ClientServer(5000,100);
+    server = new Server(2222, 1, ShowInterfa.getIpAddress());
+    clientServer = new ClientServer(5000,100, ShowInterfa.getIpAddress());
     clientServer.setInputManager(inputManager);
 
     serverThread = new Thread(server);

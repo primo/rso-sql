@@ -9,6 +9,7 @@ import pw.edu.elka.rso.server.Server;
 import pw.edu.elka.rso.server.ShardDetails;
 import pw.edu.elka.rso.storage.DataShard;
 
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -24,16 +25,16 @@ public class RunServer {
     Server server;
     ClientServer clientServer;
 
-    server = new Server(2222, 1);
-    clientServer = new ClientServer(5000, 100);
+    server = new Server(2222, 1, "ipadres");
+    clientServer = new ClientServer(5000, 100, "adresIp");
 
-
+    //InetAddress address = new Inet4Address();
     ShardDetails thisServer = server.getServerDetails();
     //UZUPELNIC InetAddress.getLocalHost() WARTOSCIAMI KOLEGOW
-    ShardDetails server1 = new ShardDetails(2222, InetAddress.getLocalHost(), 3);
-    ShardDetails server2 = new ShardDetails(2222, InetAddress.getLocalHost(), 4);
-    ShardDetails server3 = new ShardDetails(2222, InetAddress.getLocalHost(), 5);
-    ShardDetails server4 = new ShardDetails(2222, InetAddress.getLocalHost(), 6);
+    ShardDetails server1 = new ShardDetails(2222,3,"adresIP");
+    ShardDetails server2 = new ShardDetails(2222,4,"adresIP");
+    ShardDetails server3 = new ShardDetails(2222,5,"adresIP");
+    ShardDetails server4 = new ShardDetails(2222,6,"adresIP");
 
 
     Thread serverThread;

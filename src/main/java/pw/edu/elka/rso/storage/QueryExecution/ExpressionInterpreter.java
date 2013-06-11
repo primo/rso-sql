@@ -315,7 +315,7 @@ public class ExpressionInterpreter implements ExpressionVisitor {
             Record r = currentLines.get(tabname);
             out = r.getValue(colname);
         } else if(null != tabalias) {
-            String name = aliases.get(tabalias);
+            tabname = aliases.get(tabalias);
             Record r = currentLines.get(tabname);
             out = r.getValue(colname);
         } else if (null != columnMapping.get(colname)) {

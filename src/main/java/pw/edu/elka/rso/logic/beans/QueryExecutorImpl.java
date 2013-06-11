@@ -3,6 +3,7 @@ package pw.edu.elka.rso.logic.beans;
 import org.apache.log4j.Logger;
 import pw.edu.elka.rso.core.communication.ClientServer;
 import pw.edu.elka.rso.logic.QueryExecution.Metadata;
+import pw.edu.elka.rso.logic.QueryExecution.ReplicationManager;
 import pw.edu.elka.rso.logic.interfaces.IQueryExecutor;
 import pw.edu.elka.rso.logic.procedures.Procedure;
 import pw.edu.elka.rso.logic.procedures.ProceduresManager;
@@ -23,8 +24,6 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
   static Logger logger = Logger.getLogger(QueryExecutorImpl.class);
   private static long queryId = 0;
   //TODO: wywalic, testowe
-  public Server DoTegoRootuj;
-
   //TODO; Przyjmie obiekt QueryInfo i z niego zwroci np. stringa ktory ma uzupelnione wartosci  ? ? ?
   private IDataShard dataShard;
   private QueryResultReceiverImpl queryResultReceiver;
@@ -42,6 +41,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
   //T_T
   private ClientServer clientServer;
   private Metadata metadata;
+  private ReplicationManager replicationManager;
 
   public QueryExecutorImpl(Observable consoleObservable, IDataShard dataShard, Server server, Metadata new_metadata) {
     metadata = new_metadata;
@@ -53,6 +53,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
 
     this.consoleObservable.addObserver(this);
     this.server = server;
+    replicationManager = new ReplicationManager(metadata);
 
     this.queryResultManager = new QueryResultManager();
   }
@@ -73,28 +74,19 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
     Procedure procedure = proceduresManager.getProcedure(queryInfo.getProcedureName(), queryInfo.getParameters());
     try {
 
+      int partition = 0;
+      // set idkow nodow do ktorych zrootowac zapytanie CREATE
+      //tylko dla create'a
+//      Set<Integer> nodes = replicationManager.reserveNodesForPartitionReplicas(partition);
+      //
+      //String tableName = "table_name"; // z query create
 
-
-
-      /**
-       *
-       * TUTAJ DODAJEMY LOGIKE PARTYCJONOWANIA
-       * ROOTOWANIA ZAPYTAN DO ODPOWIEDNICH SHARDOW
-       * ETCETC...
-       * SPROWADZA SIE TO DO UZUPELNIENIA LISTY PONIZJE
-       * rootQueryHere() WARTOSCIAMI ShardDetails mowiacymi GDZIE DANA PROCEDURA MAMY WYKONAC
-       * USTAWIAMY WARTOSC DLA executeQuereOnThisShard W ZALEZNOSCI CZY TA PROCEDURA SIE WYKONA TUTAJ
-       *
-       *
-       *
-       */
       LinkedList<ShardDetails> rootQueryHere = new LinkedList<>();
       SqlDescription sqlDescription = new SqlDescription();
-
       sqlDescription.statement = procedure.getParsedQuery();
-      metadata.getNodesContaining(sqlDescription);
       sqlDescription.toStringQuery(queryInfo.getProcedureName());
       sqlDescription.id = queryType == QueryType.RAW ? queryTaskReceived.getInput().id : queryInfo.getQueryId();
+
 
 
       /**
@@ -107,8 +99,10 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
 
       if (queryType == QueryType.MANGED) {
 
+        ArrayList<ShardDetails> resultOfPartioning = metadata.getNodesContaining(sqlDescription);
+        executeQuereOnThisShard = resultOfPartioning.contains(this.server.getServerDetails());
 
-        rootQueryHere.add(DoTegoRootuj.getServerDetails());
+        rootQueryHere.addAll(resultOfPartioning);
         //TODO: ALL LOGIC GOES HERE
 
 
@@ -215,6 +209,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
             QueryResult queryResult = queryResultTask.getInput();
             queryResult.prepareForReading();
             queryResultManager.insertResult(queryResult.queryId, queryResult.output);
+            //UPDATE MATADATA
           } else if (task instanceof MetadataUpdateTask) {
             logger.debug("Dostalem(@" + server.getServerDetails() + ") odpowiedz  " + task.getInput());
             metadata.updateMetadata(((MetadataUpdateTask) task).getInput());
@@ -261,7 +256,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
 
           Table resultTable = null;
 
-          if(value.size() > 1){
+          if (value.size() > 1) {
             resultTable = value.get(0);
           }
 

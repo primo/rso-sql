@@ -24,7 +24,8 @@ public class MainLogic {
     InputManager inputManager = new InputManager();
 //    InputManager inputManager2 = new InputManager();
 
-    Server server1 = new Server(2222, 1);
+
+    Server server1 = new Server(2222, 1, "ipadres" );
 //    Server server2 = new Server(2223, 2);
 
 //    ClientServer clientServer = new ClientServer(5000,100);

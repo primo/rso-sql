@@ -92,36 +92,49 @@ public class TableSchema implements Cloneable, Serializable {
         return ts;
     }
 
-    public TableSchema appendSchema(TableSchema tableSchema) {
+    public TableSchema appendSchema(TableSchema tableSchema) throws CloneNotSupportedException {
         Set<String> keys = tableSchema.specification.keySet();
         for (String k: keys) {
             if (this.specification.containsKey(k)) {
                 throw new InvalidParameterException("TableScheme to be appended duplicates keys from the source.");
             }
         }
+        // Shift the columns from the appended scheme by the offset in the original schema
+        final int baseOffset = this.rLength-1;
         for (String k : keys) {
-            this.specification.put(k, tableSchema.getTableColumn(k));
+            TableColumn temp = (TableColumn)tableSchema.getTableColumn(k).clone();
+            temp.position += baseOffset;
+            this.rLength += temp.length;
+            this.specification.put(k, temp);
         }
         return this;
     }
 
-    public TableSchema appendSchema(TableSchema tableSchema, String prefix) {
+    public TableSchema appendSchema(TableSchema tableSchema, String prefix) throws CloneNotSupportedException {
         Set<String> keys = tableSchema.specification.keySet();
         for (String k: keys) {
             if (this.specification.containsKey(prefix.concat(k))) {
                 throw new InvalidParameterException("TableScheme to be appended duplicates keys from the source.");
             }
         }
+        final int baseOffset = this.rLength-1;
         for (String k : keys) {
-            this.specification.put(prefix+"."+k, tableSchema.getTableColumn(k));
+            TableColumn temp = (TableColumn)tableSchema.getTableColumn(k).clone();
+            temp.position += baseOffset;
+            this.rLength += temp.length;
+            this.specification.put(prefix+"."+k, temp);
         }
         return this;
     }
 
-    public TableSchema appendScheme(TableSchema tableSchema, List<SimpleEntry<String,String>> renames) {
+    public TableSchema appendScheme(TableSchema tableSchema, List<SimpleEntry<String,String>> renames) throws CloneNotSupportedException {
         // ! does not validate duplicated columns between schemas etc...
+        final int baseOffset = this.rLength-1;
         for (Entry<String,String> p : renames) {
-            this.specification.put(p.getKey(), tableSchema.getTableColumn(p.getValue()));
+            TableColumn temp = (TableColumn)tableSchema.getTableColumn(p.getValue()).clone();
+            temp.position += baseOffset;
+            this.rLength += temp.length;
+            this.specification.put(p.getKey(), temp);
         }
         return this;
     }

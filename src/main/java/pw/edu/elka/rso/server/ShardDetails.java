@@ -16,11 +16,26 @@ public class ShardDetails implements Serializable, Comparable<ShardDetails> {
   public final static String groupName = "225.4.5.6";
   private InetAddress host;
   private int id;
+  private String ipAddress;
+
+  public String getIpAddress() {
+    return ipAddress;
+  }
+
+  public void setIpAddress(String ipAddress) {
+    this.ipAddress = ipAddress;
+  }
 
   public ShardDetails(int portNumber, InetAddress host, int id) {
       this.portNumber = portNumber;
       this.host = host;
       this.id = id;
+  }
+
+  public ShardDetails(int portNumber, int id, String ipAddress) {
+    this.portNumber = portNumber;
+    this.id = id;
+    this.ipAddress = ipAddress;
   }
 
   @Override

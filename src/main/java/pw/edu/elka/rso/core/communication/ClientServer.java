@@ -30,8 +30,8 @@ public class ClientServer extends AbstractServer implements Runnable, IPushToCli
   private InputManager inputManager;
   private Socket clientSocket;
 
-  public ClientServer(int portNumber, int id) throws UnknownHostException {
-    super(portNumber, id);
+  public ClientServer(int portNumber, int id, String ipAddress) throws UnknownHostException {
+    super(portNumber, id, ipAddress);
   }
 
   public InputManager getInputManager() {
