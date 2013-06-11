@@ -21,9 +21,9 @@ public class ExampleServer {
     InputManager inputManager = new InputManager();
 
 
-    Server shardServer = new Server(2222, 1);
+    Server shardServer = new Server(2222, 1, "ipadres");
 
-    ClientServer clientServer = new ClientServer(5000,100);
+    ClientServer clientServer = new ClientServer(5000,100, "ipadres");
     clientServer.setInputManager(inputManager);
 
     Thread thread1 = new Thread(shardServer);

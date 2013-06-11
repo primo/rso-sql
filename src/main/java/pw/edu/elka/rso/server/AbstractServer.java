@@ -24,8 +24,8 @@ public abstract class AbstractServer {
   protected Map<ShardDetails, Queue<Object>> outcomingData = new HashMap<ShardDetails, Queue<Object>>();
   // The client socket.
 
-  public AbstractServer(int portNumber, int id) throws UnknownHostException {
-    shardDetails = new ShardDetails(portNumber, InetAddress.getLocalHost(), id);
+  public AbstractServer(int portNumber, int id, String ipAddress) throws UnknownHostException {
+    shardDetails = new ShardDetails(portNumber, id, ipAddress );
   }
 
   private static Logger log = Logger.getLogger(AbstractServer.class);
@@ -44,7 +44,7 @@ public abstract class AbstractServer {
   public static Socket initConnectionToOtherShard(ShardDetails shardDetails) {
     Socket clientSocket = null;
     try {
-      clientSocket = new Socket(shardDetails.getHost(), shardDetails.getPortNumber());
+      clientSocket = new Socket(shardDetails.getIpAddress(), shardDetails.getPortNumber());
     } catch (IOException e) {
       log.debug("shiet nie polaczylem sie z serwerem " + shardDetails.getHost().toString() + " na porcie " + shardDetails.getPortNumber());
       e.printStackTrace();

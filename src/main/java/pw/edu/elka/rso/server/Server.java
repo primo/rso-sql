@@ -36,8 +36,8 @@ public class Server extends AbstractServer implements Runnable, ITaskManager {
 
   private QueryExecutorImpl queryExecutor;
 
-  public Server(int portNumber, int id) throws UnknownHostException {
-    super(portNumber, id);
+  public Server(int portNumber, int id, String ipAddress) throws UnknownHostException {
+    super(portNumber, id, ipAddress);
   }
 
   public void initOutgoingConnections(ShardDetails shardDetail) {
