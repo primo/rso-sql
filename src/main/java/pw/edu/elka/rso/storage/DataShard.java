@@ -3,6 +3,7 @@ package pw.edu.elka.rso.storage;
 import java.util.Map.Entry;
 import java.util.AbstractMap.SimpleEntry;
 import org.apache.log4j.Logger;
+import pw.edu.elka.rso.logic.QueryExecution.Metadata;
 import pw.edu.elka.rso.storage.QueryExecution.QueryEngine;
 
 import java.security.InvalidParameterException;
@@ -22,20 +23,30 @@ public class DataShard implements IDataShard, Runnable {
     boolean stopped = false;
     private long nextQueryId = 0;
     private QueryEngine engine = null;
+    private int counter = 0;
+    final private Metadata metadata;
 
     static Logger LOG = Logger.getLogger(DataShard.class);
-
     public DataShard() {
+        this.metadata = null;
+    }
+
+    public DataShard(Metadata metadata) {
+        this.metadata = metadata;
     }
 
     @Override
     public void query(SqlDescription query, Object queryContext) {
+        counter++;
+        if ( counter % 10 == 0 && metadata != null) {
+            metadata.updateLoad(counter);
+        }
         tasks.offer(new SimpleEntry<SqlDescription, Object>(query, queryContext));
     }
 
     @Override
-    public ShardMetadata getMetadata() {
-        return null;
+    public Metadata getMetadata() {
+        return metadata;
     }
 
     @Override

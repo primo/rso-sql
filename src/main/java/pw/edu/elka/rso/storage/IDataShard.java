@@ -1,5 +1,7 @@
 package pw.edu.elka.rso.storage;
 
+import pw.edu.elka.rso.logic.QueryExecution.Metadata;
+
 /**
  * Created with IntelliJ IDEA.
  * User: primo
@@ -9,7 +11,7 @@ package pw.edu.elka.rso.storage;
  */
 public interface IDataShard {
     void query( SqlDescription query, Object queryContext);
-    ShardMetadata getMetadata();
+    Metadata getMetadata();
     ShardStatistics getStatistics();
     boolean registerQueryResultReceiver( QueryResultReceiver queryResultReceiver);
 }
