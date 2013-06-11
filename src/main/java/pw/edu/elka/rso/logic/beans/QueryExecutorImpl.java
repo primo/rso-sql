@@ -76,7 +76,6 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
 
 
 
-
       /**
        *
        * TUTAJ DODAJEMY LOGIKE PARTYCJONOWANIA
@@ -91,8 +90,9 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
        */
       LinkedList<ShardDetails> rootQueryHere = new LinkedList<>();
       SqlDescription sqlDescription = new SqlDescription();
-      sqlDescription.statement = procedure.getParsedQuery();
 
+      sqlDescription.statement = procedure.getParsedQuery();
+      metadata.getNodesContaining(sqlDescription);
       sqlDescription.toStringQuery(queryInfo.getProcedureName());
       sqlDescription.id = queryType == QueryType.RAW ? queryTaskReceived.getInput().id : queryInfo.getQueryId();
 

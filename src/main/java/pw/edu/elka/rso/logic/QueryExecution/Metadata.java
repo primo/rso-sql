@@ -4,6 +4,7 @@ import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.ItemsList;
 import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.create.table.CreateTable;
 import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
@@ -135,10 +136,10 @@ public class Metadata{
 
     public ArrayList<ShardDetails> getNodesContaining(SqlDescription sql)
     {
-        return null;
-        /*Statement statement = sql.statement;
+        Statement statement = sql.statement;
         Set<Integer> prts = null;
-        Set<Integer> result = new TreeSet<Integer>();
+        Set<Integer> nodes= new TreeSet<Integer>();
+        ArrayList<ShardDetails> result = new ArrayList<ShardDetails>();
         if (statement instanceof Select)
         {
             SelectBody body =((Select) statement).getSelectBody();
@@ -147,10 +148,10 @@ public class Metadata{
                 prts = this.getTablePartitions( ((PlainSelect)body).getFromItem().toString() );
             }
 
-            if (prts == null) return result;
+            if (prts != null) return result;
 
             for (Integer partId : prts){
-                result.addAll(partition2nodes.get(partId));
+                result.add(shards.get(partition2nodes.get(partId)));
             }
             return result;
         }
@@ -167,13 +168,18 @@ public class Metadata{
                 {
                     if (partition.contains(e))
                     {
-                        result.add(id);
+                        result.add(shards.get(id));
                     }
                 }
             }
             return result;
         }
 
-        return result;*/
+        if (statement instanceof CreateTable)
+        {
+            //((CreateTable)statement).getTable().getName();
+        }
+
+        return result;
     }
 }
