@@ -148,11 +148,14 @@ public class Metadata{
                 prts = this.getTablePartitions( ((PlainSelect)body).getFromItem().toString() );
             }
 
-            if (prts != null) return result;
+            if (prts == null) return result;
 
             for (Integer partId : prts){
-
-                result.add(shards.get(partition2nodes.get(partId)));
+                nodes.add(partitions.get(partId).getNodeId());
+            }
+            for (Integer node: nodes )
+            {
+                result.add(shards.get(node));
             }
             return result;
         }
