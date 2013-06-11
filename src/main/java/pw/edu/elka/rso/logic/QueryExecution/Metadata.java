@@ -30,6 +30,7 @@ public class Metadata{
     private Map<String, Set<Integer>> table2partitions = new HashMap<>();
     private Map<Integer, Set<Integer>> partition2nodes = new HashMap<>();
     private Map<Integer, PartitionMetadata> partitions = new HashMap<>();
+    private Map<Integer, ShardDetails> shards = new HashMap<>();
     private Map<Integer, Float> currentLoad = new HashMap<>();
     PriorityQueue<RepCount> replicasCount = new PriorityQueue<>();
 
@@ -130,9 +131,10 @@ public class Metadata{
         return currentLoad.get(node_id);
     }
 
-    public Set<Integer> getNodesContaining(SqlDescription sql)
+    public ArrayList<ShardDetails> getNodesContaining(SqlDescription sql)
     {
-        Statement statement = sql.statement;
+        return null;
+        /*Statement statement = sql.statement;
         Set<Integer> prts = null;
         Set<Integer> result = new TreeSet<Integer>();
         if (statement instanceof Select)
@@ -170,6 +172,6 @@ public class Metadata{
             return result;
         }
 
-        return result;
+        return result;*/
     }
 }
