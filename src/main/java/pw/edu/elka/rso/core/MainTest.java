@@ -32,7 +32,6 @@ public class MainTest {
         repmap.put(2, replicas);
 
         metadata.updateMetadata(name, parts, repmap);
-        int i = 0;
-        i++;
+        metadata.updateLoad(4.4f);
     }
 }
