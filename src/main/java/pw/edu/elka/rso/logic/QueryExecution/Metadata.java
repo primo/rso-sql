@@ -133,9 +133,10 @@ public class Metadata{
         return currentLoad.get(node_id);
     }
 
-    public Set<Integer> getNodesContaining(SqlDescription sql)
+    public ArrayList<ShardDetails> getNodesContaining(SqlDescription sql)
     {
-        Statement statement = sql.statement;
+        return null;
+        /*Statement statement = sql.statement;
         Set<Integer> prts = null;
         Set<Integer> result = new TreeSet<Integer>();
         if (statement instanceof Select)
@@ -173,6 +174,6 @@ public class Metadata{
             return result;
         }
 
-        return result;
+        return result;*/
     }
 }
