@@ -4,6 +4,7 @@ import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.ItemsList;
 import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.create.table.CreateTable;
 import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
@@ -30,6 +31,7 @@ public class Metadata{
     private Map<String, Set<Integer>> table2partitions = new HashMap<>();
     private Map<Integer, Set<Integer>> partition2nodes = new HashMap<>();
     private Map<Integer, PartitionMetadata> partitions = new HashMap<>();
+    private Map<Integer, ShardDetails> shards = new HashMap<>();
     private Map<Integer, Float> currentLoad = new HashMap<>();
     PriorityQueue<RepCount> replicasCount = new PriorityQueue<>();
 
@@ -118,8 +120,10 @@ public class Metadata{
         return partition2nodes.get(partition_id);
     }
 
-    public void addNode(int node_ID){
-        replicasCount.add(new RepCount(node_ID));
+    public void addNode(ShardDetails shard_details){
+        Integer id = shard_details.getId();
+        shards.put(id, shard_details);
+        replicasCount.add(new RepCount(id));
     }
 
     void updateLoad(int node_id, float new_load){
@@ -130,11 +134,12 @@ public class Metadata{
         return currentLoad.get(node_id);
     }
 
-    public Set<Integer> getNodesContaining(SqlDescription sql)
+    public ArrayList<ShardDetails> getNodesContaining(SqlDescription sql)
     {
         Statement statement = sql.statement;
         Set<Integer> prts = null;
-        Set<Integer> result = new TreeSet<Integer>();
+        Set<Integer> nodes= new TreeSet<Integer>();
+        ArrayList<ShardDetails> result = new ArrayList<ShardDetails>();
         if (statement instanceof Select)
         {
             SelectBody body =((Select) statement).getSelectBody();
@@ -143,10 +148,10 @@ public class Metadata{
                 prts = this.getTablePartitions( ((PlainSelect)body).getFromItem().toString() );
             }
 
-            if (prts == null) return result;
+            if (prts != null) return result;
 
             for (Integer partId : prts){
-                result.addAll(partition2nodes.get(partId));
+                result.add(shards.get(partition2nodes.get(partId)));
             }
             return result;
         }
@@ -163,11 +168,26 @@ public class Metadata{
                 {
                     if (partition.contains(e))
                     {
-                        result.add(id);
+                        result.add(shards.get(id));
                     }
                 }
             }
             return result;
+        }
+
+        if (statement instanceof CreateTable)
+        {
+            String table = ((CreateTable)statement).getTable().getName();
+            int rangeNum = 0;
+            int rangeCiach = (int)Math.ceil(PartitionMetadata.hashMaxIndex/shards.size()+1);
+            for (Integer id: shards.keySet())
+            {
+                PartitionMetadata part = new PartitionMetadata(rangeNum*rangeCiach,(rangeNum-1)*rangeCiach,table,id);
+                partitions.put(part.getId(),part);
+                if (partition2nodes == null) partition2nodes.put(id,new TreeSet<Integer>());
+                partition2nodes.get(part.getId()).add(id);
+                rangeNum++;
+            }
         }
 
         return result;

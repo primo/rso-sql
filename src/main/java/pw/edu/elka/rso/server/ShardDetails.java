@@ -12,13 +12,15 @@ import java.net.InetAddress;
  */
 public class ShardDetails implements Serializable, Comparable<ShardDetails> {
   private int portNumber;
+  public final static int loadReportingPort = 3333;
+  public final static String group_name = "load_exchange";
   private InetAddress host;
   private int id;
 
   public ShardDetails(int portNumber, InetAddress host, int id) {
-    this.portNumber = portNumber;
-    this.host = host;
-    this.id = id;
+      this.portNumber = portNumber;
+      this.host = host;
+      this.id = id;
   }
 
   @Override

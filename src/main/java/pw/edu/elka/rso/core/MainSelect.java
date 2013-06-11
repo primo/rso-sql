@@ -52,13 +52,13 @@ public class MainSelect {
     Metadata metadata1 = new Metadata(server1);
     QueryExecutorImpl queryExecutor = new QueryExecutorImpl(inputManager, dataShard, server1, metadata1);
     queryExecutor.setQueryResultReceiver(queryResultReceiver);
-    queryExecutor.DoTegoRootuj = server2;
+    //queryExecutor.DoTegoRootuj = server2;
     queryExecutor.setClientServer(clientServer);
 
     Metadata metadata2 = new Metadata(server2);
     QueryExecutorImpl queryExecutor2 = new QueryExecutorImpl(inputManager2, dataShard2, server2, metadata2);
     queryExecutor2.setQueryResultReceiver(queryResultReceiver2);
-    queryExecutor2.DoTegoRootuj = server1;
+    //queryExecutor2.DoTegoRootuj = server1;
 //
     server1.setQueryExecutor(queryExecutor);
     server2.setQueryExecutor(queryExecutor2);
