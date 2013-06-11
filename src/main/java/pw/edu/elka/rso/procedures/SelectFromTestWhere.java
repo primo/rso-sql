@@ -11,11 +11,11 @@ package pw.edu.elka.rso.procedures;
 import net.sf.jsqlparser.JSQLParserException;
 import pw.edu.elka.rso.logic.procedures.Procedure;
 
-public class SelectFromWorkers extends Procedure {
+public class SelectFromTestWhere extends Procedure {
 
-    public final String procedureName = "SelectFromWorkers";
+    public final String procedureName = "SelectFromTestWhere";
 
-    public final String sql = "select zawodnik from zawodnicy;";
+    public final String sql = "SELECT ID, TEST from test WHERE ID > 5;";
 
     public Procedure prepareProcedure() throws JSQLParserException {
         return super.prepareProcedure(procedureName, sql);

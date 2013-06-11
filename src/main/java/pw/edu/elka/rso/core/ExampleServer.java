@@ -62,6 +62,6 @@ public class ExampleServer {
     //dataShard.start();
 
 
-//    inputManager.readInput("SelectFromClients", QueryExecutorImpl.returnNewQueryId(), null);
+//    inputManager.readInput("SelectFromTest", QueryExecutorImpl.returnNewQueryId(), null);
   }
 }

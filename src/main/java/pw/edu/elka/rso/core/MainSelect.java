@@ -75,7 +75,7 @@ public class MainSelect {
 //    params.add("999");
 //    params.add("999");
 //    inputManager.readInput("InsertIntoTest", QueryExecutorImpl.returnNewQueryId(), params);
-//    inputManager.readInput("SelectFromClients", QueryExecutorImpl.returnNewQueryId(), null);
+//    inputManager.readInput("SelectFromTest", QueryExecutorImpl.returnNewQueryId(), null);
 
   }
 }

@@ -108,7 +108,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
       if (queryType == QueryType.MANGED) {
 
 
-        rootQueryHere.add(DoTegoRootuj.getServerDetails());
+        //rootQueryHere.add(DoTegoRootuj.getServerDetails());
         //TODO: ALL LOGIC GOES HERE
 
 
@@ -275,6 +275,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
            * NARAZIE POMIJANY
            *
            */
+          resultTable = resultTable == null ? value.get(0) : resultTable;
           clientServer.pushToClientServer(resultTable.toString());
         }
 

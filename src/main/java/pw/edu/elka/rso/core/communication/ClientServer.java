@@ -100,7 +100,7 @@ public class ClientServer extends AbstractServer implements Runnable, IPushToCli
         ObjectOutputStream oos;
         try {
           oos = new ObjectOutputStream(this.clientSocket.getOutputStream());
-          log.debug("Wysylam do klienta "+result);
+//          log.debug("Wysylam do klienta "+result);
           oos.writeObject(result);
         } catch (IOException e) {
           e.printStackTrace();
@@ -148,7 +148,7 @@ class ClientRequestThread implements Runnable {
     try {
       ois = new ObjectInputStream(clientSocket.getInputStream());
     } catch (IOException e) {
-      e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+      e.printStackTrace();
     }
 
     while (true) {
