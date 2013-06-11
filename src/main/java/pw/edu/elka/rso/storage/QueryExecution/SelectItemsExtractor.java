@@ -34,7 +34,7 @@ class SelectItemsExtractor implements SelectItemVisitor {
     public void visit(AllTableColumns allTableColumns) {
         table = allTableColumns.getTable().getName();
         if (null!=table) {
-            table.toLowerCase();
+            table = table.toLowerCase();
         }
         column = "*";
         this.allColumns = true;
@@ -53,7 +53,7 @@ class SelectItemsExtractor implements SelectItemVisitor {
         table = item.getKey();
         column = item.getValue();
         if (null!=table) {
-            table.toLowerCase();
+            table = table.toLowerCase();
         }
     }
 }

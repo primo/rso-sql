@@ -92,20 +92,22 @@ public class DataShardTester implements QueryResultReceiver{
         statements.add(statement);
         statement = parser.parse(new StringReader("INSERT INTO TEST3 VALUES(2,'TEST444');"));
         statements.add(statement);
-        statement = parser.parse(new StringReader("INSERT INTO TEST3 VALUES(13,'TEST3');"));
+        statement = parser.parse(new StringReader("INSERT INTO TEST3 VALUES(4,'TEST3');"));
         statements.add(statement);
         statement = parser.parse(new StringReader("select Test3.* from Test3 ;"));
         statements.add(statement);
-        statement = parser.parse(new StringReader("CREATE TABLE TEST3 (id INTEGER, test DOUBLE, lala CHAR(10));"));
+        statement = parser.parse(new StringReader("CREATE TABLE TEST4 (id INTEGER, test DOUBLE, lala CHAR(10));"));
         statements.add(statement);
-        statement = parser.parse(new StringReader("INSERT INTO TEST3 VALUES(1,0.44, 'HELLO');"));
+        statement = parser.parse(new StringReader("INSERT INTO TEST4 VALUES(1,0.44, 'HELLO');"));
         statements.add(statement);
-        statement = parser.parse(new StringReader("INSERT INTO TEST3 VALUES(2,0.57, 'HELLO');"));
+        statement = parser.parse(new StringReader("INSERT INTO TEST4 VALUES(2,0.57, 'HELLO');"));
         statements.add(statement);
-        statement = parser.parse(new StringReader("INSERT INTO TEST3 VALUES(13,0.78, 'HELLO');"));
+        statement = parser.parse(new StringReader("INSERT INTO TEST4 VALUES(13,0.78, 'HELLO');"));
         statements.add(statement);
-        statement = parser.parse(new StringReader("select * from Test3 ;"));
+        statement = parser.parse(new StringReader("select * from Test3 join Test2 on Test3.id = Test2.id WHERE Test3.id > 1 AND TEST3.id < 6;"));
         statements.add(statement);
+//        statement = parser.parse(new StringReader("select * from Test3 ;"));
+//        statements.add(statement);
         return statements;
     }
 

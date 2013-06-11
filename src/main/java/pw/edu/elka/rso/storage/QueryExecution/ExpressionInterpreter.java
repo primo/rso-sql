@@ -305,10 +305,10 @@ public class ExpressionInterpreter implements ExpressionVisitor {
         String tabname = column.getTable().getName();
         String tabalias = column.getTable().getName();
         if (null!=tabname) {
-            tabname.toLowerCase();
+            tabname = tabname.toLowerCase();
         }
         if (null!=tabalias) {
-            tabalias.toLowerCase();
+            tabalias = tabalias.toLowerCase();
         }
         Object out = null;
         if (null != tabname) {

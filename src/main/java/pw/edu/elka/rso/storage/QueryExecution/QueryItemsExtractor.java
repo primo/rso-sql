@@ -90,7 +90,7 @@ class QueryItemsExtractor implements ItemsListVisitor, ExpressionVisitor {
 
     @Override
     public void visit(StringValue stringValue) {
-        appendObject(stringValue.getValue());
+        appendObject(stringValue.getValue().toLowerCase());
     }
 
     @Override
@@ -175,7 +175,11 @@ class QueryItemsExtractor implements ItemsListVisitor, ExpressionVisitor {
 
     @Override
     public void visit(Column column) {
-        appendObject(new SimpleEntry<String,String>(column.getTable().getName(), column.getColumnName()));
+        String tabName = column.getTable().getName();
+        if (null != tabName) {
+            tabName = tabName.toLowerCase();
+        }
+        appendObject(new SimpleEntry<String,String>(tabName, column.getColumnName().toLowerCase()));
     }
 
     @Override
