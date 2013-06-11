@@ -49,7 +49,7 @@ public class ColumnRangeExtractor implements ExpressionVisitor {
         }
         Comparable from = (Comparable) resultantFrom;
         Comparable to = (Comparable) resultantTo;
-        if (from.compareTo(to) < 0) {
+        if (from.compareTo(to) > 0) {
             return null;
         }
         SelectRange temp = new SelectRange();
@@ -126,6 +126,7 @@ public class ColumnRangeExtractor implements ExpressionVisitor {
         minorThan.getRightExpression().accept(this);
         sr.to = lastArgument;
         sr.op = Operation.LT;
+        ranges.add(sr);
     }
 
     @Override
@@ -138,6 +139,7 @@ public class ColumnRangeExtractor implements ExpressionVisitor {
         sr.to = lastArgument;
         sr.toInclusive = true;
         sr.op = Operation.LTE;
+        ranges.add(sr);
     }
 
     @Override
@@ -150,6 +152,7 @@ public class ColumnRangeExtractor implements ExpressionVisitor {
         sr.to = lastArgument;
         sr.toInclusive = true;
         sr.op = Operation.NEQ;
+        //ranges.add(sr);
     }
 
     @Override
@@ -162,7 +165,7 @@ public class ColumnRangeExtractor implements ExpressionVisitor {
         sr.to = lastArgument;
         sr.toInclusive = true;
         sr.op = Operation.NEQ;
-        ranges.add(sr);
+//        ranges.add(sr);
     }
 
     @Override

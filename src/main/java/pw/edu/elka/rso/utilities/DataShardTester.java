@@ -104,10 +104,10 @@ public class DataShardTester implements QueryResultReceiver{
         statements.add(statement);
         statement = parser.parse(new StringReader("INSERT INTO TEST4 VALUES(13,0.78, 'HELLO');"));
         statements.add(statement);
-        statement = parser.parse(new StringReader("select * from Test3 join Test2 on Test3.id = Test2.id WHERE Test3.id > 1 AND TEST3.id < 6;"));
+        statement = parser.parse(new StringReader("select * from Test3 join Test2 on Test3.id = Test2.id WHERE Test3.id > 1 AND Test3.id < 6;"));
         statements.add(statement);
-//        statement = parser.parse(new StringReader("select * from Test3 ;"));
-//        statements.add(statement);
+        statement = parser.parse(new StringReader("select * from Test3 ;"));
+        statements.add(statement);
         return statements;
     }
 
