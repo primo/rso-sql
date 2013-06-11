@@ -26,20 +26,24 @@ public class RunServer {
     Server server;
     ClientServer clientServer;
 
-    server = new Server(2222, 10, "192.168.47.235");
-    clientServer = new ClientServer(5000, 100, "192.168.47.235");
+    server = new Server(2222, 1, "192.168.1.102");
+    clientServer = new ClientServer(5000, 100, "192.168.1.102");
 
     //InetAddress address = new Inet4Address();
     ShardDetails thisServer = server.getServerDetails();
     //UZUPELNIC InetAddress.getLocalHost() WARTOSCIAMI KOLEGOW
-    ShardDetails server1 = new ShardDetails(2222,3,"192.168.47.227");
-    ShardDetails server2 = new ShardDetails(2222,4,"adresIP");
-    ShardDetails server3 = new ShardDetails(2222,5,"adresIP");
-    ShardDetails server4 = new ShardDetails(2222,6,"adresIP");
+    ShardDetails server1 = new ShardDetails(2222,2,"adresIp");
+    ShardDetails server2 = new ShardDetails(2222,3,"adresIP");
+    ShardDetails server3 = new ShardDetails(2222,4,"adresIP");
+    ShardDetails server4 = new ShardDetails(2222,5,"adresIP");
 
     LinkedList<ShardDetails> lolCodeCat = new LinkedList<>();
 
-    //lolCodeCat.add(server.getServerDetails());
+    lolCodeCat.add(server1);
+      lolCodeCat.add(server2);
+      lolCodeCat.add(server3);
+      lolCodeCat.add(server4);
+
 
     QueryExecutorImpl.lolCode = true;
     QueryExecutorImpl.lolCodeList = lolCodeCat;
@@ -60,17 +64,19 @@ public class RunServer {
     serverThread = new Thread(server);
     serverToClientThread = new Thread(clientServer);
 
-    queryResultReceiver = new QueryResultReceiverImpl();
-    dataShard = new DataShard();
-    dataShard.registerQueryResultReceiver(queryResultReceiver);
 
     metadata = new Metadata(server);
+    queryResultReceiver = new QueryResultReceiverImpl();
+    dataShard = new DataShard(metadata);
+    dataShard.registerQueryResultReceiver(queryResultReceiver);
+
     //metadata.addNode(server1);
     //metadata.addNode(server.getServerDetails());
     queryExecutor = new QueryExecutorImpl(inputManager, dataShard, server, metadata);
     queryExecutor.setQueryResultReceiver(queryResultReceiver);
     queryExecutor.setClientServer(clientServer);
     queryExecutorThread = new Thread(queryExecutor);
+    server.setQueryExecutor(queryExecutor);
 
     serverThread.start();
     serverToClientThread.start();
@@ -83,7 +89,7 @@ public class RunServer {
 
     //inputManager.readInput("CreateTestx", QueryExecutorImpl.returnNewQueryId(), null);
     //inputManager.readInput("InsertIntoTestx", QueryExecutorImpl.returnNewQueryId(), params);
-    inputManager.readInput("SelectAllFromTestx", QueryExecutorImpl.returnNewQueryId(), null);
+   // inputManager.readInput("SelectAllFromTestx", QueryExecutorImpl.returnNewQueryId(), null);
 
   }
 }
