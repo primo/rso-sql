@@ -108,7 +108,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
       if (queryType == QueryType.MANGED) {
 
 
-        //rootQueryHere.add(DoTegoRootuj.getServerDetails());
+        rootQueryHere.add(DoTegoRootuj.getServerDetails());
         //TODO: ALL LOGIC GOES HERE
 
 
@@ -269,13 +269,14 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
             resultTable.merge(value.get(i));
           }
 
-//          System.out.println(resultTable.toString());
           /**
            * ODKOMENTOWAC ZEBY WYSLAC WYNIK DO server'a ktory komunikuje sie z klientem
            * NARAZIE POMIJANY
            *
            */
           resultTable = resultTable == null ? value.get(0) : resultTable;
+          System.out.println(resultTable.toString());
+
           clientServer.pushToClientServer(resultTable.toString());
         }
 
