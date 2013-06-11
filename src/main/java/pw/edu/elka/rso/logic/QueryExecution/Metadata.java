@@ -30,6 +30,7 @@ public class Metadata{
     private Map<String, Set<Integer>> table2partitions = new HashMap<>();
     private Map<Integer, Set<Integer>> partition2nodes = new HashMap<>();
     private Map<Integer, PartitionMetadata> partitions = new HashMap<>();
+    private Map<Integer, ShardDetails> shards = new HashMap<>();
     private Map<Integer, Float> currentLoad = new HashMap<>();
     PriorityQueue<RepCount> replicasCount = new PriorityQueue<>();
 
@@ -118,8 +119,10 @@ public class Metadata{
         return partition2nodes.get(partition_id);
     }
 
-    public void addNode(int node_ID){
-        replicasCount.add(new RepCount(node_ID));
+    public void addNode(ShardDetails shard_details){
+        Integer id = shard_details.getId();
+        shards.put(id, shard_details);
+        replicasCount.add(new RepCount(id));
     }
 
     void updateLoad(int node_id, float new_load){
