@@ -274,7 +274,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
            *
            */
           resultTable = resultTable == null ? value.get(0) : resultTable;
-          System.out.println(resultTable.toString());
+//          System.out.println(resultTable.toString());
 
           clientServer.pushToClientServer(resultTable.toString());
         }

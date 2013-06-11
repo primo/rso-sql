@@ -16,7 +16,7 @@ public class Client {
 
   public static void main(String[] args) throws IOException, ClassNotFoundException {
 
-    ShardDetails clientServer = new ShardDetails(5000, 100, "192.168.47.235");
+    ShardDetails clientServer = new ShardDetails(5000, 100, "192.168.1.101");
 
     BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
     Socket clientSocket = AbstractServer.initConnectionToOtherShard(clientServer);
