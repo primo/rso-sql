@@ -84,7 +84,6 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
       LinkedList<ShardDetails> rootQueryHere = new LinkedList<>();
       SqlDescription sqlDescription = new SqlDescription();
       sqlDescription.statement = procedure.getParsedQuery();
-
       sqlDescription.toStringQuery(queryInfo.getProcedureName());
       sqlDescription.id = queryType == QueryType.RAW ? queryTaskReceived.getInput().id : queryInfo.getQueryId();
 
@@ -100,7 +99,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
 
       if (queryType == QueryType.MANGED) {
 
-        LinkedList<ShardDetails> resultOfPartioning = metadata.getNodesContaining(sqlDescription);
+        ArrayList<ShardDetails> resultOfPartioning = metadata.getNodesContaining(sqlDescription);
 
         rootQueryHere.addAll(resultOfPartioning);
         //TODO: ALL LOGIC GOES HERE
