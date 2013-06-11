@@ -4,17 +4,11 @@ import net.sf.jsqlparser.JSQLParserException;
 import pw.edu.elka.rso.logic.procedures.Procedure;
 
 /**
- * Created with IntelliJ IDEA.
- * User: zewlak
- * Date: 10.06.13
- * Time: 19:20
- * To change this template use File | Settings | File Templates.
  */
-public class InsertIntoTest extends Procedure {
-
+public class JoinExample extends Procedure{
     public final String procedureName = "InsertIntoTest";
 
-    public final String sql = "INSERT INTO TEST VALUES (?,?,?);";
+    public final String sql = "select * from Test join Test2 on Test.id = Test2.id WHERE Test2.id > 1 AND Test2.id < 6;";
 
     public Procedure prepareProcedure() throws JSQLParserException {
         return super.prepareProcedure(procedureName, sql);

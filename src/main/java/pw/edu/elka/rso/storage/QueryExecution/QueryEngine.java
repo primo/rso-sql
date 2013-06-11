@@ -91,7 +91,7 @@ public class QueryEngine {
 
 
         int tableid = freeTableId++;
-        name2TableId.put("test", tableid);
+        name2TableId.put("testx", tableid);
         tables.put(tableid, table);
 
     }
