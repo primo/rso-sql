@@ -13,7 +13,7 @@ import pw.edu.elka.rso.logic.procedures.Procedure;
 
 public class SelectFromTestWhere2 extends Procedure {
 
-    public final String procedureName = "SelectFromTestWhere";
+    public final String procedureName = "SelectFromTestWhere2";
 
     public final String sql = "SELECT id, test, test2 from test WHERE ID > ?;";
 

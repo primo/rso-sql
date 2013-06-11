@@ -13,7 +13,7 @@ import pw.edu.elka.rso.logic.procedures.Procedure;
 
 public class InsertIntoWorkers extends Procedure {
 
-    public final String procedureName = "InsertIntoTestWithParams";
+    public final String procedureName = "InsertIntoWorkers";
 
     public final String sql = "INSERT INTO TEST VALUES (?,?);"; //firstname, lastname, salary
 
