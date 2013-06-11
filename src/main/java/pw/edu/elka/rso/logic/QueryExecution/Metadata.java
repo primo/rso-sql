@@ -1,8 +1,6 @@
 package pw.edu.elka.rso.logic.QueryExecution;
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
-import net.sf.jsqlparser.expression.operators.relational.ItemsList;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.create.table.CreateTable;
 import net.sf.jsqlparser.statement.insert.Insert;
@@ -13,6 +11,8 @@ import pw.edu.elka.rso.server.Server;
 import pw.edu.elka.rso.server.ShardDetails;
 import pw.edu.elka.rso.storage.SqlDescription;
 
+import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.util.*;
 
 /*
@@ -26,6 +26,7 @@ public class Metadata{
     //One instance
     public Metadata(Server a_server){
         server = a_server;
+        loadDisseminator = new LoadDisseminator(this);
     }
 
     private Map<String, Set<Integer>> table2partitions = new HashMap<>();
@@ -34,6 +35,9 @@ public class Metadata{
     private Map<Integer, ShardDetails> shards = new HashMap<>();
     private Map<Integer, Float> currentLoad = new HashMap<>();
     PriorityQueue<RepCount> replicasCount = new PriorityQueue<>();
+
+    //Sockety
+    LoadDisseminator loadDisseminator;
 
     /*
     Zwraca IDki partycji, które składają się na daną tabelę.
@@ -126,7 +130,11 @@ public class Metadata{
         replicasCount.add(new RepCount(id));
     }
 
-    void updateLoad(int node_id, float new_load){
+    public void updateLoad(float new_load){
+        loadDisseminator.update(server.getServerDetails().getId(), new_load);
+    }
+
+    void doUpdateLoad(int node_id, float new_load){
         currentLoad.put(node_id, new_load);
     }
 
