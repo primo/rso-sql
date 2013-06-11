@@ -21,6 +21,8 @@ import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, ITaskManager {
+  public static boolean lolCode = false;
+  public static LinkedList<ShardDetails> lolCodeList = new LinkedList<>();
   static Logger logger = Logger.getLogger(QueryExecutorImpl.class);
   private static long queryId = 0;
   //TODO: wywalic, testowe
@@ -88,7 +90,6 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
       sqlDescription.id = queryType == QueryType.RAW ? queryTaskReceived.getInput().id : queryInfo.getQueryId();
 
 
-
       /**
        * Ta ladna liste wypelni nam
        */
@@ -99,10 +100,13 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
 
       if (queryType == QueryType.MANGED) {
 
-        ArrayList<ShardDetails> resultOfPartioning = metadata.getNodesContaining(sqlDescription);
-        executeQuereOnThisShard = resultOfPartioning.contains(this.server.getServerDetails());
-
-        rootQueryHere.addAll(resultOfPartioning);
+        //ArrayList<ShardDetails> resultOfPartioning = metadata.getNodesContaining(sqlDescription);
+       // executeQuereOnThisShard = resultOfPartioning.contains(this.server.getServerDetails());
+        if (lolCode) {
+          rootQueryHere.addAll(lolCodeList);
+        } else {
+//          rootQueryHere.addAll(resultOfPartioning);
+        }
         //TODO: ALL LOGIC GOES HERE
 
 
@@ -110,9 +114,10 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
          * Tworzymy nowego taska do polaczenia z innym shardem dla warsty komunikacyjnej
          * tylko i wylacznie wtedy jesli nie jestemy juz z nim polaczeni
          */
+
         for (ShardDetails snigleShard : rootQueryHere) {
           boolean isAlreadyConnected = server.getConnections().containsKey(snigleShard);
-          if (!isAlreadyConnected) {
+          if (!isAlreadyConnected ) {
             Task connectionTask = new SetConnectionTask(snigleShard);
             server.doTask(connectionTask);
           }
@@ -138,7 +143,6 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
        * TUTAJ WYKONUJEMY ZAPYTANIE DO Sharda
        * !!!!!!!
        */
-      if (executeQuereOnThisShard)
         dataShard.query(sqlDescription, queryTaskReceived);
 
 
