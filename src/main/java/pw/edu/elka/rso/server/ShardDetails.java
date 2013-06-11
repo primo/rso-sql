@@ -13,7 +13,7 @@ import java.net.InetAddress;
 public class ShardDetails implements Serializable, Comparable<ShardDetails> {
   private int portNumber;
   public final static int loadReportingPort = 3333;
-  public final static String group_name = "load_exchange";
+  public final static String groupName = "225.4.5.6";
   private InetAddress host;
   private int id;
   private String ipAddress;
