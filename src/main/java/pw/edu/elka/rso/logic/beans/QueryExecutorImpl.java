@@ -100,7 +100,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
 
       if (queryType == QueryType.MANGED) {
 
-        ArrayList<ShardDetails> resultOfPartioning = metadata.getNodesContaining(sqlDescription);
+        LinkedList<ShardDetails> resultOfPartioning = metadata.getNodesContaining(sqlDescription);
 
         rootQueryHere.addAll(resultOfPartioning);
         //TODO: ALL LOGIC GOES HERE
@@ -270,7 +270,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
            *
            */
           resultTable = resultTable == null ? value.get(0) : resultTable;
-          //System.out.println(resultTable.toString());
+          System.out.println(resultTable.toString());
 
           clientServer.pushToClientServer(resultTable.toString());
         }
