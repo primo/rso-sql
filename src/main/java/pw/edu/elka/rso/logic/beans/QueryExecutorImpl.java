@@ -100,6 +100,7 @@ public class QueryExecutorImpl implements Observer, Runnable, IQueryExecutor, IT
       if (queryType == QueryType.MANGED) {
 
         ArrayList<ShardDetails> resultOfPartioning = metadata.getNodesContaining(sqlDescription);
+        executeQuereOnThisShard = resultOfPartioning.contains(this.server.getServerDetails());
 
         rootQueryHere.addAll(resultOfPartioning);
         //TODO: ALL LOGIC GOES HERE
