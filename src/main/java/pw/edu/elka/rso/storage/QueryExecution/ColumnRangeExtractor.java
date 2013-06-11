@@ -16,7 +16,7 @@ enum Operation {
 
 /**
  */
-public class ColumnRangeExtractor implements ExpressionVisitor{
+public class ColumnRangeExtractor implements ExpressionVisitor {
 
     private List<SelectRange> ranges;
     private String lastTable;
@@ -47,10 +47,10 @@ public class ColumnRangeExtractor implements ExpressionVisitor{
             resultantTo = s1.to;
             resFromIncl = s1.toInclusive;
         }
-        Comparable from = (Comparable)resultantFrom;
-        Comparable to = (Comparable)resultantTo;
-        if (from.compareTo(to) < 0 ) {
-                                return  null;
+        Comparable from = (Comparable) resultantFrom;
+        Comparable to = (Comparable) resultantTo;
+        if (from.compareTo(to) < 0) {
+            return null;
         }
         SelectRange temp = new SelectRange();
         temp.from = resultantFrom;
@@ -62,8 +62,10 @@ public class ColumnRangeExtractor implements ExpressionVisitor{
         return temp;
     }
 
-    /** Returns map of SelectRanges
+    /**
+     * Returns map of SelectRanges
      * TableName => List of 'SelectRange's
+     *
      * @return
      */
     public Map<String, List<SelectRange>> getRanges() {
@@ -90,7 +92,7 @@ public class ColumnRangeExtractor implements ExpressionVisitor{
                 SelectRange s1 = lsr.get(0);
                 SelectRange s2 = lsr.get(1);
                 lsr.clear();
-                SelectRange temp = rangeAnd(s1,s2);
+                SelectRange temp = rangeAnd(s1, s2);
                 if (null != temp) {
                     lsr.add(temp);
                 }

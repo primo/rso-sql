@@ -95,12 +95,14 @@ public class ColumnExtractor implements ExpressionVisitor {
 
     @Override
     public void visit(AndExpression andExpression) {
-        andExpression.accept(this);
+        andExpression.getLeftExpression().accept(this);
+        andExpression.getRightExpression().accept(this);
     }
 
     @Override
     public void visit(OrExpression orExpression) {
-        orExpression.accept(this);
+        orExpression.getLeftExpression().accept(this);
+        orExpression.getRightExpression().accept(this);
     }
 
     @Override
@@ -110,17 +112,20 @@ public class ColumnExtractor implements ExpressionVisitor {
 
     @Override
     public void visit(EqualsTo equalsTo) {
-        equalsTo.accept(this);
+        equalsTo.getLeftExpression().accept(this);
+        equalsTo.getRightExpression().accept(this);
     }
 
     @Override
     public void visit(GreaterThan greaterThan) {
-        greaterThan.accept(this);
+        greaterThan.getLeftExpression().accept(this);
+        greaterThan.getRightExpression().accept(this);
     }
 
     @Override
     public void visit(GreaterThanEquals greaterThanEquals) {
-        greaterThanEquals.accept(this);
+        greaterThanEquals.getLeftExpression().accept(this);
+        greaterThanEquals.getRightExpression().accept(this);
     }
 
     @Override
@@ -130,7 +135,7 @@ public class ColumnExtractor implements ExpressionVisitor {
 
     @Override
     public void visit(IsNullExpression isNullExpression) {
-        isNullExpression.accept(this);
+        isNullExpression.getLeftExpression().accept(this);
     }
 
     @Override
@@ -140,12 +145,14 @@ public class ColumnExtractor implements ExpressionVisitor {
 
     @Override
     public void visit(MinorThan minorThan) {
-        minorThan.accept(this);
+        minorThan.getLeftExpression().accept(this);
+        minorThan.getRightExpression().accept(this);
     }
 
     @Override
     public void visit(MinorThanEquals minorThanEquals) {
-        minorThanEquals.accept(this);
+        minorThanEquals.getLeftExpression().accept(this);
+        minorThanEquals.getRightExpression().accept(this);
     }
 
     @Override
@@ -157,6 +164,10 @@ public class ColumnExtractor implements ExpressionVisitor {
     public void visit(Column tableColumn) {
         String column = tableColumn.getColumnName();
         String table = tableColumn.getTable().getName();
+        column = column.toLowerCase();
+        if (null!=table) {
+            table = table.toLowerCase();
+        }
         columns.add(new SimpleEntry<String, String>(column,table));
     }
 

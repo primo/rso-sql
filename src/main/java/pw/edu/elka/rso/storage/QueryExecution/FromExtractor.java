@@ -22,8 +22,11 @@ class FromExtractor implements FromItemVisitor {
 
     @Override
     public void visit(Table table) {
-        tableName = table.getName();
+        tableName = table.getName().toLowerCase();
         tableAlias = table.getAlias();
+        if (null != tableAlias) {
+            tableAlias = tableAlias.toLowerCase();
+        }
     }
 
     @Override
